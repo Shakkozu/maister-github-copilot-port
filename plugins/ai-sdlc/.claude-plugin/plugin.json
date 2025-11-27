@@ -1,0 +1,9 @@
+{
+  "name": "ai-sdlc",
+  "version": "1.0.0",
+  "description": "AI SDLC workflows with standards management",
+  "author": {
+    "name": "Skillpanel",
+    "email": "marek@skillpanel.com"
+  }
+}

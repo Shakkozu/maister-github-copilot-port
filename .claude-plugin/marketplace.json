@@ -1,0 +1,18 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "aisdlc-plugins",
+  "version": "1.0.0",
+  "description": "Bundled plugins for AI Driven SDLC",
+  "owner": {
+    "name": "Skillpanel",
+    "email": "marek@skillpanel.com"
+  },
+  "plugins": [
+    {
+      "name": "ai-sdlc",
+      "description": "AI SDLC workflows with standards management",
+      "source": "./plugins/ai-sdlc",
+      "category": "development"
+    }
+  ]
+}

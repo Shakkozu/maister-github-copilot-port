@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+
+# Claude local settings
+.claude/settings.local.json
+sdlc-plugin-generator/.claude/settings.local.json
