@@ -195,9 +195,9 @@ actual_hours: 0
 6. Verify specification quality
 
 **Outputs**:
-- `spec.md` - Feature specification
-- `planning/requirements.md` - Requirements gathering results
-- `planning/visuals/` - Design mockups (if provided)
+- `implementation/spec.md` - Feature specification
+- `analysis/requirements.md` - Requirements gathering results
+- `analysis/visuals/` - Design mockups (if provided)
 - `verification/spec-verification.md` - Specification quality report
 - `metadata.yml` - Task metadata
 
@@ -254,7 +254,7 @@ Keywords indicating UI-intensive work:
 3. If not UI-heavy: Skip to Phase 2 (Planning)
 
 **Outputs**:
-- `planning/ui-mockups.md` - ASCII diagrams showing layout integration
+- `analysis/ui-mockups.md` - ASCII diagrams showing layout integration
 - Component reuse plan
 - Integration point annotations
 
@@ -282,7 +282,7 @@ Keywords indicating UI-intensive work:
 5. Define acceptance criteria
 
 **Outputs**:
-- `implementation-plan.md` - Detailed implementation steps
+- `implementation/implementation-plan.md` - Detailed implementation steps
 
 **Auto-Fix Strategy**:
 - If planning incomplete: Regenerate with specific constraints
@@ -295,7 +295,7 @@ Keywords indicating UI-intensive work:
 **Standards Reminder**: The implementer skill reads `.ai-sdlc/docs/INDEX.md` for continuous standards discovery throughout execution. Ensure relevant standards context from previous phases is available.
 
 **Actions**:
-1. Execute implementation-plan.md step by step
+1. Execute implementation/implementation-plan.md step by step
 2. Continuous standards discovery from docs/INDEX.md
 3. Adaptive execution mode (direct/plan-execute/orchestrated)
 4. Test-driven approach (write tests → implement → verify)
@@ -303,7 +303,7 @@ Keywords indicating UI-intensive work:
 
 **Outputs**:
 - Implemented code changes
-- Updated `implementation-plan.md` (all steps complete)
+- Updated `implementation/implementation-plan.md` (all steps complete)
 - `implementation/work-log.md` - Activity log
 
 **Auto-Fix Strategy**:
@@ -325,7 +325,7 @@ Keywords indicating UI-intensive work:
    - Files modified count (from work-log.md or git diff)
    - Critical files touched: auth, payment, security, database (check file paths)
    - Feature type: new-feature (from task path)
-   - Complexity: from planning phase (implementation-plan.md task groups count)
+   - Complexity: from planning phase (implementation/implementation-plan.md task groups count)
    - Deployment target: from metadata.yml or default to "production"
 
 2. **Determine recommendation level for each check**:
@@ -653,9 +653,9 @@ Extract from invocation:
 **If new feature**:
 1. Start from specified phase (`--from`) or Phase 1 (default)
 2. If starting mid-workflow, validate required files exist:
-   - Starting from plan: Requires spec.md
-   - Starting from implement: Requires spec.md + implementation-plan.md
-   - Starting from verify: Requires spec.md + implementation-plan.md + implementation complete
+   - Starting from plan: Requires implementation/spec.md
+   - Starting from implement: Requires implementation/spec.md + implementation/implementation-plan.md
+   - Starting from verify: Requires implementation/spec.md + implementation/implementation-plan.md + implementation complete
 
 **If prerequisites missing**:
 ```
@@ -867,7 +867,7 @@ keywords="show display render view visualize button form modal table card list g
 # Scan spec
 ui_heavy=false
 for keyword in $keywords; do
-  if grep -iq "$keyword" "$TASK_PATH/spec.md"; then
+  if grep -iq "$keyword" "$TASK_PATH/implementation/spec.md"; then
     ui_heavy=true
     break
   fi
@@ -996,8 +996,8 @@ Auto-fix approach:
    - [Issue 2]
 
    Existing files:
-   - planning/requirements.md (keep requirements)
-   - spec.md (revise based on issues)
+   - analysis/requirements.md (keep requirements)
+   - implementation/spec.md (revise based on issues)
    ```
 3. Max attempts: 2
 4. If still failing: Report to user, halt workflow
@@ -1087,7 +1087,7 @@ Auto-fix approach:
 Auto-fix approach:
 1. Generate minimal missing documentation:
    - Update work-log.md with summary entry
-   - Complete implementation-plan.md checkmarks
+   - Complete implementation/implementation-plan.md checkmarks
 2. Re-run verification
 3. Max attempts: 1
 
@@ -1163,12 +1163,12 @@ Create comprehensive summary:
 
 1. ✅ Specification
    - Status: Success
-   - Output: spec.md, planning/requirements.md
+   - Output: implementation/spec.md, analysis/requirements.md
    - Auto-fix attempts: 0
 
 2. ✅ Planning
    - Status: Success
-   - Output: implementation-plan.md
+   - Output: implementation/implementation-plan.md
    - Task groups: [N]
    - Total steps: [M]
 
@@ -1307,8 +1307,8 @@ Phases Completed: [N]/[M]
 - Standards applied: [count]
 
 📄 Reports:
-- Specification: spec.md
-- Implementation plan: implementation-plan.md
+- Specification: implementation/spec.md
+- Implementation plan: implementation/implementation-plan.md
 - Work log: implementation/work-log.md
 - Verification: verification/implementation-verification.md
 [If E2E] - E2E tests: verification/e2e-verification-report.md
@@ -1421,12 +1421,12 @@ orchestrator:
     specification:
       status: success
       output_files:
-        - spec.md
-        - planning/requirements.md
+        - implementation/spec.md
+        - analysis/requirements.md
     planning:
       status: success
       output_files:
-        - implementation-plan.md
+        - implementation/implementation-plan.md
       task_groups: 4
       total_steps: 18
 ```
@@ -1493,17 +1493,17 @@ If state file is missing or corrupted, attempt reconstruction from existing arti
 
 **specification-creator**:
 - Phase 1 execution
-- Creates spec.md and all specification artifacts
+- Creates implementation/spec.md and all specification artifacts
 - Already handles adaptive workflow and verification
 
 **implementation-planner**:
 - Phase 2 execution
-- Creates implementation-plan.md
+- Creates implementation/implementation-plan.md
 - Adapts task groups based on complexity
 
 **implementer**:
 - Phase 3 execution
-- Executes implementation-plan.md
+- Executes implementation/implementation-plan.md
 - Continuous standards discovery
 - Adaptive execution modes
 
@@ -1744,8 +1744,8 @@ Mode: Interactive
 Starting Phase: Implementation
 
 Checking prerequisites...
-✅ spec.md found
-✅ implementation-plan.md found
+✅ implementation/spec.md found
+✅ implementation/implementation-plan.md found
 
 [Executes Phase 3: Implementation]
 [Continue workflow...]
@@ -1780,7 +1780,7 @@ Generate UI mockups? [Y/n]: Y
 [Phase 1.5: UI Mockup Generation]
 Invoking ui-mockup-generator...
 ✅ UI Mockups Generated
-- Located: planning/ui-mockups.md
+- Located: analysis/ui-mockups.md
 - Reusable components: 3 identified
 - Layout structure: Sidebar + Main content
 - Navigation: Added to sidebar menu

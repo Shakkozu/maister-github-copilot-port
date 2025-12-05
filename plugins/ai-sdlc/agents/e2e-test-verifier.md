@@ -486,6 +486,72 @@ Step 8: Check console for errors
 
 ---
 
+### Phase 5.5: Organize Screenshots
+
+**Goal**: Copy all screenshots from working directories to task verification folder
+
+**MANDATORY**: Execute this step before generating the report to ensure screenshots are in the correct location.
+
+**Steps**:
+
+1. **Create screenshot directory in task folder**:
+```bash
+mkdir -p [task-path]/verification/screenshots
+```
+
+2. **Copy screenshots from all possible source locations**:
+```bash
+# Check and copy from .playwright-mcp (common Playwright MCP location)
+if [ -d ".playwright-mcp" ]; then
+  cp .playwright-mcp/*.png [task-path]/verification/screenshots/ 2>/dev/null || true
+fi
+
+# Check and copy from screenshots/ (working directory default)
+if [ -d "screenshots" ]; then
+  cp screenshots/*.png [task-path]/verification/screenshots/ 2>/dev/null || true
+fi
+
+# Check and copy from project root screenshots
+if [ -d "$(pwd)/screenshots" ]; then
+  cp "$(pwd)/screenshots"/*.png [task-path]/verification/screenshots/ 2>/dev/null || true
+fi
+```
+
+3. **Verify screenshots were copied**:
+```bash
+screenshot_count=$(ls -1 [task-path]/verification/screenshots/*.png 2>/dev/null | wc -l)
+echo "Organized $screenshot_count screenshots to verification/screenshots/"
+ls -la [task-path]/verification/screenshots/
+```
+
+4. **Validate screenshot references**:
+After organizing screenshots, verify that all screenshots referenced in test results exist:
+```bash
+# For each screenshot referenced in test execution (e.g., "01-initial-page.png")
+# Check it exists in verification/screenshots/
+for screenshot in $(echo "$referenced_screenshots"); do
+  if [ ! -f "[task-path]/verification/screenshots/$screenshot" ]; then
+    echo "⚠️ Missing screenshot: $screenshot"
+  fi
+done
+```
+
+**Screenshot Reference Format**:
+In the generated report, reference screenshots using relative paths from the report location:
+- Report at: `verification/e2e-verification-report.md`
+- Screenshots at: `verification/screenshots/`
+- Reference as: `screenshots/filename.png` (relative to verification/)
+
+**Example references in report**:
+```markdown
+- [01-initial-page.png](screenshots/01-initial-page.png)
+- [02-form-filled.png](screenshots/02-form-filled.png)
+```
+
+**Output**: All screenshots organized in `verification/screenshots/` directory, ready for report references
+
+---
+
 ### Phase 6: Generate Report
 
 **Goal**: Create comprehensive verification report
@@ -1426,6 +1492,8 @@ Before completing verification, ensure:
 ✓ **All user stories tested** from spec.md
 ✓ **All acceptance criteria verified**
 ✓ **Screenshots captured** for all scenarios
+✓ **Screenshots organized** to `verification/screenshots/` (Phase 5.5)
+✓ **Screenshot references** use relative paths (`screenshots/filename.png`)
 ✓ **Console checked** for errors
 ✓ **Pass/fail status** determined for each test
 ✓ **Issues documented** with evidence

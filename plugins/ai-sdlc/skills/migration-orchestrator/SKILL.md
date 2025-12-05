@@ -198,11 +198,11 @@ This phase is executed by the ai-sdlc:existing-feature-analyzer subagent to prev
    7. Generate Analysis Report
 
    Create comprehensive current state analysis at:
-   planning/current-state-analysis.md
+   analysis/current-state-analysis.md
 
    Return structured result with:
    - status: success|failed|partial
-   - report_path: planning/current-state-analysis.md
+   - report_path: analysis/current-state-analysis.md
    - summary: [2-3 sentence overview]
    - files_found: [array of {path, confidence, lines, consumers}]
    - technologies: [array of current tech stack items]
@@ -231,7 +231,7 @@ This phase is executed by the ai-sdlc:existing-feature-analyzer subagent to prev
    - Complexity: [complexity]
    - Migration Effort: [estimate]
 
-   Report: planning/current-state-analysis.md
+   Report: analysis/current-state-analysis.md
 
    Ready to proceed to Phase 1 (Target State Planning)? [Y/n/review]
    ```
@@ -249,7 +249,7 @@ This phase is executed by the ai-sdlc:existing-feature-analyzer subagent to prev
 - Creates comprehensive baseline analysis report
 
 **Outputs**:
-- `planning/current-state-analysis.md` - Current system analysis report (400-600 lines)
+- `analysis/current-state-analysis.md` - Current system analysis report (400-600 lines)
 - Structured result passed back to orchestrator
 
 **Auto-Fix Strategy**:
@@ -280,7 +280,7 @@ This phase is executed by the gap-analyzer subagent for complex analysis workflo
 
    Migration Description: [insert migration description]
    Task Path: [.ai-sdlc/tasks/migrations/YYYY-MM-DD-name/]
-   Existing Analysis Path: planning/current-state-analysis.md
+   Existing Analysis Path: analysis/current-state-analysis.md
    Mode: [interactive or yolo]
 
    Follow your adapted 9-phase workflow:
@@ -302,11 +302,11 @@ This phase is executed by the gap-analyzer subagent for complex analysis workflo
    - Recommend migration phases if incremental approach needed
 
    Create comprehensive gap analysis report at:
-   planning/target-state-plan.md
+   analysis/target-state-plan.md
 
    Return structured result with:
    - status: success|failed|partial
-   - report_path: planning/target-state-plan.md
+   - report_path: analysis/target-state-plan.md
    - summary: [target system + gaps overview]
    - migration_type: code|data|architecture|general
    - migration_strategy: incremental|big-bang|dual-run|phased
@@ -347,7 +347,7 @@ This phase is executed by the gap-analyzer subagent for complex analysis workflo
    - Data transformations needed: [yes/no]
    - Backward compatibility: [yes/no/partial]
 
-   Report: planning/target-state-plan.md
+   Report: analysis/target-state-plan.md
 
    Confirmed migration type: [type]? [Y/n/specify]
    ```
@@ -367,7 +367,7 @@ This phase is executed by the gap-analyzer subagent for complex analysis workflo
 - Documents migration phases if incremental approach needed
 
 **Outputs**:
-- `planning/target-state-plan.md` - Target system and gap analysis (500-700 lines)
+- `analysis/target-state-plan.md` - Target system and gap analysis (500-700 lines)
 - Structured result passed back to orchestrator
 
 **Auto-Fix Strategy**:
@@ -395,15 +395,15 @@ This phase is executed by the gap-analyzer subagent for complex analysis workflo
    - Incremental milestone definitions (if incremental strategy)
    - Data migration procedures (if data migration)
    - Breaking change mitigation strategies
-5. Create spec.md with migration specification
-6. Create `planning/rollback-plan.md` with undo procedures
-7. If dual-run: Create `planning/dual-run-plan.md` with parallel operation details
+5. Create implementation/spec.md with migration specification
+6. Create `analysis/rollback-plan.md` with undo procedures
+7. If dual-run: Create `analysis/dual-run-plan.md` with parallel operation details
 8. Verify specification quality
 
 **Outputs**:
-- `spec.md` - Migration specification
-- `planning/rollback-plan.md` - Rollback procedures for each phase
-- `planning/dual-run-plan.md` - Dual-run configuration (if applicable)
+- `implementation/spec.md` - Migration specification
+- `analysis/rollback-plan.md` - Rollback procedures for each phase
+- `analysis/dual-run-plan.md` - Dual-run configuration (if applicable)
 - `verification/spec-verification.md` - Specification quality report
 
 **Auto-Fix Strategy**:
@@ -436,7 +436,7 @@ dual_run_configured: true|false
 5. Set dependencies ensuring proper migration sequence
 
 **Outputs**:
-- `implementation-plan.md` - Detailed implementation steps with rollback procedures
+- `implementation/implementation-plan.md` - Detailed implementation steps with rollback procedures
 
 **Auto-Fix Strategy**:
 - If planning incomplete: Regenerate with migration-specific constraints (max 2 attempts)
@@ -611,10 +611,10 @@ General Migration (fallback):
 **If new migration**:
 1. Start from specified phase (`--from`) or Phase 0 (default)
 2. If starting mid-workflow, validate required files exist:
-   - Starting from target: Requires `planning/current-state-analysis.md`
-   - Starting from spec: Requires `planning/current-state-analysis.md` + `planning/target-state-plan.md`
-   - Starting from plan: Requires `spec.md`
-   - Starting from execute: Requires `spec.md` + `implementation-plan.md`
+   - Starting from target: Requires `analysis/current-state-analysis.md`
+   - Starting from spec: Requires `analysis/current-state-analysis.md` + `analysis/target-state-plan.md`
+   - Starting from plan: Requires `implementation/spec.md`
+   - Starting from execute: Requires `implementation/spec.md` + `implementation/implementation-plan.md`
    - Starting from verify: Requires implementation complete
 
 **If prerequisites missing**:
@@ -846,6 +846,37 @@ write_yaml(state)
 5. **State Preservation**: Save state before failing so workflow can resume
 6. **Data Safety**: For data migrations, HALT on data integrity issues (don't auto-fix)
 
+## Output Directory Structure
+
+Migration tasks follow the standard task structure with migration-specific analysis files:
+
+```
+.ai-sdlc/tasks/migrations/YYYY-MM-DD-migration-name/
+├── metadata.yml                          # Task metadata and tracking
+├── orchestrator-state.yml                # Workflow state for resume
+├── analysis/                             # Analysis and planning artifacts
+│   ├── current-state-analysis.md        # Phase 0 output
+│   ├── target-state-plan.md             # Phase 1 output
+│   ├── rollback-plan.md                 # Phase 2 output
+│   └── dual-run-plan.md                 # Phase 2 output (if dual-run strategy)
+├── implementation/                       # Implementation work
+│   ├── spec.md                          # Phase 2 output (migration specification)
+│   ├── implementation-plan.md           # Phase 3 output
+│   └── work-log.md                      # Phase 4 output
+├── verification/                         # Verification results
+│   ├── spec-verification.md             # Phase 2 output
+│   ├── implementation-verification.md   # Phase 5 output
+│   └── compatibility-test-results.md    # Phase 5 output
+└── documentation/                        # User-facing docs (if enabled)
+    └── migration-guide.md               # Phase 6 output (optional)
+```
+
+**Key Points**:
+- `spec.md` and `implementation-plan.md` go in `implementation/` (consistent with other orchestrators)
+- Analysis artifacts (current state, target state, rollback plans) go in `analysis/`
+- Verification reports go in `verification/`
+- Documentation artifacts go in `documentation/`
+
 ## Important Guidelines
 
 1. **Always Start with Phase 0**: Don't skip current state analysis, even if you think you know the system
@@ -966,25 +997,25 @@ write_yaml(state)
 Before completing workflow:
 
 **Phase 0 (Current State Analysis)**:
-- ✓ `planning/current-state-analysis.md` created
+- ✓ `analysis/current-state-analysis.md` created
 - ✓ Current system files identified with confidence scores
 - ✓ Current technologies documented
 - ✓ State file contains `current_system` fields
 
 **Phase 1 (Target State Planning)**:
-- ✓ `planning/target-state-plan.md` created
+- ✓ `analysis/target-state-plan.md` created
 - ✓ Migration type detected and confirmed
 - ✓ Migration strategy recommended
 - ✓ State file contains `migration_type`, `target_system`, `migration_strategy`, `risk_level`
 
 **Phase 2 (Migration Strategy Specification)**:
-- ✓ `spec.md` created with migration details
-- ✓ `planning/rollback-plan.md` created
-- ✓ `planning/dual-run-plan.md` created if dual-run strategy
+- ✓ `implementation/spec.md` created with migration details
+- ✓ `analysis/rollback-plan.md` created
+- ✓ `analysis/dual-run-plan.md` created if dual-run strategy
 - ✓ State file contains `rollback_plan_created` and `dual_run_configured`
 
 **Phase 3 (Implementation Planning)**:
-- ✓ `implementation-plan.md` created with task groups
+- ✓ `implementation/implementation-plan.md` created with task groups
 - ✓ Rollback steps included in each task group
 - ✓ Dependencies set correctly for migration sequence
 

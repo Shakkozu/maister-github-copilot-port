@@ -104,8 +104,8 @@ DATED_TASK_NAME="${TODAY}-${TASK_NAME}"
 TASK_PATH=".ai-sdlc/tasks/$TASK_TYPE/$DATED_TASK_NAME"
 
 # Create folder structure
-mkdir -p "$TASK_PATH/planning"
-mkdir -p "$TASK_PATH/planning/visuals"
+mkdir -p "$TASK_PATH/analysis"
+mkdir -p "$TASK_PATH/analysis/visuals"
 mkdir -p "$TASK_PATH/implementation"
 mkdir -p "$TASK_PATH/verification"
 mkdir -p "$TASK_PATH/documentation"
@@ -195,7 +195,7 @@ Please provide file/folder paths or names of these features if they exist.
 ```
 Do you have any design mockups, wireframes, or screenshots that could help guide development?
 
-If yes, please place them in: `.ai-sdlc/tasks/[type]/[dated-name]/planning/visuals/`
+If yes, please place them in: `.ai-sdlc/tasks/[type]/[dated-name]/analysis/visuals/`
 
 Use descriptive file names like:
 - homepage-mockup.png
@@ -215,7 +215,7 @@ After receiving user's answers:
 2. **MANDATORY: Check for visual assets** (even if user says no):
 
 ```bash
-ls -la .ai-sdlc/tasks/[type]/[dated-name]/planning/visuals/ 2>/dev/null | grep -E '\.(png|jpg|jpeg|gif|svg|pdf)$' || echo "No visual files found"
+ls -la .ai-sdlc/tasks/[type]/[dated-name]/analysis/visuals/ 2>/dev/null | grep -E '\.(png|jpg|jpeg|gif|svg|pdf)$' || echo "No visual files found"
 ```
 
 3. **Smart Visual Handling**:
@@ -260,7 +260,7 @@ IF follow-ups needed, OUTPUT to user using AskUserQuestion and WAIT for response
 
 ### Step 4: Save Requirements
 
-Create `.ai-sdlc/tasks/[type]/[dated-name]/planning/requirements.md`:
+Create `.ai-sdlc/tasks/[type]/[dated-name]/analysis/requirements.md`:
 
 ```markdown
 # Requirements: [Task Name]
@@ -347,7 +347,7 @@ No visual assets provided.
 ### Step 1: Analyze Requirements and Context
 
 Read and analyze:
-- `.ai-sdlc/tasks/[type]/[dated-name]/planning/requirements.md`
+- `.ai-sdlc/tasks/[type]/[dated-name]/analysis/requirements.md`
 - Visual assets (if present)
 - Project standards in `.ai-sdlc/docs/standards/`
 
@@ -390,7 +390,7 @@ Document findings for the specification.
 
 ### Step 3: Create Specification Document
 
-Write `.ai-sdlc/tasks/[type]/[dated-name]/spec.md`:
+Write `.ai-sdlc/tasks/[type]/[dated-name]/implementation/spec.md`:
 
 ```markdown
 # Specification: [Task Name]
@@ -409,7 +409,7 @@ Write `.ai-sdlc/tasks/[type]/[dated-name]/spec.md`:
 
 ## Visual Design
 [If mockups provided]
-- Mockup reference: `planning/visuals/[filename]`
+- Mockup reference: `analysis/visuals/[filename]`
 - Key UI elements to implement
 - Fidelity level: [high-fidelity / low-fidelity wireframe]
 - Layout and structure guidelines
@@ -490,7 +490,7 @@ Ask: "This spec is straightforward (<15 requirements, no visuals). Use light ver
 
 ### Step 1: Verify Requirements Accuracy
 
-Read `.ai-sdlc/tasks/[type]/[dated-name]/planning/requirements.md` and verify:
+Read `.ai-sdlc/tasks/[type]/[dated-name]/analysis/requirements.md` and verify:
 - All user answers from Q&A are accurately captured
 - No answers are missing or misrepresented
 - Follow-up questions and answers are included
@@ -501,7 +501,7 @@ Read `.ai-sdlc/tasks/[type]/[dated-name]/planning/requirements.md` and verify:
 Check for visual assets:
 
 ```bash
-ls -la .ai-sdlc/tasks/[type]/[dated-name]/planning/visuals/ 2>/dev/null | grep -v "^total" | grep -v "^d"
+ls -la .ai-sdlc/tasks/[type]/[dated-name]/analysis/visuals/ 2>/dev/null | grep -v "^total" | grep -v "^d"
 ```
 
 IF visuals exist, verify they're mentioned in requirements.md.
@@ -518,7 +518,7 @@ If visual files found:
 
 ### Step 4: Validate Core Specification
 
-Read `.ai-sdlc/tasks/[type]/[dated-name]/spec.md` and verify:
+Read `.ai-sdlc/tasks/[type]/[dated-name]/implementation/spec.md` and verify:
 
 1. **Goal**: Directly addresses problem from requirements
 2. **User Stories**: Relevant and aligned to requirements
@@ -650,13 +650,13 @@ After completing all phases, output to the user:
 
 ## Created Files
 
-📄 **Specification**: `.ai-sdlc/tasks/[type]/[dated-name]/spec.md`
-📋 **Requirements**: `.ai-sdlc/tasks/[type]/[dated-name]/planning/requirements.md`
+📄 **Specification**: `.ai-sdlc/tasks/[type]/[dated-name]/implementation/spec.md`
+📋 **Requirements**: `.ai-sdlc/tasks/[type]/[dated-name]/analysis/requirements.md`
 ✅ **Verification**: `.ai-sdlc/tasks/[type]/[dated-name]/verification/spec-verification.md`
 📊 **Metadata**: `.ai-sdlc/tasks/[type]/[dated-name]/metadata.yml`
 
 [If visuals found]
-🎨 **Visual Assets**: [X] files in `planning/visuals/`
+🎨 **Visual Assets**: [X] files in `analysis/visuals/`
 
 [If issues found in verification]
 ⚠️ **Verification Status**: [X] issues found (see verification report)

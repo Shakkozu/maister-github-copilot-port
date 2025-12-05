@@ -7,7 +7,7 @@ You are an implementer that executes implementation plans with continuous standa
 
 ## Core Responsibilities
 
-1. **Execute implementation plans**: Follow implementation-plan.md step by step
+1. **Execute implementation plans**: Follow implementation/implementation-plan.md step by step
 2. **Continuous standards discovery**: Check docs/INDEX.md throughout implementation, not just at start
 3. **Adaptive delegation**: Direct execution for simple tasks, delegate planning for complex tasks
 4. **Apply all changes**: Main agent applies file changes, subagent only creates plans
@@ -31,7 +31,7 @@ The implementer adapts execution mode based on implementation plan complexity:
 - Ideal for: standard features, moderate complexity
 
 ### Mode 3: Orchestrated (9+ steps)
-- Break into logical groups (by task group from implementation-plan.md)
+- Break into logical groups (by task group from implementation/implementation-plan.md)
 - Delegate each group to implementation-changes-planner
 - Main agent coordinates and applies all changes
 - Ideal for: complex features, multiple technical layers
@@ -55,14 +55,14 @@ Provide the task path (e.g., `.ai-sdlc/tasks/new-features/2025-10-24-user-auth/`
 ### Step 2: Validate Prerequisites
 
 Check that required files exist:
-- `.ai-sdlc/tasks/[type]/[dated-name]/implementation-plan.md` (required)
-- `.ai-sdlc/tasks/[type]/[dated-name]/spec.md` (recommended)
+- `.ai-sdlc/tasks/[type]/[dated-name]/implementation/implementation-plan.md` (required)
+- `.ai-sdlc/tasks/[type]/[dated-name]/implementation/spec.md` (recommended)
 
 If implementation-plan.md not found:
 ```
 ❌ No implementation plan found!
 
-Expected: `[task-path]/implementation-plan.md`
+Expected: `[task-path]/implementation/implementation-plan.md`
 
 Please create an implementation plan first:
 - Use the implementation-planner skill
@@ -87,7 +87,7 @@ Read `.ai-sdlc/docs/INDEX.md` to identify:
 
 ### Step 4: Analyze Implementation Plan
 
-Read `implementation-plan.md` and extract:
+Read `implementation/implementation-plan.md` and extract:
 - Total task groups
 - Total implementation steps
 - Dependencies between groups
@@ -104,7 +104,7 @@ Output to user:
 ```
 📋 Implementation Plan Loaded
 
-Task: [task name from implementation-plan.md]
+Task: [task name from implementation/implementation-plan.md]
 Total Steps: [X]
 Task Groups: [Y]
 Execution Mode: [Mode 1/2/3] ([mode name])
@@ -176,7 +176,7 @@ Ready to begin implementation work!
 
 ### Mode 1: Direct Execution (1-3 steps)
 
-For each step in implementation-plan.md:
+For each step in implementation/implementation-plan.md:
 
 **Before Each Step**:
 1. **Check standards again**: Re-read docs/INDEX.md and relevant standard files
@@ -184,7 +184,7 @@ For each step in implementation-plan.md:
    - Check for standards related to current step's technology/area
    - Example: File handling standards become relevant when implementing uploads
 
-2. **Read current step details** from implementation-plan.md
+2. **Read current step details** from implementation/implementation-plan.md
 
 3. **Analyze existing code** (if modifying existing files):
    - Read files that will be changed
@@ -200,13 +200,13 @@ For each step in implementation-plan.md:
 1. **Apply relevant standards** discovered from INDEX.md
 2. **Make file changes** using Edit/Write tools
 3. **Follow patterns** from existing code where applicable
-4. **Reference spec.md** for requirements clarity
+4. **Reference implementation/spec.md** for requirements clarity
 
 **After Each Step (MANDATORY - YOU MUST DO THIS)**:
 
 **⚠️ CRITICAL**: You MUST mark the checkbox IMMEDIATELY after completing each step. This is NOT optional.
 
-1. ✅ **UPDATE CHECKBOX IMMEDIATELY**: Edit implementation-plan.md
+1. ✅ **UPDATE CHECKBOX IMMEDIATELY**: Edit implementation/implementation-plan.md
    - Find: `- [ ] X.Y Step description`
    - Change to: `- [x] X.Y Step description`
    - Save the file using Edit tool
@@ -227,13 +227,13 @@ For each step in implementation-plan.md:
 ```bash
 # Verify step was marked complete - RUN THIS NOW
 STEP_NUMBER="X.Y"  # Replace with actual step number
-if grep -q "- \[x\] $STEP_NUMBER" implementation-plan.md; then
+if grep -q "- \[x\] $STEP_NUMBER" implementation/implementation-plan.md; then
   echo "✅ Step $STEP_NUMBER marked complete"
 else
   echo "❌ ERROR: Step $STEP_NUMBER NOT marked!"
   echo ""
   echo "STOP! You must mark this step before continuing."
-  echo "Use Edit tool NOW to update implementation-plan.md:"
+  echo "Use Edit tool NOW to update implementation/implementation-plan.md:"
   echo "  Change: - [ ] $STEP_NUMBER"
   echo "  To:     - [x] $STEP_NUMBER"
   exit 1
@@ -270,14 +270,14 @@ Invoke implementation-changes-planner subagent with:
 Create detailed change plan for implementation:
 
 Task Path: [task-path]
-Implementation Plan: [full implementation-plan.md content]
-Spec: [spec.md content]
+Implementation Plan: [full implementation/implementation-plan.md content]
+Spec: [implementation/spec.md content]
 
 Standards to Apply:
 [List from INDEX.md and standards files]
 
 Requirements:
-1. Analyze all steps in implementation-plan.md
+1. Analyze all steps in implementation/implementation-plan.md
 2. Check docs/INDEX.md continuously for relevant standards
 3. Create detailed change plan for each step:
    - File path to modify
@@ -298,7 +298,7 @@ When subagent returns the change plan:
 1. Review for completeness
 2. Check standards compliance
 3. Verify test-driven approach
-4. Confirm all steps from implementation-plan.md are covered
+4. Confirm all steps from implementation/implementation-plan.md are covered
 
 **Step 4: Apply Changes**
 
@@ -319,7 +319,7 @@ For each change in the plan:
 
 **⚠️ CRITICAL**: Mark checkbox IMMEDIATELY after applying each change. Do NOT batch updates.
 
-1. ✅ **UPDATE CHECKBOX NOW**: Edit implementation-plan.md
+1. ✅ **UPDATE CHECKBOX NOW**: Edit implementation/implementation-plan.md
    - Find the step: `- [ ] X.Y Step description`
    - Mark complete: `- [x] X.Y Step description`
    - Save the file using Edit tool
@@ -341,7 +341,7 @@ For each change in the plan:
 ```bash
 # Check if step marked complete - RUN THIS NOW
 CURRENT_STEP="X.Y"  # Replace with actual step number
-if grep -q "- \[x\] $CURRENT_STEP" implementation-plan.md; then
+if grep -q "- \[x\] $CURRENT_STEP" implementation/implementation-plan.md; then
   echo "✅ Step $CURRENT_STEP marked complete"
 else
   echo "❌ ERROR: Step $CURRENT_STEP NOT marked!"
@@ -363,11 +363,11 @@ After completing each task group:
 1. Run the 2-8 tests for that group (not entire suite)
 2. Verify critical functionality works
 3. Fix any failures before proceeding
-4. Update implementation-plan.md
+4. Update implementation/implementation-plan.md
 
 ### Mode 3: Orchestrated (9+ steps)
 
-Break implementation into logical groups (use task groups from implementation-plan.md):
+Break implementation into logical groups (use task groups from implementation/implementation-plan.md):
 
 **For Each Task Group**:
 
@@ -386,8 +386,8 @@ Create change plan for task group [N]:
 
 Task Path: [task-path]
 Task Group: [group name]
-Steps: [steps for this group from implementation-plan.md]
-Dependencies: [dependencies from implementation-plan.md]
+Steps: [steps for this group from implementation/implementation-plan.md]
+Dependencies: [dependencies from implementation/implementation-plan.md]
 
 Standards to Apply:
 [List relevant standards from INDEX.md for this group]
@@ -413,7 +413,7 @@ Check INDEX.md throughout - new standards may become relevant as you analyze the
    - Verify all group tests pass
    - Fix any failures before marking complete
 
-2. ✅ **UPDATE ALL CHECKBOXES**: Edit implementation-plan.md
+2. ✅ **UPDATE ALL CHECKBOXES**: Edit implementation/implementation-plan.md
    - Mark group header: `- [x] X.0 Complete [specialty] layer`
    - Mark all steps in group: `- [x] X.1`, `- [x] X.2`, `- [x] X.3`, etc.
    - **Verify all checkboxes** in group are marked
@@ -430,13 +430,13 @@ GROUP_NUMBER="X"
 next_group=$((GROUP_NUMBER + 1))
 
 # Count unmarked steps in this group
-unmarked=$(sed -n "/### Task Group $GROUP_NUMBER/,/### Task Group $next_group/p" implementation-plan.md | grep -c "- \[ \]" || echo "0")
+unmarked=$(sed -n "/### Task Group $GROUP_NUMBER/,/### Task Group $next_group/p" implementation/implementation-plan.md | grep -c "- \[ \]" || echo "0")
 
 if [ "$unmarked" -gt "0" ]; then
   echo "❌ ERROR: Task Group $GROUP_NUMBER has $unmarked unmarked steps!"
   echo ""
   echo "Unmarked steps:"
-  sed -n "/### Task Group $GROUP_NUMBER/,/### Task Group $next_group/p" implementation-plan.md | grep "- \[ \]"
+  sed -n "/### Task Group $GROUP_NUMBER/,/### Task Group $next_group/p" implementation/implementation-plan.md | grep "- \[ \]"
   echo ""
   echo "Please mark all steps complete before proceeding to next group."
   exit 1
@@ -462,18 +462,18 @@ fi
 
 ## ⚠️ CRITICAL: Progress Tracking
 
-**You MUST mark steps complete in implementation-plan.md as you work.**
+**You MUST mark steps complete in implementation/implementation-plan.md as you work.**
 
 This is NOT optional. Marking checkboxes is as important as writing code.
 
 ### After Completing EACH Step:
 
-1. ✅ **UPDATE CHECKBOX**: Edit implementation-plan.md
+1. ✅ **UPDATE CHECKBOX**: Edit implementation/implementation-plan.md
    - Change: `- [ ] X.Y Step description`
    - To: `- [x] X.Y Step description`
    - Use Edit tool to save the change
 
-2. ✅ **VERIFY**: Read implementation-plan.md to confirm checkbox is marked
+2. ✅ **VERIFY**: Read implementation/implementation-plan.md to confirm checkbox is marked
 
 3. ✅ **LOG**: Document the change in `implementation/work-log.md`
 
@@ -524,22 +524,22 @@ Run comprehensive validation to ensure ALL steps are marked complete:
 
 ```bash
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Validating implementation-plan.md completion..."
+echo "Validating implementation/implementation-plan.md completion..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
 # Check for any unmarked steps
-unmarked_count=$(grep -c "^  - \[ \]" implementation-plan.md || echo "0")
+unmarked_count=$(grep -c "^  - \[ \]" implementation/implementation-plan.md || echo "0")
 
 if [ "$unmarked_count" -gt "0" ]; then
   echo "❌ VALIDATION FAILED"
   echo ""
   echo "Found $unmarked_count unmarked steps:"
   echo ""
-  grep -n "^  - \[ \]" implementation-plan.md
+  grep -n "^  - \[ \]" implementation/implementation-plan.md
   echo ""
   echo "🔧 Action Required:"
-  echo "1. Review implementation-plan.md"
+  echo "1. Review implementation/implementation-plan.md"
   echo "2. Mark all completed steps with [x]"
   echo "3. Re-run finalization"
   echo ""
@@ -548,14 +548,14 @@ if [ "$unmarked_count" -gt "0" ]; then
 fi
 
 # Check for any unmarked group headers
-unmarked_headers=$(grep -c "^- \[ \] [0-9]\.0" implementation-plan.md || echo "0")
+unmarked_headers=$(grep -c "^- \[ \] [0-9]\.0" implementation/implementation-plan.md || echo "0")
 
 if [ "$unmarked_headers" -gt "0" ]; then
   echo "❌ VALIDATION FAILED"
   echo ""
   echo "Found $unmarked_headers unmarked task group headers:"
   echo ""
-  grep -n "^- \[ \] [0-9]\.0" implementation-plan.md
+  grep -n "^- \[ \] [0-9]\.0" implementation/implementation-plan.md
   echo ""
   echo "🔧 Action Required:"
   echo "Mark group headers complete after finishing all steps in group."
@@ -566,8 +566,8 @@ if [ "$unmarked_headers" -gt "0" ]; then
 fi
 
 # Success - count completions
-completed_count=$(grep -c "^  - \[x\]" implementation-plan.md || echo "0")
-completed_groups=$(grep -c "^- \[x\] [0-9]\.0" implementation-plan.md || echo "0")
+completed_count=$(grep -c "^  - \[x\]" implementation/implementation-plan.md || echo "0")
+completed_groups=$(grep -c "^- \[x\] [0-9]\.0" implementation/implementation-plan.md || echo "0")
 
 echo "✅ VALIDATION PASSED"
 echo ""
@@ -710,7 +710,7 @@ cat .ai-sdlc/docs/standards/[area]/[standard].md
 
 ### Test-Driven Approach
 
-Follow the test-driven pattern from implementation-plan.md:
+Follow the test-driven pattern from implementation/implementation-plan.md:
 
 **Each Task Group Has**:
 1. **Test Writing Step** (X.1): Write 2-8 focused tests
@@ -761,8 +761,8 @@ Update after:
 ### Path Correctness
 
 - Task path: `.ai-sdlc/tasks/[type]/[dated-name]/`
-- Implementation plan: `[task-path]/implementation-plan.md`
-- Spec: `[task-path]/spec.md`
+- Implementation plan: `[task-path]/implementation/implementation-plan.md`
+- Spec: `[task-path]/implementation/spec.md`
 - Work log: `[task-path]/implementation/work-log.md`
 - Standards: `.ai-sdlc/docs/standards/`
 - INDEX: `.ai-sdlc/docs/INDEX.md`
@@ -858,7 +858,7 @@ Note: Discovered external-services.md and secure-forms.md during implementation 
 
 Before marking implementation complete, verify:
 
-✓ **All steps in implementation-plan.md marked complete** (no `- [ ]` remaining)
+✓ **All steps in implementation/implementation-plan.md marked complete** (no `- [ ]` remaining)
 ✓ **All task group headers marked complete** (no `- [ ] X.0` remaining)
 ✓ **Checkbox validation passed** (blocking validation in Phase 3)
 ✓ docs/INDEX.md checked multiple times throughout

@@ -44,18 +44,18 @@ Example groups: Database, API, Email Notifications, Background Jobs, Frontend, T
 
 ### Prerequisites Check
 
-Task must have: `spec.md`
+Task must have: `implementation/spec.md`
 
 Optional but helpful:
-- `planning/requirements.md`
-- `planning/visuals/` directory with mockups
+- `analysis/requirements.md`
+- `analysis/visuals/` directory with mockups
 
 ### Step 1: Read Specification Files
 
 Read and analyze:
-- `.ai-sdlc/tasks/[type]/[dated-name]/spec.md` (required)
-- `.ai-sdlc/tasks/[type]/[dated-name]/planning/requirements.md` (if exists)
-- Visual assets in `planning/visuals/` (if exist)
+- `.ai-sdlc/tasks/[type]/[dated-name]/implementation/spec.md` (required)
+- `.ai-sdlc/tasks/[type]/[dated-name]/analysis/requirements.md` (if exists)
+- Visual assets in `analysis/visuals/` (if exist)
 
 ### Step 2: Extract Technical Requirements
 
@@ -167,7 +167,7 @@ For each task group, create steps following the test-driven pattern:
     - Reuse: [existing component] (if mentioned in spec)
   - [ ] X.3 [Another implementation task]
     - Detail 1
-    - Reference mockup: `planning/visuals/[file]` (if applicable)
+    - Reference mockup: `analysis/visuals/[file]` (if applicable)
 ```
 
 **Test Verification Step** (X.final) - ALWAYS LAST:
@@ -268,7 +268,7 @@ For each task group, create steps following the test-driven pattern:
   - [ ] 3.4 Build [View] page
     - Layout: [description from spec]
     - Components: [list]
-    - Match mockup: `planning/visuals/[file]` (if exists)
+    - Match mockup: `analysis/visuals/[file]` (if exists)
   - [ ] 3.5 Apply styles
     - Follow existing design system
     - Reference: `.ai-sdlc/docs/standards/frontend/`
@@ -335,7 +335,7 @@ Count:
 
 ### Step 2: Write implementation-plan.md
 
-Create file at: `.ai-sdlc/tasks/[type]/[dated-name]/implementation-plan.md`
+Create file at: `.ai-sdlc/tasks/[type]/[dated-name]/implementation/implementation-plan.md`
 
 Use this exact structure:
 
@@ -372,7 +372,7 @@ During implementation, follow standards from:
 - **Run Tests Incrementally**: Run only newly written tests after each group, not entire suite
 - **Mark Progress**: Check off steps as completed in this file
 - **Reuse First**: Prioritize reusing existing components mentioned in spec
-- **Visual Reference**: Match mockups in `planning/visuals/` where applicable
+- **Visual Reference**: Match mockups in `analysis/visuals/` where applicable
 ```
 
 ---
@@ -384,7 +384,7 @@ After creating the file, output to the user:
 ```
 ✅ Implementation plan created!
 
-Location: `.ai-sdlc/tasks/[type]/[dated-name]/implementation-plan.md`
+Location: `.ai-sdlc/tasks/[type]/[dated-name]/implementation/implementation-plan.md`
 
 Summary:
 - Task groups: [X]
@@ -460,7 +460,7 @@ Standards to follow:
 
 - Always use `.ai-sdlc/tasks/[type]/[dated-name]/`
 - Reference standards at `.ai-sdlc/docs/standards/`
-- Reference visuals at `planning/visuals/[filename]`
+- Reference visuals at `analysis/visuals/[filename]`
 
 ### Standards Compliance
 

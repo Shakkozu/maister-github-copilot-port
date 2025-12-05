@@ -835,29 +835,67 @@ If you're still having trouble or have questions not covered in this guide:
 
 ### Phase 7: Save Documentation
 
-**Goal**: Save documentation to proper location
+**Goal**: Save documentation to proper location with organized screenshots
 
-**Create directory structure**:
+#### 7.1 Create Directory Structure
+
 ```bash
 mkdir -p [task-path]/documentation/screenshots
 ```
 
-**Save user guide**:
+#### 7.2 Save User Guide
+
 ```bash
 cat > [task-path]/documentation/user-guide.md << 'EOF'
 [documentation content]
 EOF
 ```
 
-**Screenshots are already saved** by Playwright to:
-```
-screenshots/[name].png
+#### 7.3 Organize Screenshots
+
+**MANDATORY**: Copy screenshots from all possible source locations to ensure they are available in the task directory.
+
+Playwright MCP tools may save screenshots to different locations depending on configuration:
+
+**Copy from all possible source locations**:
+```bash
+# Check and copy from .playwright-mcp (common Playwright MCP location)
+if [ -d ".playwright-mcp" ]; then
+  cp .playwright-mcp/*.png [task-path]/documentation/screenshots/ 2>/dev/null || true
+fi
+
+# Check and copy from screenshots/ (working directory default)
+if [ -d "screenshots" ]; then
+  cp screenshots/*.png [task-path]/documentation/screenshots/ 2>/dev/null || true
+fi
+
+# Check and copy from project root screenshots
+if [ -d "$(pwd)/screenshots" ]; then
+  cp "$(pwd)/screenshots"/*.png [task-path]/documentation/screenshots/ 2>/dev/null || true
+fi
 ```
 
-**Move screenshots to documentation folder**:
+#### 7.4 Verify Screenshots
+
+**Count organized screenshots**:
 ```bash
-mv screenshots/*.png [task-path]/documentation/screenshots/
+screenshot_count=$(ls -1 [task-path]/documentation/screenshots/*.png 2>/dev/null | wc -l)
+echo "Organized $screenshot_count screenshots"
 ```
+
+**Validate screenshot references**:
+```bash
+# Extract screenshot references from user guide
+grep -oP '(?<=\()screenshots/[^)]+\.png(?=\))' [task-path]/documentation/user-guide.md | while read ref; do
+  if [ ! -f "[task-path]/documentation/$ref" ]; then
+    echo "⚠️ Missing screenshot: $ref"
+  fi
+done
+```
+
+If any referenced screenshots are missing, either:
+1. Re-capture the missing screenshots using Playwright
+2. Update the documentation to remove invalid references
 
 **Final structure**:
 ```
@@ -1215,6 +1253,12 @@ Before saving documentation, verify:
 - Images show what's being described
 - Consistent screenshot naming
 - All images embedded correctly
+
+✓ **Screenshot Organization**:
+- Screenshots copied from working directory to task folder
+- All source locations checked (.playwright-mcp/, screenshots/)
+- Referenced screenshots exist in documentation/screenshots/
+- No broken image references in user guide
 
 ✓ **User Focus**:
 - Written from user perspective ("you" not "the user")
