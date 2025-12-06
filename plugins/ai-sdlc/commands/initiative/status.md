@@ -1,4 +1,5 @@
 ---
+name: ai-sdlc:initiative:status
 description: View initiative progress, dependency graph, and task status
 ---
 

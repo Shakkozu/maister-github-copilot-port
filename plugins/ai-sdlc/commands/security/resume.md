@@ -1,5 +1,5 @@
 ---
-name: security:resume
+name: ai-sdlc:security:resume
 description: Resume an interrupted or failed security remediation workflow from where it left off
 category: Security Workflows
 ---

@@ -1,4 +1,5 @@
 ---
+name: ai-sdlc:initiative:new
 description: Start a new epic-level initiative with guided orchestration through all phases
 ---
 

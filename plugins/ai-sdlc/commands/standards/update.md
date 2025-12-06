@@ -1,5 +1,5 @@
 ---
-name: standards:update
+name: ai-sdlc:standards:update
 description: Update or create project standards from conversation context or explicit input
 ---
 

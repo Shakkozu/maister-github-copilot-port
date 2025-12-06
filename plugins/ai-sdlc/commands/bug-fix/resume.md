@@ -1,5 +1,5 @@
 ---
-name: bug-fix:resume
+name: ai-sdlc:bug-fix:resume
 description: Resume an interrupted or failed bug fix workflow from where it left off
 category: Bug Fix Workflows
 ---

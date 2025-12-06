@@ -1,4 +1,5 @@
 ---
+name: ai-sdlc:reviews:pragmatic
 description: Run pragmatic code review to detect over-engineering and ensure code matches project scale
 ---
 

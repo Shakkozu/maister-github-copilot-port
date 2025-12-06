@@ -1,4 +1,5 @@
 ---
+name: ai-sdlc:reviews:spec-audit
 description: Independent specification audit to verify completeness and clarity before implementation
 ---
 

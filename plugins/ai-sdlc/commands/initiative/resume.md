@@ -1,4 +1,5 @@
 ---
+name: ai-sdlc:initiative:resume
 description: Resume an interrupted or failed initiative workflow from where it left off
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: documentation:new
+name: ai-sdlc:documentation:new
 description: Start a documentation creation workflow with content planning, screenshot generation, and publication
 ---
 

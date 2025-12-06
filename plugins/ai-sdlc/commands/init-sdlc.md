@@ -1,3 +1,8 @@
+---
+name: ai-sdlc:init-sdlc
+description: Initialize AI SDLC framework with intelligent project analysis and documentation generation
+---
+
 ## Initialization Process
 
 Initialize `.ai-sdlc/docs/` with intelligent project analysis and meaningful documentation generation based on actual codebase inspection.

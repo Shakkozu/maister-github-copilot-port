@@ -1,5 +1,5 @@
 ---
-name: feature:resume
+name: ai-sdlc:feature:resume
 description: Resume an interrupted or failed feature development workflow from where it left off
 ---
 

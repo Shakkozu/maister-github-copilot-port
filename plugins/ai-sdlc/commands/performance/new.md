@@ -1,5 +1,5 @@
 ---
-name: performance:new
+name: ai-sdlc:performance:new
 description: Start a performance optimization workflow with profiling, benchmarking, and load testing
 category: Performance Workflows
 ---

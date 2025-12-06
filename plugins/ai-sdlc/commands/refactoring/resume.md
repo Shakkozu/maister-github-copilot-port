@@ -1,4 +1,5 @@
 ---
+name: ai-sdlc:refactoring:resume
 description: Resume an interrupted or failed refactoring workflow from where it left off
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: feature:new
+name: ai-sdlc:feature:new
 description: Start a new feature development workflow with guided orchestration through all phases
 ---
 

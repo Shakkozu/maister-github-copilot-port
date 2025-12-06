@@ -1,4 +1,5 @@
 ---
+name: ai-sdlc:reviews:reality-check
 description: Comprehensive reality assessment of completed work to verify it actually works and is production-ready
 ---
 

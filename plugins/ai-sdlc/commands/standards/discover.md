@@ -1,5 +1,5 @@
 ---
-name: standards:discover
+name: ai-sdlc:standards:discover
 description: Automatically discover coding standards, conventions, and best practices from multiple sources in the project (configuration files, source code, pull requests, documentation, CI/CD)
 ---
 

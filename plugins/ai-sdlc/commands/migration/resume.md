@@ -1,5 +1,5 @@
 ---
-name: migration:resume
+name: ai-sdlc:migration:resume
 description: Resume an interrupted or failed migration workflow from where it left off
 ---
 

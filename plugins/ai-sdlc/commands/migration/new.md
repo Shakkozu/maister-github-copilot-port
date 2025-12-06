@@ -1,5 +1,5 @@
 ---
-name: migration:new
+name: ai-sdlc:migration:new
 description: Start a new migration workflow with guided orchestration through all phases
 ---
 

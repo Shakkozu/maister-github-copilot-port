@@ -1,5 +1,5 @@
 ---
-name: bug-fix:new
+name: ai-sdlc:bug-fix:new
 description: Start a comprehensive bug fixing workflow with guided orchestration through all phases
 ---
 

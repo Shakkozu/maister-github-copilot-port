@@ -1,5 +1,5 @@
 ---
-name: security:new
+name: ai-sdlc:security:new
 description: Start a security remediation workflow with vulnerability analysis, prioritized fixes, and compliance audit
 category: Security Workflows
 ---

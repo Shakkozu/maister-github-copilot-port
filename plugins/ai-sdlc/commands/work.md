@@ -1,4 +1,5 @@
 ---
+name: ai-sdlc:work
 description: Unified entry point - auto-classifies tasks and routes to appropriate workflow
 ---
 

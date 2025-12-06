@@ -1,4 +1,5 @@
 ---
+name: ai-sdlc:reviews:code
 description: Run automated code quality, security, and performance analysis on your code
 ---
 

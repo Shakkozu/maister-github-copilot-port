@@ -1,4 +1,5 @@
 ---
+name: ai-sdlc:refactoring:new
 description: Start a new refactoring workflow with guided orchestration through all phases
 ---
 

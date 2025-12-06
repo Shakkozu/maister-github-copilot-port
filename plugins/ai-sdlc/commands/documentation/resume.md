@@ -1,5 +1,5 @@
 ---
-name: documentation:resume
+name: ai-sdlc:documentation:resume
 description: Resume an interrupted or failed documentation workflow from where it left off
 category: Documentation Workflows
 ---

@@ -1,5 +1,5 @@
 ---
-name: performance:resume
+name: ai-sdlc:performance:resume
 description: Resume an interrupted or failed performance optimization workflow from where it left off
 category: Performance Workflows
 ---

@@ -1,4 +1,5 @@
 ---
+name: ai-sdlc:reviews:production-readiness
 description: Verify production deployment readiness with comprehensive checks
 ---
 

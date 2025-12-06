@@ -1,4 +1,5 @@
 ---
+name: ai-sdlc:research:new
 description: Start a new research workflow with guided orchestration through all phases
 ---
 
