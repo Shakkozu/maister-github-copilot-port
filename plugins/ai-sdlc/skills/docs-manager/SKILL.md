@@ -345,7 +345,7 @@ Use this to ensure the project's CLAUDE.md properly integrates with the document
 ```markdown
 ## Project Documentation
 
-**CRITICAL**: Before starting any task, read `@.ai-sdlc/docs/INDEX.md` to understand:
+**CRITICAL**: Before starting any task, read @.ai-sdlc/docs/INDEX.md to understand:
 - Project vision, goals, and roadmap
 - Technology stack and architectural decisions
 - Coding standards and conventions
@@ -361,10 +361,10 @@ All project documentation is located in `.ai-sdlc/docs/`:
 
 ### Using Documentation
 
-1. **Always start** by reading `@.ai-sdlc/docs/INDEX.md`
+1. **Always start** by reading @.ai-sdlc/docs/INDEX.md
 2. **Load relevant documentation** based on the task:
-   - For project context: Read `@.ai-sdlc/docs/project/vision.md`, `@.ai-sdlc/docs/project/tech-stack.md`
-   - For architecture decisions: Read `@.ai-sdlc/docs/project/architecture.md`
+   - For project context: Read `.ai-sdlc/docs/project/vision.md`, `.ai-sdlc/docs/project/tech-stack.md`
+   - For architecture decisions: Read `.ai-sdlc/docs/project/architecture.md`
    - For coding patterns: Read appropriate standards from `.ai-sdlc/docs/standards/`
 3. **Follow standards** when writing code - they represent team decisions and conventions
 4. **Keep documentation updated** - update docs when making significant changes
@@ -373,7 +373,7 @@ All project documentation is located in `.ai-sdlc/docs/`:
 ### Documentation Priority
 
 When in doubt, this is the priority order:
-1. Project documentation in `@.ai-sdlc/docs/` (highest priority)
+1. Project documentation in `.ai-sdlc/docs/` (highest priority)
 2. Code patterns and conventions visible in the codebase
 3. User's direct instructions
 4. General best practices (lowest priority)
@@ -388,7 +388,7 @@ This project uses the ai-sdlc plugin for structured development. Available orche
 - `/ai-sdlc:migration:new` - Technology/platform migrations (with rollback planning)
 - `/ai-sdlc:bug-fix:new` - Bug fixes (reproduce → analyze → fix → verify)
 
-All orchestrators read `@.ai-sdlc/docs/INDEX.md` continuously to apply project standards.
+All orchestrators read @.ai-sdlc/docs/INDEX.md continuously to apply project standards.
 Use interactive mode (default) or `--yolo` for continuous execution.
 ```
 
