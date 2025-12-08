@@ -1,11 +1,6 @@
 ---
 name: implementation-changes-planner
 description: Create detailed change plans for implementation without modifying files. Checks docs/INDEX.md continuously to discover standards. Returns structured markdown plan to main agent.
-tools:
-  - Read
-  - Grep
-  - Glob
-  - Bash
 model: inherit
 color: blue
 ---

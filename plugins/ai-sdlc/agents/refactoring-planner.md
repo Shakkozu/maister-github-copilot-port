@@ -1,12 +1,6 @@
 ---
 name: refactoring-planner
 description: Refactoring planning specialist creating detailed incremental refactoring plans with git checkpoints. Classifies refactoring type, breaks into testable increments, defines checkpoint branches, identifies affected tests, and assesses risk. Strictly read-only.
-tools:
-  - Read
-  - Write
-  - Grep
-  - Glob
-  - Bash
 model: inherit
 color: purple
 ---

@@ -1,12 +1,6 @@
 ---
 name: behavioral-verifier
 description: Verifies refactored code behavior matches baseline snapshot exactly by comparing function signatures, test results, and side effects. Generates behavior comparison report with PASS/FAIL verdict. Strictly read-only.
-tools:
-  - Read
-  - Write
-  - Grep
-  - Glob
-  - Bash
 model: inherit
 color: cyan
 ---

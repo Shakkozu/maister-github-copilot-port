@@ -1,12 +1,6 @@
 ---
 name: refactoring-analyzer
 description: Code quality analysis specialist establishing quantitative baselines before refactoring. Calculates cyclomatic complexity, measures code duplication, identifies code smells, assesses test coverage, and generates quality baseline. Strictly read-only.
-tools:
-  - Read
-  - Write
-  - Grep
-  - Glob
-  - Bash
 model: inherit
 color: blue
 ---

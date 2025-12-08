@@ -1,12 +1,6 @@
 ---
 name: bottleneck-analyzer
 description: Analyzes performance profiling data to identify bottlenecks including N+1 queries, missing indexes, inefficient algorithms, memory leaks, and blocking I/O. Classifies bottleneck types and creates prioritized optimization plan by impact vs effort. Strictly read-only.
-tools:
-  - Read
-  - Write
-  - Grep
-  - Glob
-  - Bash
 model: inherit
 color: blue
 ---

@@ -1,12 +1,6 @@
 ---
 name: initiative-planner
 description: Breaks down epic-level initiatives into concrete tasks with dependency relationships. Analyzes requirements, identifies task groupings, creates dependency graphs, and produces comprehensive initiative planning artifacts.
-tools:
-  - Read
-  - Write
-  - Grep
-  - Glob
-  - Bash
 model: inherit
 color: purple
 ---

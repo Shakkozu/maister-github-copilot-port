@@ -1,7 +1,6 @@
 ---
 name: e2e-test-verifier
 description: Runs end-to-end tests using Playwright to verify implementation aligns with specifications and user stories. Use when verifying completed features, testing user workflows, or before deployment.
-tools: Read, Write, Bash, mcp__playwright__navigate, mcp__playwright__screenshot, mcp__playwright__click, mcp__playwright__fill, mcp__playwright__evaluate, mcp__playwright__console_messages, mcp__plugin_ai-sdlc_playwright__browser_navigate, mcp__plugin_ai-sdlc_playwright__browser_click, mcp__plugin_ai-sdlc_playwright__browser_take_screenshot, mcp__plugin_ai-sdlc_playwright__browser_evaluate, mcp__plugin_ai-sdlc_playwright__browser_fill_form, mcp__plugin_ai-sdlc_playwright__browser_type, mcp__plugin_ai-sdlc_playwright__browser_wait_for, mcp__plugin_ai-sdlc_playwright__browser_close
 model: inherit
 color: green
 ---

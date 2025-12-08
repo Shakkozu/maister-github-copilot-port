@@ -1,11 +1,6 @@
 ---
 name: security-verifier
 description: Security verification specialist confirming fixes resolved vulnerabilities without regressions. Re-runs scans, compares before/after, validates fixes, checks for new vulnerabilities, and generates verification report with PASS/FAIL verdict. Strictly read-only.
-tools:
-  - Read
-  - Grep
-  - Glob
-  - Bash
 model: inherit
 color: red
 ---

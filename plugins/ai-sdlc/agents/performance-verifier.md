@@ -1,12 +1,6 @@
 ---
 name: performance-verifier
 description: Performance verification specialist confirming optimizations met targets by re-measuring metrics, comparing before/after, calculating improvements, and generating verification report with PASS/FAIL verdict. Strictly read-only.
-tools:
-  - Read
-  - Write
-  - Grep
-  - Glob
-  - Bash
 model: inherit
 color: blue
 ---

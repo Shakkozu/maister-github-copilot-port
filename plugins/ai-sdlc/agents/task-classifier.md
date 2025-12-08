@@ -1,7 +1,6 @@
 ---
 name: task-classifier
 description: Task classification specialist analyzing task descriptions and issue references to classify into 9 types (initiative, bug-fix, enhancement, new-feature, refactoring, performance, security, migration, documentation). Supports GitHub/Jira integration, codebase context analysis, and confidence scoring.
-tools: Read, Grep, Bash, WebFetch, AskUserQuestion
 model: inherit
 color: purple
 ---

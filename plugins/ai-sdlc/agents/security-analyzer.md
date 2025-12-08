@@ -1,11 +1,6 @@
 ---
 name: security-analyzer
 description: Security vulnerability analysis specialist identifying security issues including dependency CVEs, authentication flaws, injection vulnerabilities, data exposure, and misconfigurations. Scores using CVSS v3.1, classifies by OWASP Top 10, and creates comprehensive security baseline. Strictly read-only.
-tools:
-  - Read
-  - Grep
-  - Glob
-  - Bash
 model: inherit
 color: red
 ---

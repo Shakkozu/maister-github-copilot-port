@@ -1,12 +1,6 @@
 ---
 name: behavioral-snapshot-capturer
 description: Captures comprehensive behavioral baseline before refactoring including function signatures, test execution results, observable side effects, and behavioral fingerprints for exact comparison. Strictly read-only.
-tools:
-  - Read
-  - Write
-  - Grep
-  - Glob
-  - Bash
 model: inherit
 color: green
 ---

@@ -1,7 +1,6 @@
 ---
 name: gap-analyzer
 description: Compares current vs desired state, identifies gaps, classifies enhancement type, performs user journey impact assessment, and conducts data entity lifecycle analysis with three-layer verification. Detects orphaned operations and ensures complete, usable, discoverable features.
-tools: Read, Write, Glob, Grep, Bash, AskUserQuestion, WebSearch, WebFetch
 model: inherit
 color: blue
 ---

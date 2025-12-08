@@ -1,7 +1,6 @@
 ---
 name: user-docs-generator
 description: Generates end-user documentation with screenshots using Playwright. Creates easy-to-understand guides for non-technical users. Use after features are implemented to create user-facing documentation.
-tools: Read, Write, Bash, mcp__playwright__navigate, mcp__playwright__screenshot, mcp__playwright__click, mcp__playwright__fill, mcp__playwright__evaluate, mcp__plugin_ai-sdlc_playwright__browser_navigate, mcp__plugin_ai-sdlc_playwright__browser_click, mcp__plugin_ai-sdlc_playwright__browser_take_screenshot, mcp__plugin_ai-sdlc_playwright__browser_evaluate, mcp__plugin_ai-sdlc_playwright__browser_fill_form, mcp__plugin_ai-sdlc_playwright__browser_type, mcp__plugin_ai-sdlc_playwright__browser_wait_for, mcp__plugin_ai-sdlc_playwright__browser_close
 model: inherit
 color: blue
 ---

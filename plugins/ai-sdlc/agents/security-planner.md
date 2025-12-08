@@ -1,12 +1,6 @@
 ---
 name: security-planner
 description: Security remediation planning specialist creating detailed incremental fix plans. Classifies fix types, prioritizes by CVSS score and exploitability, breaks into testable increments, and defines verification steps. Strictly read-only.
-tools:
-  - Read
-  - Write
-  - Grep
-  - Glob
-  - Bash
 model: inherit
 color: red
 ---

@@ -1,12 +1,6 @@
 ---
 name: documentation-reviewer
 description: Documentation quality specialist validating completeness and readability. Calculates Flesch metrics, validates screenshots and links, flags jargon, assesses clarity, and generates review report with PASS/FAIL verdict. Strictly read-only.
-tools:
-  - Read
-  - Write
-  - Grep
-  - Glob
-  - Bash
 model: inherit
 color: blue
 ---

@@ -1,12 +1,6 @@
 ---
 name: documentation-planner
 description: Documentation planning specialist creating structured content outlines. Classifies doc type, identifies target audience, determines tone, creates comprehensive outline with sections, and identifies required screenshots. Strictly read-only.
-tools:
-  - Read
-  - Write
-  - Grep
-  - Glob
-  - Bash
 model: inherit
 color: blue
 ---

@@ -1,12 +1,6 @@
 ---
 name: performance-profiler
 description: Performance analysis specialist establishing quantitative baseline metrics including response time percentiles (p50/p95/p99), throughput, CPU/memory usage, and database query count. Identifies performance hotspots for optimization. Strictly read-only.
-tools:
-  - Read
-  - Write
-  - Grep
-  - Glob
-  - Bash
 model: inherit
 color: blue
 ---

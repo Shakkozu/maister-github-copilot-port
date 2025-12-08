@@ -1,13 +1,6 @@
 ---
 name: research-planner
 description: Research planning specialist creating structured research plans from research questions. Analyzes objectives, determines methodology, identifies data sources (codebase, documentation, web), and defines analysis frameworks.
-tools:
-  - Read
-  - Write
-  - Grep
-  - Glob
-  - WebSearch
-  - Bash
 model: inherit
 color: blue
 ---

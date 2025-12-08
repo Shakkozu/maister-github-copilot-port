@@ -1,7 +1,6 @@
 ---
 name: existing-feature-analyzer
 description: Analyzes existing features before enhancement using multi-strategy search with confidence scoring. Analyzes functionality, dependencies, test coverage, and complexity. Generates comprehensive baseline analysis report for Phase 0 of enhancement workflow.
-tools: Read, Write, Glob, Grep, Bash, AskUserQuestion
 model: haiku
 color: blue
 ---
