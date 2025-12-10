@@ -2,14 +2,14 @@
 
 ## Purpose
 
-Orchestrates epic-level initiatives from planning through verification, managing multiple related tasks with dependency coordination, mixed sequential/parallel execution, and robust state management. Designed for multi-week projects requiring coordination of 3-15 tasks across different types (new-features, enhancements, migrations, etc.).
+Orchestrates epic-level initiatives from planning through verification, managing multiple related tasks with dependency coordination and sequential execution. Designed for multi-week projects requiring coordination of 3-15 tasks across different types (new-features, enhancements, migrations, etc.).
 
 ## When to Use
 
 - **Epic-level work**: Large multi-week initiatives spanning multiple features
 - **Coordinated delivery**: Multiple related tasks that must work together
 - **Complex dependencies**: Tasks with technical or logical ordering requirements
-- **Team coordination**: Work that requires parallel execution across team members
+- **Team coordination**: Work that requires coordinated execution across multiple tasks
 - **Milestone-based delivery**: Initiatives with clear delivery checkpoints
 
 ## Progress Tracking
@@ -100,7 +100,7 @@ After completing Steps 1 and 2, proceed to Phase 0 (Initiative Planning).
 0. **Initiative Planning** → Delegate to initiative-planner agent
 1. **Task Creation** → Create task directories and metadata
 2. **Dependency Resolution** → Validate dependencies, determine execution strategy
-3. **Task Execution** → Orchestrate task completion (sequential/parallel/mixed)
+3. **Task Execution** → Orchestrate task completion (sequential, one at a time)
 4. **Initiative Verification** → Verify all tasks complete, run integration tests
 5. **Finalization** → Update roadmap, create summary, archive
 
@@ -114,7 +114,7 @@ After completing Steps 1 and 2, proceed to Phase 0 (Initiative Planning).
 
 ```yaml
 name: initiative-orchestrator
-description: Orchestrates epic-level initiatives from planning through verification with dependency management and mixed execution
+description: Orchestrates epic-level initiatives from planning through verification with dependency management and sequential execution
 allowed-tools:
   - Read
   - Write
@@ -216,7 +216,7 @@ allowed-tools:
 Initiative planning complete:
 - Total tasks: N
 - Estimated hours: X
-- Execution strategy: [Sequential/Parallel/Mixed]
+- Execution strategy: Sequential (one task at a time)
 - Milestones: [List]
 
 Review: initiatives/YYYY-MM-DD-name/task-plan.md
@@ -323,7 +323,7 @@ orchestrator:
      orchestrator:
        mode: interactive|yolo
        current_phase: task-creation
-       execution_strategy: sequential|parallel|mixed
+       execution_strategy: sequential
 
      tasks:
        pending: [all-task-ids]
@@ -348,8 +348,7 @@ orchestrator:
        percent: 0
 
      coordination:
-       parallel_running: 0
-       max_parallel: 3
+       current_task: null
        next_poll: null
      ```
 
@@ -418,17 +417,15 @@ phase_results:
    - Assign level to each task (Level 0 = no deps, Level N = max dep level + 1)
    - Identify critical path (longest path through graph)
 
-4. **Determine Execution Groups**
+4. **Build Execution Queue**
    - Group tasks by dependency level
-   - Within each level, tasks can execute in parallel
-   - Between levels, execution must be sequential
+   - Create ordered queue: Level 0 tasks first, then Level 1, etc.
+   - Tasks within same level ordered by priority (if specified) or alphabetically
 
 5. **Finalize Execution Strategy**
-   - Read recommended strategy from initiative.yml
-   - Validate against dependency graph
-   - **Sequential**: Execute one task at a time, respect dependencies
-   - **Parallel**: Execute all Level N tasks concurrently before Level N+1
-   - **Mixed**: Execute sequential between levels, parallel within levels (recommended)
+   - Execution is always sequential (one task at a time)
+   - Dependency levels determine the order
+   - Tasks from higher levels wait until their dependencies complete
 
 6. **Update Initiative State**
    - Save execution groups
@@ -464,10 +461,12 @@ phase_results:
 Dependency resolution complete:
 - Dependency levels: N
 - Critical path: [task-1] → [task-2] → [task-3] (X hours)
-- Execution strategy: Mixed
-  - Level 0: [task-A, task-B] (parallel)
-  - Level 1: [task-C] (depends on A, B)
-  - Level 2: [task-D, task-E] (parallel)
+- Execution order:
+  1. task-A (Level 0)
+  2. task-B (Level 0)
+  3. task-C (Level 1, depends on A, B)
+  4. task-D (Level 2)
+  5. task-E (Level 2)
 
 Review: initiatives/YYYY-MM-DD-name/task-plan.md
 
@@ -482,10 +481,10 @@ current_phase: task-execution
 phase_results:
   dependency_resolution:
     total_levels: N
-    execution_groups: {level-0: [...], level-1: [...]}
+    execution_queue: [task-A, task-B, task-C, task-D, task-E]
     critical_path: [task-ids]
     critical_path_hours: X
-    strategy: mixed
+    strategy: sequential
 ```
 
 ---
@@ -502,101 +501,62 @@ phase_results:
 
 1. **Read Initiative State**
    - Load `initiative-state.yml`
-   - Identify current execution group (start with Level 0)
+   - Build task queue ordered by dependency levels (Level 0 first)
 
-2. **Determine Tasks to Execute**
-   - If sequential mode: Select 1 task from current level
-   - If parallel/mixed mode: Select all tasks from current level
-
-3. **Pre-Execution Validation**
+2. **Pre-Execution Validation**
    - For each task, verify all dependencies are `completed`
    - If any dependency not completed: Mark task as `blocked`, skip
 
-#### 3.2 Launch Task Orchestrators
+#### 3.2 Launch Task Orchestrators (Sequential)
 
-**Key Principle**: Use **single message with multiple Skill tool calls** for parallel execution (per Claude Code docs)
+**IMPORTANT**: Execute tasks ONE AT A TIME. Each task orchestrator needs the main agent to delegate to subagents, so parallel execution is not supported.
 
-**Sequential Mode**:
-```markdown
-1. Select next task from queue (dependency order)
-2. Determine task type from metadata.yml
-3. Launch appropriate orchestrator skill:
-   - New features → Skill: feature-orchestrator
-   - Enhancements → Skill: enhancement-orchestrator
-   - Migrations → Skill: migration-orchestrator
-   - Bug fixes → Skill: bug-fix-orchestrator
-   - Refactoring → Skill: refactoring-orchestrator
-4. Wait for completion
-5. Update initiative-state.yml
-6. Repeat until all tasks complete
+**Task Type to Skill Mapping**:
+
+| Task Type | Skill to Invoke |
+|-----------|-----------------|
+| new-feature | `feature-orchestrator` |
+| enhancement | `enhancement-orchestrator` |
+| migration | `migration-orchestrator` |
+| bug-fix | `bug-fix-orchestrator` |
+| refactoring | `refactoring-orchestrator` |
+| performance | `performance-orchestrator` |
+| security | `security-orchestrator` |
+| documentation | `documentation-orchestrator` |
+
+**Execution Loop**:
+
+1. **Select next task** from queue (respecting dependency order)
+2. **Read task's `metadata.yml`** to determine task type
+3. **Use the Skill tool NOW** to invoke the appropriate orchestrator:
+   ```
+   Use Skill tool with: skill=[type]-orchestrator
+   ```
+   The orchestrator skill will load and execute all its phases for this task.
+4. **Wait for orchestrator to complete** (skill execution is synchronous)
+5. **Update `initiative-state.yml`** with task completion status
+6. **Check dependency unblocking** (see 3.3)
+7. **Repeat** from step 1 until all tasks complete
+
+**Context Passed to Orchestrator**:
+
+When invoking a task orchestrator, provide this context:
+```
+Task path: [task-path]
+Task type: [type from metadata.yml]
+
+Initiative context:
+- Part of initiative: [initiative-name]
+- Initiative ID: [initiative-id]
+- Execution mode: [--yolo if initiative in yolo mode]
+
+The task metadata.yml already contains:
+- initiative_id
+- dependencies (satisfied)
+- blocks (tasks this will unblock)
 ```
 
-**Parallel/Mixed Mode**:
-```markdown
-1. Identify all tasks in current level with satisfied dependencies
-2. Launch ALL orchestrators in single message:
-
-   Use Skill tool (multiple calls in one message):
-   - Skill call 1: skill=feature-orchestrator for task-A
-   - Skill call 2: skill=feature-orchestrator for task-B
-   - Skill call 3: skill=enhancement-orchestrator for task-C
-
-3. Monitor all running tasks (see 3.3 Task Monitoring)
-4. Wait for ALL tasks in level to complete
-5. Move to next level
-6. Repeat until all levels complete
-```
-
-**Skill Invocation Details**:
-```markdown
-Skill tool usage:
-- skill: [feature-orchestrator|enhancement-orchestrator|migration-orchestrator|bug-fix-orchestrator|refactoring-orchestrator]
-- The skill receives task path and initiative context via its standard input
-
-Orchestrator receives:
-    Task path: [task-path]
-
-    Initiative context:
-    - Part of initiative: [initiative-name]
-    - Initiative ID: [initiative-id]
-    - Dependencies satisfied: [list]
-    - This task will unblock: [list]
-
-    Execution mode: [--yolo flag if initiative in yolo mode, otherwise interactive]
-
-    Task metadata.yml already has:
-    - initiative_id: [id]
-    - dependencies: [paths]
-    - blocks: [ids]
-
-    Phase 0.5 (Dependency Check) verifies dependencies before proceeding.
-
-After completion, orchestrator updates:
-    - Task metadata.yml status to "completed"
-    - actual_hours field with final hours
-```
-
-#### 3.3 Task Monitoring
-
-**Polling Strategy** (for parallel execution):
-
-1. **Launch all tasks in level** (single message, multiple Skill calls)
-2. **Poll task states** every 30 seconds or on phase boundaries:
-   - Read each task's `orchestrator-state.yml`
-   - Check `current_phase` and `completed_phases`
-3. **Detect completion**: When `current_phase == "completed"` or all phases in `completed_phases`
-4. **Update initiative state**:
-   - Move task from `in_progress` to `completed`
-   - Record actual_hours from task metadata.yml
-   - Update progress metrics
-
-**State Coordination**:
-- Each task orchestrator owns its `orchestrator-state.yml`
-- Initiative orchestrator owns `initiative-state.yml`
-- Coordination via file reads (poll task states)
-- No shared state modification (no race conditions)
-
-#### 3.4 Dependency Unblocking
+#### 3.3 Dependency Unblocking
 
 **On Task Completion**:
 
@@ -611,8 +571,7 @@ After completion, orchestrator updates:
      - If yes: Update status from `blocked` to `pending`
 
 3. **Add to execution queue**:
-   - If sequential mode: Add to end of queue
-   - If parallel/mixed mode: Add to next level's execution group
+   - Add unblocked tasks to end of queue
 
 4. **Update initiative state**:
    - Move task from `blocked` to `pending`
@@ -686,10 +645,11 @@ progress:
 
 ```markdown
 Initiative-level todos (updated during execution):
-- [ ] Level 0: Execute tasks A, B (2/2 complete) ✅
-- [ ] Level 1: Execute task C (1/1 in progress) 🔄
-- [ ] Level 2: Execute tasks D, E (pending)
-- [ ] Level 3: Execute task F (pending)
+- [x] Task A: User authentication (completed)
+- [x] Task B: Database schema (completed)
+- [ ] Task C: API endpoints (in progress)
+- [ ] Task D: Frontend integration (pending)
+- [ ] Task E: Integration tests (blocked - waiting for C, D)
 ```
 
 ### Outputs
@@ -704,9 +664,9 @@ Initiative-level todos (updated during execution):
 **Max Attempts**: Delegated to task orchestrators (each has own limits)
 
 **Initiative-Level Recovery**:
-- **Parallel execution failure**: Continue other parallel tasks, retry failed task
-- **Critical path failure**: Pause initiative, prompt user (blocks entire initiative)
-- **Non-critical path failure**: Log, continue (can fix later)
+- **Task failure**: Pause initiative, prompt user with options (skip, retry, abort)
+- **Critical path failure**: Blocks dependent tasks, requires user decision
+- **Non-critical path failure**: Can skip and continue with independent tasks
 
 ### Interactive Mode Pause
 
@@ -1035,7 +995,7 @@ orchestrator:
   current_phase: planning|task-creation|dependency-resolution|task-execution|initiative-verification|finalization|completed
   completed_phases: [array]
   failed_phases: [array]
-  execution_strategy: sequential|parallel|mixed
+  execution_strategy: sequential
 
   auto_fix_attempts:
     planning: 0
@@ -1086,10 +1046,9 @@ progress:
   remaining_hours: Z
 
 coordination:
-  parallel_running: N
-  max_parallel: 3
-  last_poll: YYYY-MM-DDTHH:MM:SSZ
-  next_poll: YYYY-MM-DDTHH:MM:SSZ
+  current_task: task-id|null
+  queue_position: N
+  last_updated: YYYY-MM-DDTHH:MM:SSZ
 
 timestamps:
   created: YYYY-MM-DDTHH:MM:SSZ

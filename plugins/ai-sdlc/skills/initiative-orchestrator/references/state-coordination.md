@@ -51,7 +51,7 @@ orchestrator:
   current_phase: planning|task-creation|dependency-resolution|task-execution|initiative-verification|finalization|completed
   completed_phases: [planning, task-creation]
   failed_phases: []
-  execution_strategy: sequential|parallel|mixed
+  execution_strategy: sequential
 
   auto_fix_attempts:
     planning: 0
@@ -94,7 +94,9 @@ tasks:
       orchestrator_phase: implementation  # Currently in implementation
 
 execution:
-  current_level: 1           # For mixed/parallel strategies
+  queue: [task-id-4, task-id-5, task-id-6, task-id-7]  # Tasks waiting to execute
+  queue_position: 3                                     # Current position in overall queue
+  current_task: task-id-3                              # Currently executing task
   total_levels: 4
   levels:
     level-0: [task-id-1, task-id-2]
@@ -117,14 +119,9 @@ progress:
   actual_hours: 35
   remaining_hours: 205
 
-  current_level_progress: 50  # For mixed strategy
-
 coordination:
-  parallel_running: 1           # Currently running task count
-  max_parallel: 3               # Max concurrent tasks
-  last_poll: "2025-11-14T15:30:00Z"
-  next_poll: "2025-11-14T15:30:30Z"    # Poll every 30 seconds
-  poll_interval_seconds: 30
+  current_task: task-id-3
+  last_updated: "2025-11-14T15:30:00Z"
 
 timestamps:
   created: "2025-11-14T09:00:00Z"
@@ -137,7 +134,7 @@ phase_results:
     initiative_path: initiatives/2025-11-14-auth-system
     task_count: 7
     estimated_hours: 240
-    strategy: mixed
+    strategy: sequential
     milestones: ["Foundation", "Core Features", "Production"]
     completed_at: "2025-11-14T09:45:00Z"
 
@@ -377,34 +374,45 @@ def poll_all_in_progress_tasks(initiative_state):
         apply_task_status_updates(initiative_state, updates)
 ```
 
-### Polling Loop
+### Sequential Execution Loop
 
 ```python
-def task_execution_polling_loop(initiative_path):
-    """Main polling loop for parallel execution"""
+def task_execution_loop(initiative_path):
+    """Main execution loop for sequential task execution"""
 
     while True:
         state = read_initiative_state(initiative_path)
 
-        # Check if any tasks still in progress
-        if len(state['tasks']['in_progress']) == 0:
+        # Check if any tasks remaining
+        if len(state['execution']['queue']) == 0:
             break  # All tasks complete
 
-        # Poll each in-progress task
-        poll_all_in_progress_tasks(state)
+        # Get next task from queue
+        next_task = state['execution']['queue'][0]
 
-        # Check if current level complete (for mixed strategy)
-        if is_current_level_complete(state):
-            advance_to_next_level(state)
+        # Verify dependencies satisfied
+        if not dependencies_satisfied(next_task, state):
+            # Move to blocked, try next task
+            move_to_blocked(next_task, state)
+            continue
 
-        # Update next poll time
-        state['coordination']['last_poll'] = current_iso_timestamp()
-        state['coordination']['next_poll'] = calculate_next_poll_time(30)
-
+        # Mark as in-progress
+        state['tasks']['in_progress'] = [next_task]
+        state['execution']['current_task'] = next_task
         write_initiative_state(initiative_path, state)
 
-        # Sleep until next poll
-        sleep(30)  # 30 seconds
+        # Invoke task orchestrator via Skill tool (synchronous)
+        # Use Skill tool with: skill=[type]-orchestrator
+        result = invoke_task_orchestrator(next_task)
+
+        # Update state based on result
+        if result.success:
+            move_to_completed(next_task, state)
+            check_unblocked_tasks(state)
+        else:
+            handle_failure(next_task, state, result)
+
+        write_initiative_state(initiative_path, state)
 ```
 
 ---

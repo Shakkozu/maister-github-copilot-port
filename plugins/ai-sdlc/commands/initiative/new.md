@@ -39,9 +39,11 @@ Orchestrate epic-level initiatives that coordinate 3-15 related tasks with depen
 /ai-sdlc:initiative:new "Multi-tenant support" --from=task-creation
 ```
 
-## What This Does
+## What You Are Doing
 
-**Invoke the initiative-orchestrator skill** which guides through 6 phases:
+**Invoke the initiative-orchestrator skill NOW using the Skill tool.**
+
+The skill guides through 6 phases:
 
 **Phase 0: Initiative Planning**
 - Break initiative into 3-15 tasks
@@ -58,8 +60,8 @@ Orchestrate epic-level initiatives that coordinate 3-15 related tasks with depen
 - Determine execution strategy
 
 **Phase 3: Task Execution**
-- Execute tasks respecting dependencies
-- Sequential, parallel, or mixed execution
+- Execute tasks sequentially (one at a time)
+- Respect dependency order
 - Auto-recovery for failures
 
 **Phase 4: Initiative Verification**
@@ -71,11 +73,14 @@ Orchestrate epic-level initiatives that coordinate 3-15 related tasks with depen
 - Create initiative summary
 - Update roadmap
 
-## Execution Strategies
+## Execution Strategy
 
-- **Sequential**: Execute one task at a time (A→B→C)
-- **Parallel**: Independent tasks concurrently (max 3)
-- **Mixed** (recommended): Parallel within levels, sequential between levels
+Tasks execute **sequentially** (one at a time) in dependency order:
+- Level 0 tasks first (no dependencies)
+- Then Level 1 tasks (depend on Level 0)
+- And so on...
+
+This ensures each task orchestrator can properly delegate to its subagents.
 
 ## Outputs
 
@@ -126,4 +131,4 @@ State preserved automatically.
 
 ---
 
-**Invoke**: initiative-orchestrator skill
+Invoke the **initiative-orchestrator** skill to coordinate your epic-level initiative with dependency management and sequential task execution.

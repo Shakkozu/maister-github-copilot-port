@@ -85,6 +85,21 @@ Continues from determined resume point:
 - Handles in-progress tasks appropriately
 - Continues with remaining work
 
+---
+
+## What You Are Doing
+
+**Invoke the initiative-orchestrator skill NOW in resume mode using the Skill tool.**
+
+The skill will:
+1. Load and validate `initiative-state.yml`
+2. Determine resume point (from state or `--from` flag)
+3. Handle in-progress/failed/blocked tasks
+4. Continue orchestration from the determined phase
+5. Execute remaining tasks sequentially via their respective orchestrator skills
+
+---
+
 ## Resume Scenarios
 
 ### Scenario 1: Normal Interruption
@@ -368,7 +383,6 @@ Shows real-time:
 - **`/ai-sdlc:initiative:status`**: Check progress
 - **`/ai-sdlc:feature:resume`**: Resume single task (not initiative)
 
-## See Also
+---
 
-- `skills/initiative-orchestrator/skill.md`: Resume implementation details
-- `skills/initiative-orchestrator/references/state-coordination.md`: State management
+Invoke the **initiative-orchestrator** skill in resume mode to continue your initiative from where it left off, with dependency enforcement and sequential task coordination.
