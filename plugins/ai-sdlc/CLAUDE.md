@@ -537,6 +537,13 @@ Commands invoke orchestrators and utilities. All orchestrators support `--yolo` 
 | `/ai-sdlc:reviews:reality-check` | `[task-path]` | Validate work actually solves the problem |
 | `/ai-sdlc:reviews:production-readiness` | `[path] [--target=ENV]` | Pre-deployment verification with GO/NO-GO recommendation |
 
+### Quick Commands
+
+| Command | Usage | Purpose |
+|---------|-------|---------|
+| `/ai-sdlc:quick:plan` | `[task description]` | Enter planning mode with standards awareness from INDEX.md |
+| `/ai-sdlc:quick:dev` | `[task description]` | Implement directly with standards awareness (no planning) |
+
 **See**: Individual `commands/*/` and `skills/*/skill.md` files for detailed documentation.
 
 ## Available Subagents
