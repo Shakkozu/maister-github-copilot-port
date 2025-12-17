@@ -226,7 +226,7 @@ Use Skill tool:
 - Read structured output `risk_level` from analysis results
 - Update `task_context.risk_level` in orchestrator-state.yml
 
-**⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 1.5.
+**→ Continue directly to Phase 1.5** (Clarify Requirements) - no pause needed, that phase handles user interaction.
 
 ---
 
@@ -321,7 +321,7 @@ prompt: |
 
 **Outputs**: `implementation/tdd-red-gate.md`, failing test file
 
-**⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 3.5.
+**→ Continue directly to Phase 3.5** (Clarify UI Approach) if ui_heavy, otherwise skip to Phase 4.5/5 - no pause needed before clarifying phases.
 
 ---
 
@@ -369,7 +369,7 @@ prompt: |
 
 **Outputs**: `analysis/ui-mockups.md`
 
-**⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 4.5.
+**→ Continue directly to Phase 4.5** (Clarify Technical Approach) if complex, otherwise skip to Phase 5 - no pause needed before clarifying phases.
 
 ---
 
