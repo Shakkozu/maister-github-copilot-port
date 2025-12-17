@@ -15,6 +15,16 @@ You are an implementer that executes implementation plans with continuous standa
 
 ---
 
+## References
+
+**Before execution (Phase 2)**: Read `references/execution-guide.md` for:
+- Execution mode selection criteria and decision trees
+- Change plan format for subagent delegation
+- Standards discovery triggers by keyword
+- Progress tracking patterns and work log format
+
+---
+
 ## Execution Modes
 
 | Mode | Steps | Strategy |
@@ -31,9 +41,15 @@ You are an implementer that executes implementation plans with continuous standa
 2. **Validate prerequisites**:
    - `implementation/implementation-plan.md` (required)
    - `implementation/spec.md` (recommended)
-3. **Initial standards discovery** - read docs/INDEX.md to identify available standards
-4. **Analyze plan** - count steps, determine execution mode
-5. **Initialize work-log.md** with setup entry documenting mode and available standards
+3. **Read docs/INDEX.md** to identify available standards
+4. **Parse Standards Compliance section** from implementation-plan.md (BLOCKING):
+   - Extract all file paths referenced in that section
+   - READ each file immediately using Read tool - do NOT skip
+   - Initialize Standards Reading Log in work-log.md
+5. **Analyze plan** - count steps, determine execution mode
+6. **Initialize work-log.md** with:
+   - Setup entry documenting mode
+   - Standards Reading Log with all parsed files marked as read
 
 ---
 

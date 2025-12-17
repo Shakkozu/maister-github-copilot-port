@@ -79,6 +79,16 @@ This orchestrator follows shared patterns. See:
 - **Interactive Mode**: `../orchestrator-framework/references/interactive-mode.md`
 - **Initialization**: `../orchestrator-framework/references/initialization-pattern.md`
 
+## Local References
+
+Read these during relevant phases:
+
+| File | When to Use | Purpose |
+|------|-------------|---------|
+| `references/documentation-types.md` | Phase 0 | Structure patterns by doc type (user guide, tutorial, reference, FAQ, API) |
+| `references/writing-guidelines.md` | Phase 1 | Tone, voice, clarity guidelines with examples |
+| `references/screenshot-strategies.md` | Phase 1 | Browser automation patterns and image optimization |
+
 ---
 
 ## Phase Configuration

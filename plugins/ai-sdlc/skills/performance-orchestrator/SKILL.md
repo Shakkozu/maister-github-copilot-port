@@ -80,6 +80,14 @@ This orchestrator follows shared patterns. See:
 - **Interactive Mode**: `../orchestrator-framework/references/interactive-mode.md`
 - **Initialization**: `../orchestrator-framework/references/initialization-pattern.md`
 
+## Local References
+
+Read these during relevant phases:
+
+| File | When to Use | Purpose |
+|------|-------------|---------|
+| `references/performance-optimization-guide.md` | Phase 1-2 | Optimization patterns, bottleneck classifications, benchmarking strategies |
+
 ---
 
 ## Phase Configuration

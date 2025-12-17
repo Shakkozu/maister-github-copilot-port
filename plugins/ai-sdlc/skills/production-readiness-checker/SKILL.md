@@ -20,6 +20,16 @@ You are an automated production readiness checker that verifies if code is ready
 
 ---
 
+## References
+
+**Before verification (Phases 2-7)**: Read `references/readiness-guide.md` for:
+- Detailed detection patterns and where to look for each issue
+- GO/NO-GO criteria with specific requirements
+- Rollback triggers and post-deployment verification
+- Environment-specific standards (production vs staging)
+
+---
+
 ## Phase 1: Initialize
 
 1. **Get task path** (task directory, feature directory, or entire project)

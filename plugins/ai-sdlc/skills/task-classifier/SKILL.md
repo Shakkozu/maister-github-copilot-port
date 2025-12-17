@@ -217,12 +217,9 @@ The subagent handles:
 
 For developers extending or understanding the classification methodology, design documentation is available in:
 
-- **`references/keyword-matrix.md`** - Complete keyword patterns for all 8 task types with confidence calculations
-- **`references/classification-workflow.md`** - Step-by-step classification process with detailed examples
-- **`references/context-analysis.md`** - Codebase analysis strategies for accurate classification
-- **`references/issue-fetching.md`** - Integration guide for GitHub, Jira, and other issue trackers
+- **`references/classification-design.md`** - Classification patterns, keyword matrices, and confidence scoring methodology
 
-> **Note**: These files serve as **design documentation** for developers. The actual runtime classification logic is embedded in the `agents/task-classifier.md` subagent file for path-independence when the plugin runs in user projects.
+> **Note**: This file serves as **design documentation** for developers. The actual runtime classification logic is embedded in the `agents/task-classifier.md` subagent file for path-independence when the plugin runs in user projects.
 
 ## Performance Targets
 
@@ -272,7 +269,7 @@ Flow:
 
 **This skill delegates all logic to the subagent**. If you need to understand or modify classification behavior, see:
 - **Runtime logic**: `agents/task-classifier.md` (subagent implementation)
-- **Design docs**: `references/*.md` (pattern guides)
+- **Design docs**: `references/classification-design.md` (classification patterns)
 - **Integration**: `commands/work.md` (how skill is invoked)
 
 The skill itself simply acts as an invocation point and result pass-through to keep the main agent context clean.

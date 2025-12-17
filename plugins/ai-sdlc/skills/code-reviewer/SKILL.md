@@ -18,6 +18,16 @@ You are an automated code reviewer that analyzes code for quality, security, and
 
 ---
 
+## References
+
+**Before analysis (Phases 2-5)**: Read `references/analysis-patterns.md` for:
+- Detection patterns with specific thresholds and indicators
+- OWASP Top 10 alignment for security analysis
+- Code smell categories and severity classification
+- Context-aware analysis guidelines
+
+---
+
 ## Phase 1: Initialize
 
 1. **Get analysis path** (file, directory, or task path)

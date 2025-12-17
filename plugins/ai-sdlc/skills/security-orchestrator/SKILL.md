@@ -82,6 +82,15 @@ This orchestrator follows shared patterns. See:
 - **Interactive Mode**: `../orchestrator-framework/references/interactive-mode.md`
 - **Initialization**: `../orchestrator-framework/references/initialization-pattern.md`
 
+## Local References
+
+Read these during relevant phases:
+
+| File | When to Use | Purpose |
+|------|-------------|---------|
+| `references/security-guide.md` | Phase 0-2 | Vulnerability detection patterns and fix strategies |
+| `references/vulnerability-types.md` | Phase 0-1 | CVSS scoring guidance and vulnerability classification |
+
 ---
 
 ## Phase Configuration

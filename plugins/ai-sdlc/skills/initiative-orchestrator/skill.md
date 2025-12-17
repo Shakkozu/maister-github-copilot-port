@@ -85,6 +85,17 @@ This orchestrator follows shared patterns. See:
 - **Interactive Mode**: `../orchestrator-framework/references/interactive-mode.md`
 - **Initialization**: `../orchestrator-framework/references/initialization-pattern.md`
 
+## Local References
+
+Read these during relevant phases:
+
+| File | When to Use | Purpose |
+|------|-------------|---------|
+| `references/dependency-resolution.md` | Phase 2 | Dependency graph algorithms and resolution strategies |
+| `references/execution-strategies.md` | Phase 3 | Task sequencing and execution patterns |
+| `references/phases.md` | General | Detailed phase substeps and decision points |
+| `references/state-coordination.md` | All phases | Multi-task state handling and coordination |
+
 ---
 
 ## Phase Configuration

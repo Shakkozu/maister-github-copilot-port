@@ -94,6 +94,17 @@ This orchestrator follows shared patterns. See:
 - **Interactive Mode**: `../orchestrator-framework/references/interactive-mode.md`
 - **Initialization**: `../orchestrator-framework/references/initialization-pattern.md`
 
+## Local References
+
+Read these during relevant phases:
+
+| File | When to Use | Purpose |
+|------|-------------|---------|
+| `references/behavior-preservation.md` | Core & Phase 4 | Defines what "behavior" means and verification strategies |
+| `references/quality-metrics.md` | Phase 0 | Metric calculations, thresholds, and interpretation |
+| `references/refactoring-types.md` | Phase 1 | Type classification, strategies, and risk assessment |
+| `references/auto-fix-strategies.md` | Error handling | Recovery patterns and retry strategies |
+
 ---
 
 ## Phase Configuration

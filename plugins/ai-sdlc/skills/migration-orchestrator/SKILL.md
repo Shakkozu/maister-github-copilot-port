@@ -92,6 +92,15 @@ This orchestrator follows shared patterns. See:
 - **Interactive Mode**: `../orchestrator-framework/references/interactive-mode.md`
 - **Initialization**: `../orchestrator-framework/references/initialization-pattern.md`
 
+## Local References
+
+Read these during relevant phases:
+
+| File | When to Use | Purpose |
+|------|-------------|---------|
+| `references/migration-types.md` | Phase 0-1 | Migration type classification (code, data, architecture) |
+| `references/migration-strategies.md` | Phase 2-4 | Rollback planning, dual-run patterns, verification strategies |
+
 ---
 
 ## Phase Configuration
