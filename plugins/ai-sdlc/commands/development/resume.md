@@ -5,6 +5,17 @@ description: Resume an interrupted or failed development workflow from where it 
 
 # Development Workflow: Resume
 
+**IMMEDIATE ACTION REQUIRED**: Invoke the development-orchestrator skill NOW:
+
+```
+Use Skill tool:
+  skill: "ai-sdlc:development-orchestrator"
+```
+
+Do NOT proceed manually. The skill handles resume logic and the entire workflow.
+
+---
+
 Resume an interrupted development workflow (bug fix, enhancement, or new feature) from where it left off.
 
 ## Usage

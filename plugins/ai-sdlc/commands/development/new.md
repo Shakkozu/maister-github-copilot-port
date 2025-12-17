@@ -5,6 +5,17 @@ description: Start a new development workflow (bug fix, enhancement, or new feat
 
 # Development Workflow: New
 
+**IMMEDIATE ACTION REQUIRED**: Invoke the development-orchestrator skill NOW:
+
+```
+Use Skill tool:
+  skill: "ai-sdlc:development-orchestrator"
+```
+
+Do NOT proceed manually. The skill handles the entire workflow.
+
+---
+
 Start any development task from codebase analysis through implementation to verified code. Automatically detects task type or accepts explicit override.
 
 ## Usage

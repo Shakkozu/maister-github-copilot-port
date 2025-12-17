@@ -3,44 +3,9 @@ name: research-orchestrator
 description: Orchestrates comprehensive research workflows from question definition through findings documentation. Handles technical, requirements, literature, and mixed research types with adaptive methodology, multi-source gathering, pattern synthesis, and evidence-based reporting. Supports standalone research tasks and embedded Phase 0 in other workflows.
 ---
 
-# Research Orchestrator Skill
+# Research Orchestrator
 
-## Overview
-
-You are the Research Orchestrator, responsible for executing comprehensive research workflows that gather, analyze, and synthesize information to answer research questions. You orchestrate multi-phase workflows, delegate to specialized agents, manage state, handle failures gracefully, and produce actionable research outputs.
-
-## Core Responsibilities
-
-1. **Workflow Orchestration**: Manage 7-phase research workflow from initialization through integration
-2. **Agent Delegation**: Delegate complex phases to specialized agents (research-planner, information-gatherer, research-synthesizer)
-3. **State Management**: Maintain workflow state, enable pause/resume, track progress
-4. **Failure Handling**: Attempt auto-recovery within limits, escalate when needed
-5. **Output Generation**: Produce research reports, recommendations, knowledge base documentation, specifications
-
-## Progress Tracking
-
-Use `TodoWrite` to show real-time progress to the user. Create todos at workflow start, update at each phase transition.
-
-**Phase Todos**:
-
-| Phase | content | activeForm |
-|-------|---------|------------|
-| 0 | "Initialize research" | "Initializing research" |
-| 1 | "Plan research methodology" | "Planning research methodology" |
-| 2 | "Gather information" | "Gathering information" |
-| 3 | "Analyze and synthesize" | "Analyzing and synthesizing" |
-| 4 | "Generate outputs" | "Generating outputs" |
-| 5 | "Verify findings" | "Verifying findings" |
-| 6 | "Integrate into project" | "Integrating into project" |
-
-**Rules**:
-- Create all phase todos at workflow start (pending)
-- Mark current phase `in_progress` before execution
-- Mark phase `completed` immediately after success
-- Optional phases (5, 6): mark as `completed` if skipped
-- State file remains source of truth for resume logic
-
----
+Systematic research workflow from question definition to evidence-based documentation.
 
 ## MANDATORY Initialization (Before Any Phase Work)
 
@@ -63,6 +28,8 @@ Use TodoWrite tool with todos:
 ]
 ```
 
+Note: Phases 5-6 (Verify findings, Integrate into project) are optional based on context.
+
 ### Step 2: Output Initialization Summary
 
 **Output this summary to the user:**
@@ -70,24 +37,17 @@ Use TodoWrite tool with todos:
 ```
 🚀 Research Orchestrator Started
 
-Research Question: [question/topic]
+Task: [research question]
 Mode: [Interactive/YOLO]
+Directory: [task-path]
 
-Workflow Phases:
-0. [ ] Research Initialization → direct
-1. [ ] Research Planning → research-planner subagent
-2. [ ] Information Gathering → information-gatherer subagent
-3. [ ] Analysis & Synthesis → research-synthesizer subagent
-4. [ ] Generate Outputs → direct
-5. [ ] Verification (optional) → user review
-6. [ ] Integration (optional) → direct
-
-State file: [task-path]/orchestrator-state.yml
+Workflow phases:
+[Todos list with status]
 
 [Interactive mode] You'll be prompted for review after each phase.
 [YOLO mode] All phases will run continuously.
 
-Starting Phase 0: Research Initialization...
+Starting Phase 0: Initialize research...
 ```
 
 ### Step 3: Only Then Proceed to Phase 0
@@ -96,61 +56,307 @@ After completing Steps 1 and 2, proceed to Phase 0 (Research Initialization).
 
 ---
 
-## Supported Research Types
+## When to Use This Skill
 
-- **Technical Research**: Understanding codebase implementation, architecture, patterns
-- **Requirements Research**: Gathering user needs, business requirements, constraints
-- **Literature Research**: Best practices, industry standards, framework recommendations
-- **Mixed Research**: Comprehensive investigations requiring multiple perspectives
+Use when:
+- Need comprehensive research on a topic
+- Exploring codebase patterns or architecture
+- Gathering requirements or best practices
+- Want systematic evidence-based answers
+- Research will feed into development workflows
+
+## Core Principles
+
+1. **Evidence-Based**: Every finding must have source citation
+2. **Systematic**: Follow structured methodology for consistent results
+3. **Multi-Source**: Gather from codebase, docs, config, external sources
+4. **Synthesized**: Cross-reference findings, identify patterns
+5. **Actionable**: Produce outputs that enable next steps
+
+---
+
+## Framework Patterns
+
+This orchestrator follows shared patterns. See:
+
+- **Phase Execution**: `../orchestrator-framework/references/phase-execution-pattern.md`
+- **State Management**: `../orchestrator-framework/references/state-management.md`
+- **Interactive Mode**: `../orchestrator-framework/references/interactive-mode.md`
+- **Initialization**: `../orchestrator-framework/references/initialization-pattern.md`
+
+---
+
+## Phase Configuration
+
+| Phase | content | activeForm | Agent/Skill |
+|-------|---------|------------|-------------|
+| 0 | "Initialize research" | "Initializing research" | orchestrator |
+| 1 | "Plan research methodology" | "Planning research methodology" | research-planner |
+| 2 | "Gather information" | "Gathering information" | information-gatherer |
+| 3 | "Analyze and synthesize" | "Analyzing and synthesizing" | research-synthesizer |
+| 4 | "Generate outputs" | "Generating outputs" | orchestrator |
+| 5 | "Verify findings" | "Verifying findings" | orchestrator (optional) |
+| 6 | "Integrate into project" | "Integrating into project" | orchestrator (optional) |
+
+**Workflow Overview**: 5-7 phases (Phases 5-6 optional based on context)
+
+**CRITICAL TodoWrite Usage**:
+1. At workflow start: Create todos for ALL phases using the Phase Configuration table above (all status=pending)
+2. Before each phase: Update that phase to status=in_progress
+3. After each phase: Update that phase to status=completed
+
+---
+
+## Research Types
+
+| Type | Keywords | Focus | Typical Outputs |
+|------|----------|-------|-----------------|
+| **Technical** | "how does", "where is", "implementation" | Codebase analysis | Knowledge base, architecture docs |
+| **Requirements** | "what are requirements", "user needs" | User/business needs | Specifications, requirements doc |
+| **Literature** | "best practices", "industry standards" | External research | Recommendations, comparisons |
+| **Mixed** | Multiple keywords, broad questions | Comprehensive investigation | All output types |
+
+---
 
 ## Workflow Phases
 
-### Phase 0: Research Initialization (Required)
-- **Execution**: Direct
-- **Purpose**: Define research scope and classify research type
-- **Outputs**: `metadata.yml`, `orchestrator-state.yml`, `planning/research-brief.md`
+### Phase 0: Research Initialization
 
-### Phase 1: Research Planning (Required)
-- **Execution**: Delegate to `ai-sdlc:research-planner` agent
-- **Purpose**: Design methodology and identify data sources
-- **Outputs**: `planning/research-plan.md`, `planning/sources.md`
+**Execution**: Main orchestrator (direct)
 
-### Phase 2: Information Gathering (Required)
-- **Execution**: Delegate to `ai-sdlc:information-gatherer` agent
-- **Purpose**: Collect information from all identified sources
-- **Outputs**: `analysis/findings/*.md` (multiple files with source citations)
+**Process**:
 
-### Phase 3: Analysis & Synthesis (Required)
-- **Execution**: Delegate to `ai-sdlc:research-synthesizer` agent
-- **Purpose**: Analyze findings and generate insights
-- **Outputs**: `analysis/synthesis.md`, `analysis/research-report.md`
+1. **Parse Research Question** - Extract from command or prompt user
+2. **Classify Research Type** - Auto-detect from keywords or use `--type` flag
+3. **Determine Scope** - What's in scope, what's excluded, constraints
+4. **Define Success Criteria** - How we know research is complete
+5. **Create Research Brief** - Save to `planning/research-brief.md`
 
-### Phase 4: Generate Outputs (Required)
-- **Execution**: Direct (conditional logic)
-- **Purpose**: Create output artifacts based on research objectives
-- **Outputs**: `outputs/recommendations.md` (conditional), `outputs/knowledge-base.md` (conditional), `outputs/specifications.md` (conditional)
+**Outputs**: `metadata.yml`, `orchestrator-state.yml`, `planning/research-brief.md`
+
+**Success**: Research question clear, type classified, scope defined
+
+**⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 1.
+
+---
+
+### Phase 1: Research Planning
+
+**Delegate to**: `research-planner` subagent
+
+**Task tool invocation**:
+```
+subagent_type: "ai-sdlc:research-planner"
+description: "Plan research methodology"
+prompt: |
+  You are the research-planner agent. Design research methodology
+  and identify data sources.
+
+  Task directory: [task-path]
+  Input: planning/research-brief.md
+
+  Please:
+  1. Analyze research question and type
+  2. Select appropriate methodology
+  3. Identify all relevant data sources (codebase, docs, config, external)
+  4. Create phased research plan
+  5. Define success criteria for each phase
+
+  Save to:
+  - planning/research-plan.md (methodology, approach)
+  - planning/sources.md (data sources with access paths)
+
+  Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+```
+
+**Outputs**: `planning/research-plan.md`, `planning/sources.md`
+
+**Success**: Methodology selected, sources identified (at least one), plan documented
+
+**⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 2.
+
+---
+
+### Phase 2: Information Gathering
+
+**Delegate to**: `information-gatherer` subagent
+
+**Task tool invocation**:
+```
+subagent_type: "ai-sdlc:information-gatherer"
+description: "Gather information"
+prompt: |
+  You are the information-gatherer agent. Execute systematic
+  information gathering from all identified sources.
+
+  Task directory: [task-path]
+  Inputs:
+  - planning/research-plan.md
+  - planning/sources.md
+
+  Please:
+  1. Execute research plan phases systematically
+  2. Gather from all sources in sources.md
+  3. Maintain strict source citations for EVERY finding
+  4. Organize findings by source type (one file per type)
+  5. Cross-reference findings and identify gaps
+
+  Save to:
+  - analysis/findings/00-summary.md (overview)
+  - analysis/findings/codebase-*.md
+  - analysis/findings/docs-*.md
+  - analysis/findings/config-*.md
+  - analysis/findings/external-*.md (if applicable)
+
+  CRITICAL: Every finding MUST include source reference, evidence, and context.
+
+  Use only Read, Grep, Glob, WebFetch, and Bash tools. Do NOT modify code.
+```
+
+**Outputs**: `analysis/findings/*.md` (multiple files with source citations)
+
+**Success**: All sources investigated, findings documented with citations
+
+**⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 3.
+
+---
+
+### Phase 3: Analysis & Synthesis
+
+**Delegate to**: `research-synthesizer` subagent
+
+**Task tool invocation**:
+```
+subagent_type: "ai-sdlc:research-synthesizer"
+description: "Analyze and synthesize"
+prompt: |
+  You are the research-synthesizer agent. Analyze findings
+  and generate comprehensive research report.
+
+  Task directory: [task-path]
+  Input: analysis/findings/ (all files)
+
+  Please:
+  1. Read all finding files systematically
+  2. Cross-reference findings across sources
+  3. Identify patterns, themes, relationships
+  4. Generate synthesis with pattern analysis
+  5. Generate comprehensive research report answering research question
+  6. Mark confidence levels (high/medium/low)
+  7. Document gaps and uncertainties
+
+  Save to:
+  - analysis/synthesis.md (patterns, insights)
+  - analysis/research-report.md (comprehensive report)
+
+  CRITICAL: Every insight must trace to findings, every conclusion evidence-based.
+
+  Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+```
+
+**Outputs**: `analysis/synthesis.md`, `analysis/research-report.md`
+
+**Success**: Research question answered, patterns identified, confidence documented
+
+**⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 4.
+
+---
+
+### Phase 4: Generate Outputs
+
+**Execution**: Main orchestrator (direct)
+
+**Conditional Outputs** (based on research type):
+
+| Output | Generate If | Skip If |
+|--------|------------|---------|
+| **Recommendations** | Decision-oriented research, literature comparing approaches | Purely exploratory |
+| **Knowledge Base** | Reusable knowledge, technical patterns/architecture | One-off research |
+| **Specifications** | Feeds into dev workflow, embedded Phase 0 | Standalone research |
+
+**Process**:
+
+1. **Determine Output Types** - Based on research type and context
+2. **Generate Recommendations** (if applicable) - Prioritized, with rationale and evidence
+3. **Generate Knowledge Base** (if applicable) - Overview, components, best practices
+4. **Generate Specifications** (if applicable) - Requirements, approach, integration
+
+**Outputs**: `outputs/recommendations.md`, `outputs/knowledge-base.md`, `outputs/specifications.md` (conditional)
+
+**Success**: At least research report exists, conditional outputs match context
+
+**⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 5.
+
+---
 
 ### Phase 5: Verification (Optional)
-- **Execution**: User review (interactive) or automated checks (YOLO)
-- **Purpose**: Validate findings accuracy and completeness
-- **Outputs**: `verification/verification-report.md`
+
+**Execution**: Main orchestrator (user review or automated checks)
+
+**Enable if**: Mixed research, medium/low confidence, critical gaps identified
+**Skip if**: Technical research with high confidence, simple exploratory
+
+**Process**:
+
+**Interactive Mode**:
+1. Present research report to user
+2. Request review: source credibility, finding accuracy, completeness
+3. Document feedback
+
+**YOLO Mode**:
+1. Automated checks: citations present, evidence provided, question addressed, gaps documented
+2. Create verification report
+
+**Outputs**: `verification/verification-report.md`
+
+**Note**: Verification failures are NOT auto-fixed. Document issues clearly.
+
+**⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 6.
+
+---
 
 ### Phase 6: Integration (Optional)
-- **Execution**: Direct
-- **Purpose**: Integrate research into project documentation or workflows
-- **Outputs**: Updated project documentation, integration manifest
 
-## Execution Modes
+**Execution**: Main orchestrator (direct)
 
-### Interactive Mode (Default)
-- Pause after each phase for user review
-- User can approve and continue, restart phase, or halt
-- Enables iterative refinement
+**Enable if**: Specifications generated, knowledge base created, recommendations affecting decisions
+**Skip if**: Exploratory research not for documentation
 
-### YOLO Mode
-- Continuous execution without pauses
-- Auto-decides optional phases based on context
-- Best for straightforward research
+**Process**:
+
+1. **For Specifications** - Save path, provide to parent orchestrator
+2. **For Knowledge Base** - Identify location in `.ai-sdlc/docs/`, ask user where to place
+3. **For Recommendations** - Ask user if decisions should be documented
+4. **Create Integration Manifest** - Document outputs and recommended locations
+
+**Outputs**: `integration-manifest.md`
+
+**Note**: Integration failures are NOT auto-fixed. Provide manual guidance.
+
+---
+
+## Domain Context (State Extensions)
+
+Research-specific fields in `orchestrator-state.yml`:
+
+```yaml
+research_context:
+  research_type: "technical" | "requirements" | "literature" | "mixed"
+  research_question: "[user's question]"
+  scope:
+    included: []
+    excluded: []
+    constraints: []
+  methodology: []
+  sources: []
+  confidence_level: "high" | "medium" | "low"
+
+options:
+  verification_enabled: null  # null=auto-detect
+  integration_enabled: null
+```
+
+---
 
 ## Task Structure
 
@@ -179,823 +385,19 @@ After completing Steps 1 and 2, proceed to Phase 0 (Research Initialization).
     └── verification-report.md
 ```
 
-## Orchestration Instructions
-
-### When This Skill is Invoked
-
-**Automatic Invocation** (Claude decides):
-- User asks questions like "How does X work in this codebase?"
-- User requests understanding of patterns, architecture, or implementations
-- User needs requirements gathered or best practices researched
-
-**Manual Invocation** (User commands):
-- `/ai-sdlc:research:new [research-question]` - Start new research
-- `/ai-sdlc:research:resume [task-path]` - Resume interrupted research
-
-**Embedded Invocation** (From other workflows):
-- Optional Phase 0 in feature/enhancement/migration orchestrators
-- When deep exploration needed before specification creation
-
 ---
 
-### Step 1: Determine Execution Context
-
-**Check invocation source**:
-- **New research**: Create new task directory
-- **Resume research**: Load existing state
-- **Embedded**: Integrate with parent workflow
-
-**Parse parameters**:
-- Research question or task path
-- Mode flag: `--yolo` or default interactive
-- Research type: `--type=TYPE` or auto-detect
-- Optional phase flags: `--verify`, `--integrate`
-
----
-
-### Step 2: Initialize or Load State
-
-#### For New Research (`/ai-sdlc:research:new`)
-
-**A. Create Task Directory**:
-
-```bash
-TASK_DIR=".ai-sdlc/tasks/research/$(date +%Y-%m-%d)-$(echo "$QUESTION" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | head -c 40)"
-mkdir -p "$TASK_DIR"/{planning,analysis/findings,outputs,verification}
-```
-
-**B. Create metadata.yml**:
-
-```yaml
-task_type: research
-task_name: "[research-name]"
-created: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-status: in_progress
-priority: medium
-tags: [research]
-```
-
-**C. Create orchestrator-state.yml**:
-
-```yaml
-orchestrator:
-  mode: interactive  # or yolo
-  started_phase: phase-0-initialization
-  current_phase: phase-0-initialization
-  completed_phases: []
-  failed_phases: []
-  auto_fix_attempts: {}
-
-  research_context:
-    research_type: null  # Will be set in Phase 0
-    research_question: "[user's research question]"
-    scope: null
-    methodology: []
-    sources: []
-
-  options:
-    verification_enabled: null  # null=auto-detect
-    integration_enabled: null
-
-  task_path: "$TASK_DIR"
-  created: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-  updated: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-  completed: null
-
-  phase_results: {}
-```
-
-**D. Proceed to Phase 0**
-
----
-
-#### For Resume Research (`/ai-sdlc:research:resume`)
-
-**A. Load State**:
-
-```bash
-STATE_FILE="$TASK_PATH/orchestrator-state.yml"
-```
-
-Read state file to get:
-- `current_phase`: Where to resume
-- `completed_phases`: What's already done
-- `failed_phases`: What failed and why
-- `auto_fix_attempts`: How many attempts made
-- `research_context`: Research details
-
-**B. Validate State**:
-- Check all prerequisite phases completed
-- Verify output files exist for completed phases
-- If validation fails, may need to restart earlier phase
-
-**C. Resume from `current_phase`**
-
----
-
-### Step 3: Execute Phase 0 - Research Initialization
-
-**Purpose**: Define research scope and classify type
-
-**Actions**:
-
-**A. Gather Research Question** (if not already provided):
-- Read from command parameters or prompt user
-- Ensure question is clear and specific
-
-**B. Classify Research Type**:
-
-Use keyword analysis:
-- **Technical**: "how does", "where is", "what patterns", "implementation", "architecture"
-- **Requirements**: "what are requirements", "user needs", "business requirements", "acceptance criteria"
-- **Literature**: "best practices", "industry standards", "recommended approach"
-- **Mixed**: Multiple keywords or broad questions
-
-Auto-detect or use `--type` parameter.
-
-**C. Determine Scope and Boundaries**:
-- What's in scope (included in research)
-- What's out of scope (explicitly excluded)
-- Any constraints (time, resources, access)
-
-**D. Define Success Criteria**:
-- Research question answered completely
-- All sub-questions addressed
-- Evidence collected for all claims
-- Patterns and relationships identified
-
-**E. Create Research Brief**:
-
-Write `planning/research-brief.md`:
-
-```markdown
-# Research Brief
-
-## Research Question
-[Main research question]
-
-## Research Type
-[Technical / Requirements / Literature / Mixed]
-
-## Scope
-
-### Included
-- [What's in scope]
-
-### Excluded
-- [What's explicitly out of scope]
-
-## Success Criteria
-- [Criterion 1]
-- [Criterion 2]
-- [Criterion 3]
-
-## Context
-[Any additional context or motivation for this research]
-```
-
-**F. Update State**:
-- Mark Phase 0 complete
-- Update `research_context` with type, question, scope
-- Set `current_phase` to `phase-1-planning`
-
-**G. Interactive Pause** (if interactive mode):
-- Summarize research brief
-- Ask user to confirm and continue
-
----
-
-### Step 4: Execute Phase 1 - Research Planning
-
-**Purpose**: Design methodology and identify data sources
-
-**Execution**: Delegate to `ai-sdlc:research-planner` agent
-
-**A. Prepare Agent Context**:
-- Research brief from Phase 0
-- Task directory path
-
-**B. Invoke Agent**:
-
-Use Task tool with:
-- `subagent_type`: "ai-sdlc:research-planner"
-- `description`: "Create research plan for: [research question]"
-- `prompt`:
-  ```
-  Create a comprehensive research plan for this research question.
-
-  **Input**: Read `planning/research-brief.md` in task directory: [TASK_PATH]
-
-  **Your tasks**:
-  1. Analyze the research question and type
-  2. Select appropriate methodology (see references/research-methodologies.md)
-  3. Identify all relevant data sources (codebase, docs, config, external)
-  4. Create research plan with phases
-  5. Define success criteria
-
-  **Outputs**:
-  - planning/research-plan.md (methodology, approach, phases)
-  - planning/sources.md (data sources with access paths)
-
-  **Report back**: Summary of research plan with source count and methodology.
-  ```
-
-**C. Collect Agent Output**:
-- Read `planning/research-plan.md`
-- Read `planning/sources.md`
-- Extract methodology and source count for summary
-
-**D. Validate Outputs**:
-- ✅ `planning/research-plan.md` exists and has methodology
-- ✅ `planning/sources.md` exists and has at least one source
-
-**E. Handle Failures**:
-- If agent fails or outputs invalid → Auto-fix (max 2 attempts)
-- Attempt 1: Retry with expanded search patterns
-- Attempt 2: Use fallback methodology (mixed approach)
-- If still fails → Halt, save state, escalate to user
-
-**F. Update State**:
-- Add `phase-1-planning` to `completed_phases`
-- Update `research_context.methodology` and `research_context.sources`
-- Set `current_phase` to `phase-2-gathering`
-
-**G. Interactive Pause** (if interactive mode):
-- Summarize research plan
-- Show methodology and source count
-- Ask user to confirm and continue
-
----
-
-### Step 5: Execute Phase 2 - Information Gathering
-
-**Purpose**: Collect information from all identified sources
-
-**Execution**: Delegate to `ai-sdlc:information-gatherer` agent
-
-**A. Prepare Agent Context**:
-- Research plan from Phase 1
-- Sources manifest from Phase 1
-
-**B. Invoke Agent**:
-
-Use Task tool with:
-- `subagent_type`: "ai-sdlc:information-gatherer"
-- `description`: "Gather information for: [research question]"
-- `prompt`:
-  ```
-  Execute systematic information gathering for this research.
-
-  **Input**:
-  - Read `planning/research-plan.md` in task directory: [TASK_PATH]
-  - Read `planning/sources.md` for data source list
-
-  **Your tasks**:
-  1. Execute research plan phases systematically (broad discovery → targeted reading → deep dive → verification)
-  2. Gather from all sources in sources.md (codebase, docs, config, external)
-  3. Maintain strict source citations for every finding
-  4. Organize findings by source (one file per source or source type)
-  5. Cross-reference findings and identify gaps
-
-  **Outputs**:
-  - analysis/findings/00-summary.md (overview of all findings)
-  - analysis/findings/codebase-*.md (codebase findings)
-  - analysis/findings/docs-*.md (documentation findings)
-  - analysis/findings/config-*.md (configuration findings)
-  - analysis/findings/external-*.md (external sources, if applicable)
-
-  **Critical**: Every finding MUST include:
-  - Source reference (file path with line numbers or URL)
-  - Evidence (code snippet, quote, or screenshot)
-  - Context (why this is relevant)
-
-  **Report back**: Summary with source count investigated, finding count, confidence level.
-  ```
-
-**C. Collect Agent Output**:
-- Read `analysis/findings/00-summary.md`
-- Count finding files created
-- Extract key discoveries from summary
-
-**D. Validate Outputs**:
-- ✅ `analysis/findings/00-summary.md` exists
-- ✅ At least one finding file exists
-- ✅ Findings have source citations
-
-**E. Handle Failures**:
-- If agent fails or insufficient findings → Auto-fix (max 3 attempts)
-- Attempt 1: Retry with expanded search patterns
-- Attempt 2: Try alternative source types
-- Attempt 3: Continue with available sources, document gaps
-- If critical sources missing → Halt, save state, escalate
-
-**F. Update State**:
-- Add `phase-2-gathering` to `completed_phases`
-- Set `current_phase` to `phase-3-synthesis`
-- Log finding count in `phase_results`
-
-**G. Interactive Pause** (if interactive mode):
-- Summarize information gathering
-- Show source count, finding count, key discoveries
-- Ask user to confirm and continue
-
----
-
-### Step 6: Execute Phase 3 - Analysis & Synthesis
-
-**Purpose**: Analyze findings and generate insights
-
-**Execution**: Delegate to `ai-sdlc:research-synthesizer` agent
-
-**A. Prepare Agent Context**:
-- All finding files from Phase 2
-
-**B. Invoke Agent**:
-
-Use Task tool with:
-- `subagent_type`: "ai-sdlc:research-synthesizer"
-- `description`: "Synthesize research findings for: [research question]"
-- `prompt`:
-  ```
-  Analyze and synthesize all collected findings into comprehensive research report.
-
-  **Input**: Read all files in `analysis/findings/` directory: [TASK_PATH]/analysis/findings/
-
-  **Your tasks**:
-  1. Read all finding files systematically
-  2. Cross-reference findings across sources (validate and identify contradictions)
-  3. Identify patterns, themes, and relationships
-  4. Apply appropriate analytical framework (see references/research-methodologies.md)
-  5. Generate synthesis document with pattern analysis
-  6. Generate comprehensive research report answering research question
-
-  **Outputs**:
-  - analysis/synthesis.md (patterns, insights, relationships)
-  - analysis/research-report.md (comprehensive research report with all findings)
-
-  **Critical**:
-  - Every insight must trace back to findings
-  - Every conclusion must be evidence-based
-  - Mark confidence levels (high/medium/low)
-  - Document gaps and uncertainties
-
-  **Report back**: Summary with pattern count, key insights, primary conclusions.
-  ```
-
-**C. Collect Agent Output**:
-- Read `analysis/synthesis.md`
-- Read `analysis/research-report.md`
-- Extract patterns, insights, conclusions for summary
-
-**D. Validate Outputs**:
-- ✅ `analysis/synthesis.md` exists
-- ✅ `analysis/research-report.md` exists and answers research question
-
-**E. Handle Failures**:
-- If agent fails or insufficient synthesis → Auto-fix (max 2 attempts)
-- Attempt 1: Request additional targeted gathering for gaps
-- Attempt 2: Synthesize with available information, mark limitations
-- If synthesis fails → Create minimal report with raw findings
-
-**F. Update State**:
-- Add `phase-3-synthesis` to `completed_phases`
-- Set `current_phase` to `phase-4-outputs`
-
-**G. Interactive Pause** (if interactive mode):
-- Summarize synthesis
-- Show pattern count, key insights
-- Present primary conclusions
-- Ask user to confirm and continue
-
----
-
-### Step 7: Execute Phase 4 - Generate Outputs
-
-**Purpose**: Create output artifacts based on research objectives
-
-**Execution**: Direct (orchestrator code with conditional logic)
-
-**A. Determine Output Types**:
-
-Based on research type and context:
-
-**Always Generate**:
-- Research report (already created in Phase 3)
-
-**Conditional Outputs**:
-
-**Recommendations** (`outputs/recommendations.md`):
-- Generate if: Research is decision-oriented ("what should we use?", "which approach?")
-- Generate if: Literature research comparing approaches
-- Skip if: Purely exploratory research
-
-**Knowledge Base** (`outputs/knowledge-base.md`):
-- Generate if: Research produces reusable knowledge for future reference
-- Generate if: Technical research documenting patterns/architecture
-- Skip if: One-off research not needed later
-
-**Specifications** (`outputs/specifications.md`):
-- Generate if: Research will feed into dev workflow (feature/enhancement)
-- Generate if: Embedded as Phase 0 in orchestrator workflow
-- Skip if: Standalone research not leading to development
-
-**B. Generate Recommendations** (if applicable):
-
-```markdown
-# Recommendations
-
-Based on research findings, here are actionable recommendations:
-
-## Recommendation 1: [Title]
-
-**Priority**: High / Medium / Low
-**Effort**: High / Medium / Low
-
-**Rationale**:
-[Why this is recommended, based on findings]
-
-**Benefits**:
-- [Expected benefit 1]
-- [Expected benefit 2]
-
-**Risks**:
-- [Potential risk 1]
-- [Mitigation strategy]
-
-**Next Steps**:
-1. [Step 1]
-2. [Step 2]
-
-**Supporting Evidence**:
-- [Finding/insight that supports this]
-
----
-
-[Repeat for each recommendation]
-```
-
-**C. Generate Knowledge Base** (if applicable):
-
-```markdown
-# Knowledge Base: [Topic]
-
-**Purpose**: Reusable documentation of [topic] for future reference
-
-## Overview
-[High-level summary]
-
-## Key Components
-[List and describe key components/patterns/concepts]
-
-## How It Works
-[Explain mechanisms, flows, processes]
-
-## Integration Points
-[Where this connects with other parts of system]
-
-## Best Practices
-[Recommended approaches based on findings]
-
-## Common Pitfalls
-[Things to avoid based on research]
-
-## References
-- [Link to detailed research report]
-- [Links to key source files]
-```
-
-**D. Generate Specifications** (if applicable):
-
-```markdown
-# Specifications: [Feature/Enhancement Name]
-
-**Based on Research**: [Link to research report]
-
-## Background
-[Context from research]
-
-## Requirements
-[Requirements identified from research]
-
-## Technical Approach
-[Recommended approach based on findings]
-
-## Architecture
-[Architectural patterns to use]
-
-## Implementation Considerations
-[Key considerations from research]
-
-## Integration
-[How this integrates based on research]
-
-## Testing Strategy
-[Testing approach based on patterns found]
-
-## References
-[Link to detailed findings]
-```
-
-**E. Validate Outputs**:
-- ✅ At least research report exists
-- ✅ Conditional outputs match research context
-
-**F. Handle Failures**:
-- If output generation unclear → Auto-fix (max 2 attempts)
-- Attempt 1: Generate standard outputs based on research type
-- Attempt 2: Ask user in interactive mode which outputs needed
-- If still unclear → Generate research report only
-
-**G. Update State**:
-- Add `phase-4-outputs` to `completed_phases`
-- Set `current_phase` to `phase-5-verification` (if enabled) or complete
-
-**H. Interactive Pause** (if interactive mode):
-- Summarize outputs generated
-- Ask user if verification needed
-- If yes → Continue to Phase 5
-- If no → Skip to Phase 6 or complete
-
----
-
-### Step 8: Execute Phase 5 - Verification (Optional)
-
-**Purpose**: Validate findings accuracy and completeness
-
-**Execution**: User review (interactive) or automated checks (YOLO)
-
-**A. Decide Whether to Execute**:
-
-**Auto-detect logic** (if not explicitly specified):
-- Enable if: Research type is "mixed" (complex)
-- Enable if: Confidence level from synthesis is "medium" or "low"
-- Enable if: Critical gaps identified in synthesis
-- Skip if: Research type is "technical" with high confidence
-- Skip if: Simple exploratory research
-
-**User flags override**:
-- `--verify` flag → Always enable
-- `--no-verify` flag → Always skip
-
-**B. Execute Verification** (if enabled):
-
-**Interactive Mode**:
-1. Present research report to user
-2. Ask user to review:
-   - Source credibility
-   - Finding accuracy against evidence
-   - Completeness (all questions answered)
-   - Identify any gaps or concerns
-3. User provides feedback
-4. Document feedback in `verification/verification-report.md`
-
-**YOLO Mode**:
-1. Perform automated checks:
-   - All findings have source citations ✓
-   - Evidence provided for all claims ✓
-   - Research question addressed in report ✓
-   - Gaps documented ✓
-2. Create verification report with automated check results
-
-**C. Create Verification Report**:
-
-```markdown
-# Verification Report
-
-**Date**: [Date]
-**Verification Type**: Interactive / Automated
-
-## Source Credibility
-
-### Codebase Sources
-[Check: Files exist, paths correct, line numbers accurate]
-**Result**: Pass / Fail / Concerns
-
-### Documentation Sources
-[Check: Docs exist, quotes accurate, sections correct]
-**Result**: Pass / Fail / Concerns
-
-### External Sources
-[Check: URLs accessible, sources authoritative, info current]
-**Result**: Pass / Fail / Concerns
-
-## Finding Accuracy
-
-[Check: Findings match evidence, no contradictions, confidence levels appropriate]
-**Result**: Pass / Fail / Issues
-
-## Completeness
-
-[Check: Research question fully answered, sub-questions addressed, no critical gaps]
-**Result**: Complete / Incomplete / Partial
-
-## Issues Identified
-
-[List any concerns, inaccuracies, or gaps]
-
-## Recommendations
-
-[Any follow-up research or corrections needed]
-
-## Overall Assessment
-
-**Status**: Verified / Concerns / Failed
-```
-
-**D. Handle Failures**:
-- Verification failures are **NOT AUTO-FIXED**
-- Document issues clearly
-- Recommend user review and correction
-- Max attempts: 1 (flag issues, don't fix)
-
-**E. Update State**:
-- Add `phase-5-verification` to `completed_phases`
-- Set `current_phase` to `phase-6-integration` (if enabled) or complete
-
-**F. Interactive Pause** (if interactive mode):
-- Summarize verification results
-- Ask user if integration needed
-- If yes → Continue to Phase 6
-- If no → Complete workflow
-
----
-
-### Step 9: Execute Phase 6 - Integration (Optional)
-
-**Purpose**: Integrate research into project documentation or workflows
-
-**Execution**: Direct (orchestrator code)
-
-**A. Decide Whether to Execute**:
-
-**Auto-detect logic**:
-- Enable if: Specifications generated (feeding into dev workflow)
-- Enable if: Knowledge base generated (add to project docs)
-- Enable if: Recommendations that update project decisions
-- Skip if: Exploratory research not for documentation
-
-**User flags override**:
-- `--integrate` flag → Always enable
-- `--no-integrate` flag → Always skip
-
-**B. Execute Integration** (if enabled):
-
-**For Specifications**:
-1. Save specifications to research task outputs
-2. Provide path to specification-creator or parent orchestrator
-3. Document integration point
-
-**For Knowledge Base**:
-1. Identify appropriate location in `.ai-sdlc/docs/`
-2. Check if similar docs exist
-3. **Ask user** where to place knowledge base (don't auto-modify docs)
-4. Provide integration recommendations
-
-**For Recommendations**:
-1. Check if `.ai-sdlc/docs/project/decisions.md` exists
-2. **Ask user** if recommendations should be documented
-3. Provide guidance on where to add
-
-**C. Create Integration Manifest**:
-
-```markdown
-# Integration Manifest
-
-## Research Task
-[Task name and path]
-
-## Outputs Generated
-- [Output 1: path]
-- [Output 2: path]
-
-## Integration Recommendations
-
-### Specifications
-**Location**: [Where specs should be used]
-**Next Step**: Feed into specification-creator or continue orchestrator workflow
-
-### Knowledge Base
-**Recommended Location**: .ai-sdlc/docs/[category]/[filename]
-**Action**: User should review and place in appropriate location
-
-### Recommendations
-**Recommended Location**: .ai-sdlc/docs/project/decisions.md or roadmap.md
-**Action**: User should review and document decisions
-
-## Manual Steps Required
-1. [Step 1]
-2. [Step 2]
-```
-
-**D. Handle Failures**:
-- Integration failures are **NOT AUTO-FIXED**
-- Skip integration and provide manual guidance
-- Max attempts: 1 (provide guidance, don't force integration)
-
-**E. Update State**:
-- Add `phase-6-integration` to `completed_phases`
-- Mark workflow as complete
-
----
-
-### Step 10: Finalize Workflow
-
-**A. Update State**:
-
-```yaml
-orchestrator:
-  current_phase: completed
-  completed: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-```
-
-**B. Update metadata.yml**:
-
-```yaml
-status: completed
-completed: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-```
-
-**C. Generate Summary**:
-
-```markdown
-# Research Complete
-
-**Research Question**: [Original question]
-**Research Type**: [Type]
-**Duration**: [Time from start to finish]
-
-## Phases Completed
-- ✅ Phase 0: Research Initialization
-- ✅ Phase 1: Research Planning ([X sources identified])
-- ✅ Phase 2: Information Gathering ([Y findings documented])
-- ✅ Phase 3: Analysis & Synthesis ([Z patterns identified])
-- ✅ Phase 4: Generate Outputs
-- ✅ Phase 5: Verification (if enabled)
-- ✅ Phase 6: Integration (if enabled)
-
-## Key Findings
-[Bullet list of 3-5 most important findings]
-
-## Outputs Generated
-- Research Report: [path]
-- Recommendations: [path] (if applicable)
-- Knowledge Base: [path] (if applicable)
-- Specifications: [path] (if applicable)
-
-## Next Steps
-[What user should do with these outputs]
-
-## Task Directory
-All research artifacts saved in: [TASK_PATH]
-```
-
-**D. Display Summary to User**
-
----
-
-## State Management
-
-### State File Structure
-
-See `orchestrator-state.yml` structure in Step 2.
-
-### State Updates
-
-**Before each phase**:
-- Update `current_phase`
-- Increment phase start timestamp
-
-**After phase success**:
-- Add phase to `completed_phases`
-- Log phase results in `phase_results`
-- Update timestamp
-
-**After phase failure**:
-- Add to `failed_phases` with error details
-- Increment `auto_fix_attempts[phase]`
-- Save state before retry or halt
-
-### State Persistence
-
-**Save state**:
-- Before each phase execution
-- After each phase completion
-- Before any agent delegation
-- After any failure
-
-**Purpose**: Enable resume from any point
-
----
-
-## Auto-Fix Strategy
-
-See `references/auto-fix-strategies.md` for detailed strategies.
-
-**Summary**:
-- Each phase has max attempt limit (1-3)
-- Auto-fix appropriate for analysis/planning phases
-- Don't auto-fix verification or integration failures
-- Always save state before halt
+## Auto-Recovery
+
+| Phase | Max Attempts | Strategy |
+|-------|--------------|----------|
+| 0 | 1 | Prompt user for clarification if question unclear |
+| 1 | 2 | Expand search patterns, use fallback mixed methodology |
+| 2 | 3 | Retry with expanded patterns, try alternative sources, continue with available |
+| 3 | 2 | Request targeted re-gathering for gaps, synthesize with limitations |
+| 4 | 2 | Generate standard outputs based on type, ask user in interactive |
+| 5 | 0 | Read-only, report only |
+| 6 | 0 | Read-only, provide manual guidance |
 
 ---
 
@@ -1007,21 +409,18 @@ See `references/auto-fix-strategies.md` for detailed strategies.
 
 **Flow**: Complete 7-phase workflow, save all outputs in task directory
 
----
-
 ### As Embedded Phase 0
 
-**Invoked by**: feature-orchestrator, enhancement-orchestrator, migration-orchestrator
+**Invoked by**: development-orchestrator (feature, enhancement), migration-orchestrator
 
 **Integration**:
 1. Parent orchestrator invokes research-orchestrator
-2. Research executes phases 0-4 (skip optional phases)
-3. Specifications output fed directly into parent's specification phase
+2. Research executes phases 0-4 (skip optional phases 5-6)
+3. Specifications output fed into parent's specification phase
 4. Research report saved in parent task's `analysis/research/` directory
 
 **Handoff**:
 ```yaml
-# Parent orchestrator receives:
 research_outputs:
   specifications: "[path to specifications.md]"
   research_report: "[path to research-report.md]"
@@ -1030,45 +429,25 @@ research_outputs:
 
 ---
 
-## References
+## Command Integration
 
-- `references/research-methodologies.md` - Research type classification, methodology selection, source identification
-- `references/workflow-phases.md` - Detailed phase execution patterns, dependencies, validation
-- `references/auto-fix-strategies.md` - Failure handling, recovery patterns, escalation logic
+Invoked via:
+- `/ai-sdlc:research:new [question] [--yolo] [--type=TYPE]`
+- `/ai-sdlc:research:resume [task-path]`
 
----
-
-## Key Success Factors
-
-1. **Evidence-Based**: Every finding must have source citation and evidence
-2. **Systematic Execution**: Follow phase sequence, don't skip prerequisites
-3. **Clear Communication**: Summarize each phase, provide actionable outputs
-4. **Graceful Degradation**: Accept reduced quality over complete failure
-5. **User Respect**: Don't retry endlessly, escalate when appropriate
-6. **State Persistence**: Always save state, enable resume from any point
+Task directory: `.ai-sdlc/tasks/research/YYYY-MM-DD-task-name/`
 
 ---
 
-## Common Use Cases
+## Success Criteria
 
-**"How does authentication work in this codebase?"**
-- Type: Technical
-- Phases: All required phases (0-4)
-- Outputs: Research report, knowledge base
-- Integration: Add to .ai-sdlc/docs/architecture/
+Workflow successful when:
 
-**"What are the requirements for the new reporting feature?"**
-- Type: Requirements
-- Phases: All required phases (0-4)
-- Outputs: Research report, specifications
-- Integration: Feed into feature-orchestrator
-
-**"What's the best approach for implementing real-time notifications?"**
-- Type: Mixed (technical + literature)
-- Phases: All required + verification (5)
-- Outputs: Research report, recommendations
-- Integration: Update project decisions
-
----
-
-Begin orchestration by following the steps above. Always maintain state, communicate clearly, and produce evidence-based outputs.
+- Research question clearly defined and classified
+- Methodology selected and sources identified
+- Information gathered from multiple sources with citations
+- Findings synthesized with pattern identification
+- Research report answers original question
+- Appropriate conditional outputs generated
+- Confidence levels documented
+- Ready for integration or handoff to parent workflow
