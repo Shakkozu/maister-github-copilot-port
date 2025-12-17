@@ -29,7 +29,9 @@ Use TodoWrite tool with todos:
 ]
 ```
 
-Note: Phase 0.5 (Check dependencies) only if part of initiative, Phase 6 (Generate documentation) is optional.
+**Skip phases based on context** (remove from todo list before starting):
+- **Not part of initiative**: Skip "Check dependencies"
+- **Documentation not needed**: Skip "Generate documentation"
 
 ### Step 2: Output Initialization Summary
 

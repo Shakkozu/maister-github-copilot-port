@@ -18,22 +18,35 @@ Unified workflow for bug fixes, enhancements, and new features with task-type-sp
 ```
 Use TodoWrite tool with todos:
 [
+  {"content": "Check dependencies", "status": "pending", "activeForm": "Checking dependencies"},
   {"content": "Analyze codebase", "status": "pending", "activeForm": "Analyzing codebase"},
   {"content": "Clarify requirements", "status": "pending", "activeForm": "Clarifying requirements"},
   {"content": "Analyze gaps", "status": "pending", "activeForm": "Analyzing gaps"},
+  {"content": "Write failing test (TDD Red)", "status": "pending", "activeForm": "Writing failing test"},
+  {"content": "Clarify UI approach", "status": "pending", "activeForm": "Clarifying UI approach"},
+  {"content": "Generate UI mockups", "status": "pending", "activeForm": "Generating UI mockups"},
+  {"content": "Clarify technical approach", "status": "pending", "activeForm": "Clarifying technical approach"},
   {"content": "Create specification", "status": "pending", "activeForm": "Creating specification"},
+  {"content": "Decide architecture", "status": "pending", "activeForm": "Deciding architecture"},
   {"content": "Audit specification", "status": "pending", "activeForm": "Auditing specification"},
   {"content": "Plan implementation", "status": "pending", "activeForm": "Planning implementation"},
   {"content": "Execute implementation", "status": "pending", "activeForm": "Executing implementation"},
+  {"content": "Verify test passes (TDD Green)", "status": "pending", "activeForm": "Verifying test passes"},
+  {"content": "Prompt verification options", "status": "pending", "activeForm": "Prompting verification options"},
   {"content": "Verify implementation", "status": "pending", "activeForm": "Verifying implementation"},
+  {"content": "Run E2E tests", "status": "pending", "activeForm": "Running E2E tests"},
+  {"content": "Generate user documentation", "status": "pending", "activeForm": "Generating user documentation"},
   {"content": "Finalize workflow", "status": "pending", "activeForm": "Finalizing workflow"}
 ]
 ```
 
-Add task-type-specific phases as needed:
-- **Bug fixes**: Add `{"content": "Write failing test (TDD Red)", "status": "pending", "activeForm": "Writing failing test"}` after "Analyze gaps" and `{"content": "Verify test passes (TDD Green)", "status": "pending", "activeForm": "Verifying test passes"}` after "Execute implementation"
-- **Features/Enhancements with UI** (ui_heavy=true): Add `{"content": "Clarify UI approach", "status": "pending", "activeForm": "Clarifying UI approach"}` and `{"content": "Generate UI mockups", "status": "pending", "activeForm": "Generating UI mockups"}` after "Analyze gaps"
-- **Complex tasks** (multiple approaches or high risk): Add `{"content": "Clarify technical approach", "status": "pending", "activeForm": "Clarifying technical approach"}` before "Create specification"
+**Skip phases based on task type** (remove from todo list before starting):
+- **Not part of initiative**: Skip "Check dependencies"
+- **Not bug fix**: Skip "Write failing test (TDD Red)" and "Verify test passes (TDD Green)"
+- **Not UI-heavy** (ui_heavy=false): Skip "Clarify UI approach" and "Generate UI mockups"
+- **Simple task** (not complex, single approach): Skip "Clarify technical approach" and "Decide architecture"
+- **E2E not enabled**: Skip "Run E2E tests"
+- **User docs not enabled**: Skip "Generate user documentation"
 
 ### Step 2: Output Initialization Summary
 
