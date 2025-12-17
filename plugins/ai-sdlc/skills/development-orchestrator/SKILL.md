@@ -40,13 +40,20 @@ Use TodoWrite tool with todos:
 ]
 ```
 
-**Skip phases based on task type** (remove from todo list before starting):
+**Skip phases based on task type** (remove from todo list when known):
+
+At initialization (task type known):
 - **Not part of initiative**: Skip "Check dependencies"
 - **Not bug fix**: Skip "Write failing test (TDD Red)" and "Verify test passes (TDD Green)"
-- **Not UI-heavy** (ui_heavy=false): Skip "Clarify UI approach" and "Generate UI mockups"
+- **Bug fix**: Skip "Run E2E tests" and "Generate user documentation"
+
+After gap analysis (ui_heavy known):
+- **Not UI-heavy** (ui_heavy=false): Skip "Clarify UI approach", "Generate UI mockups", and "Run E2E tests"
 - **Simple task** (not complex, single approach): Skip "Clarify technical approach" and "Decide architecture"
-- **E2E not enabled**: Skip "Run E2E tests"
-- **User docs not enabled**: Skip "Generate user documentation"
+
+After Phase 10 (user can override):
+- **User disabled E2E**: Skip "Run E2E tests"
+- **User disabled docs**: Skip "Generate user documentation"
 
 ### Step 2: Output Initialization Summary
 
@@ -289,6 +296,8 @@ prompt: |
 - Update `task_context.ui_heavy` from output `ui_heavy` field
 - Update `task_context.risk_level` from output `risk_level` (if currently null)
 - For bugs: Update `task_context.reproduction_data` from output `reproduction_data`
+- Set `options.e2e_enabled`: true if feature/enhancement AND ui_heavy, false for bugs
+- Set `options.user_docs_enabled`: true if feature/enhancement, false for bugs
 
 **⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 3.
 
@@ -548,6 +557,8 @@ Use Skill tool:
 - Production Readiness (recommended if deploying)
 - Reality Assessment (always enabled)
 - Pragmatic Review (always enabled)
+- E2E Tests (enabled by default for features/enhancements with UI, user can disable)
+- User Documentation (enabled by default for features/enhancements, user can disable)
 
 **State Update**: After user selection (Interactive) or auto-decision (YOLO):
 - Set `options.code_review_enabled` based on user choice or auto-decision
@@ -555,8 +566,8 @@ Use Skill tool:
 - Set `options.production_check_enabled` based on user choice or auto-decision
 - Set `options.pragmatic_review_enabled: true` (always enabled)
 - Set `options.reality_check_enabled: true` (always enabled)
-- Set `options.e2e_enabled` based on user choice, `--e2e` flag, or YOLO auto-decision (UI-related tasks)
-- Set `options.user_docs_enabled` based on user choice, `--user-docs` flag, or YOLO auto-decision (features/enhancements)
+- Set `options.e2e_enabled`: Default true for features/enhancements with UI (not bugs), user can disable, `--no-e2e` forces off
+- Set `options.user_docs_enabled`: Default true for features/enhancements (not bugs), user can disable, `--no-user-docs` forces off
 
 **⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 11.
 
@@ -635,8 +646,8 @@ Development-specific fields in `orchestrator-state.yml`:
 orchestrator:
   task_type: bug | enhancement | feature
   options:
-    e2e_enabled: null
-    user_docs_enabled: null
+    e2e_enabled: null             # Default true for features/enhancements with UI (Phase 10)
+    user_docs_enabled: null       # Default true for features/enhancements (Phase 10)
     code_review_enabled: null
     code_review_scope: null
     production_check_enabled: null
