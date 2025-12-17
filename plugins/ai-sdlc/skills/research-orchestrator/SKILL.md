@@ -20,7 +20,8 @@ Use TodoWrite tool with todos:
 [
   {"content": "Initialize research", "status": "pending", "activeForm": "Initializing research"},
   {"content": "Plan research methodology", "status": "pending", "activeForm": "Planning research methodology"},
-  {"content": "Gather information", "status": "pending", "activeForm": "Gathering information"},
+  {"content": "Gather information (parallel)", "status": "pending", "activeForm": "Gathering information in parallel"},
+  {"content": "Merge findings", "status": "pending", "activeForm": "Merging findings"},
   {"content": "Analyze and synthesize", "status": "pending", "activeForm": "Analyzing and synthesizing"},
   {"content": "Generate outputs", "status": "pending", "activeForm": "Generating outputs"},
   {"content": "Verify findings", "status": "pending", "activeForm": "Verifying findings"},
@@ -28,7 +29,7 @@ Use TodoWrite tool with todos:
 ]
 ```
 
-Note: Phases 5-6 (Verify findings, Integrate into project) are optional based on context.
+Note: Phase 2 runs 4 agents in parallel. Phases 5-6 (Verify findings, Integrate into project) are optional based on context.
 
 ### Step 2: Output Initialization Summary
 
@@ -84,6 +85,14 @@ This orchestrator follows shared patterns. See:
 - **Interactive Mode**: `../orchestrator-framework/references/interactive-mode.md`
 - **Initialization**: `../orchestrator-framework/references/initialization-pattern.md`
 
+## Local References
+
+Read these during relevant phases:
+
+| File | When to Use | Purpose |
+|------|-------------|---------|
+| `references/research-methodologies.md` | Phase 1 | Research methodology selection and approach patterns |
+
 ---
 
 ## Phase Configuration
@@ -92,13 +101,14 @@ This orchestrator follows shared patterns. See:
 |-------|---------|------------|-------------|
 | 0 | "Initialize research" | "Initializing research" | orchestrator |
 | 1 | "Plan research methodology" | "Planning research methodology" | research-planner |
-| 2 | "Gather information" | "Gathering information" | information-gatherer |
+| 2 | "Gather information (parallel)" | "Gathering information in parallel" | information-gatherer (x4) |
+| 2.5 | "Merge findings" | "Merging findings" | orchestrator |
 | 3 | "Analyze and synthesize" | "Analyzing and synthesizing" | research-synthesizer |
 | 4 | "Generate outputs" | "Generating outputs" | orchestrator |
 | 5 | "Verify findings" | "Verifying findings" | orchestrator (optional) |
 | 6 | "Integrate into project" | "Integrating into project" | orchestrator (optional) |
 
-**Workflow Overview**: 5-7 phases (Phases 5-6 optional based on context)
+**Workflow Overview**: 6-8 phases (Phase 2 runs 4 agents in parallel, Phases 5-6 optional)
 
 **CRITICAL TodoWrite Usage**:
 1. At workflow start: Create todos for ALL phases using the Phase Configuration table above (all status=pending)
@@ -177,45 +187,234 @@ prompt: |
 
 ---
 
-### Phase 2: Information Gathering
+### Phase 2: Information Gathering (Parallel)
 
-**Delegate to**: `information-gatherer` subagent
+**Delegate to**: 4 parallel `information-gatherer` subagent instances
 
-**Task tool invocation**:
+**CRITICAL: Spawn all 4 agents in ONE Task tool message for parallel execution.**
+
+Each agent gathers from ONE source category, runs independently, and writes to non-overlapping files.
+
+**Task tool invocation** (4 calls in ONE message):
+
 ```
-subagent_type: "ai-sdlc:information-gatherer"
-description: "Gather information"
-prompt: |
-  You are the information-gatherer agent. Execute systematic
-  information gathering from all identified sources.
+Use Task tool 4 times in ONE message:
 
-  Task directory: [task-path]
-  Inputs:
-  - planning/research-plan.md
-  - planning/sources.md
+Task 1: Codebase Gatherer
+  subagent_type: "ai-sdlc:information-gatherer"
+  description: "Gather codebase information"
+  prompt: |
+    You are the information-gatherer agent with source_category=codebase.
 
-  Please:
-  1. Execute research plan phases systematically
-  2. Gather from all sources in sources.md
-  3. Maintain strict source citations for EVERY finding
-  4. Organize findings by source type (one file per type)
-  5. Cross-reference findings and identify gaps
+    Task directory: [task-path]
+    Source category: codebase
 
-  Save to:
-  - analysis/findings/00-summary.md (overview)
-  - analysis/findings/codebase-*.md
-  - analysis/findings/docs-*.md
-  - analysis/findings/config-*.md
-  - analysis/findings/external-*.md (if applicable)
+    Inputs:
+    - planning/research-plan.md
+    - planning/sources.md (filter to "Codebase Sources" section only)
 
-  CRITICAL: Every finding MUST include source reference, evidence, and context.
+    Please:
+    1. Read research plan and filter sources.md to codebase sources only
+    2. Execute research phases for codebase sources only
+    3. Gather from code files using Glob, Grep, Read
+    4. Maintain strict source citations for EVERY finding
+    5. Save findings to analysis/findings/codebase-*.md files
 
-  Use only Read, Grep, Glob, WebFetch, and Bash tools. Do NOT modify code.
+    IMPORTANT:
+    - Only process codebase sources (file patterns, key files, directories)
+    - Do NOT create 00-summary.md or 99-verification.md (orchestrator will merge)
+    - Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+
+Task 2: Documentation Gatherer
+  subagent_type: "ai-sdlc:information-gatherer"
+  description: "Gather documentation information"
+  prompt: |
+    You are the information-gatherer agent with source_category=documentation.
+
+    Task directory: [task-path]
+    Source category: documentation
+
+    Inputs:
+    - planning/research-plan.md
+    - planning/sources.md (filter to "Documentation Sources" section only)
+
+    Please:
+    1. Read research plan and filter sources.md to documentation sources only
+    2. Execute research phases for documentation sources only
+    3. Gather from docs using Read, Grep on documentation paths
+    4. Maintain strict source citations for EVERY finding
+    5. Save findings to analysis/findings/docs-*.md files
+
+    IMPORTANT:
+    - Only process documentation sources (project docs, code docs, inline comments)
+    - Do NOT create 00-summary.md or 99-verification.md (orchestrator will merge)
+    - Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+
+Task 3: Configuration Gatherer
+  subagent_type: "ai-sdlc:information-gatherer"
+  description: "Gather configuration information"
+  prompt: |
+    You are the information-gatherer agent with source_category=configuration.
+
+    Task directory: [task-path]
+    Source category: configuration
+
+    Inputs:
+    - planning/research-plan.md
+    - planning/sources.md (filter to "Configuration Sources" section only)
+
+    Please:
+    1. Read research plan and filter sources.md to configuration sources only
+    2. Execute research phases for configuration sources only
+    3. Gather from config files using Read
+    4. Maintain strict source citations for EVERY finding
+    5. Save findings to analysis/findings/config-*.md files
+
+    IMPORTANT:
+    - Only process configuration sources (package.json, .env, docker-compose, etc.)
+    - Do NOT create 00-summary.md or 99-verification.md (orchestrator will merge)
+    - Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+
+Task 4: External Gatherer
+  subagent_type: "ai-sdlc:information-gatherer"
+  description: "Gather external information"
+  prompt: |
+    You are the information-gatherer agent with source_category=external.
+
+    Task directory: [task-path]
+    Source category: external
+
+    Inputs:
+    - planning/research-plan.md
+    - planning/sources.md (filter to "External Sources" section only)
+
+    Please:
+    1. Read research plan and filter sources.md to external sources only
+    2. Execute research phases for external sources only
+    3. Gather from web using WebSearch, WebFetch
+    4. Maintain strict source citations for EVERY finding
+    5. Save findings to analysis/findings/external-*.md files
+
+    IMPORTANT:
+    - Only process external sources (URLs, web resources, framework docs)
+    - If no external sources in sources.md, report "No external sources to gather"
+    - Do NOT create 00-summary.md or 99-verification.md (orchestrator will merge)
+    - Use WebSearch, WebFetch, Read, and Bash tools. Do NOT modify code.
 ```
 
-**Outputs**: `analysis/findings/*.md` (multiple files with source citations)
+**Outputs from Phase 2**: Category-specific findings files only (no summary/verification yet)
+- `analysis/findings/codebase-*.md` (from Task 1)
+- `analysis/findings/docs-*.md` (from Task 2)
+- `analysis/findings/config-*.md` (from Task 3)
+- `analysis/findings/external-*.md` (from Task 4, if sources exist)
 
-**Success**: All sources investigated, findings documented with citations
+**Success**: All 4 agents complete, category-specific findings files exist in `analysis/findings/`
+
+**Note**: If a category has no sources in sources.md, that agent completes quickly with a note.
+
+**⏸️ DO NOT STOP** - Proceed directly to Phase 2.5 (Merge Findings) after all agents complete.
+
+---
+
+### Phase 2.5: Merge Findings
+
+**Execution**: Main orchestrator (direct)
+
+**Purpose**: Consolidate parallel gathering results into summary and verification files.
+
+**Process**:
+
+1. **Verify all findings exist**:
+   - List all files in `analysis/findings/`
+   - Confirm at least one findings file per category (or note if category was empty)
+
+2. **Generate Summary** (`analysis/findings/00-summary.md`):
+   - Read all `codebase-*.md`, `docs-*.md`, `config-*.md`, `external-*.md` files
+   - Extract key findings from each category
+   - Create unified summary with this structure:
+
+   ```markdown
+   # Research Findings Summary
+
+   ## Research Question
+   [From research-brief.md]
+
+   ## Sources Investigated
+
+   ### Codebase Sources ([N] files)
+   [List from codebase-*.md files]
+
+   ### Documentation Sources ([N] docs)
+   [List from docs-*.md files]
+
+   ### Configuration Sources ([N] files)
+   [List from config-*.md files]
+
+   ### External Sources ([N] resources)
+   [List from external-*.md files, or "None" if no external sources]
+
+   ## Key Findings by Category
+
+   ### Codebase Findings
+   [Summarize key findings from codebase-*.md]
+
+   ### Documentation Findings
+   [Summarize key findings from docs-*.md]
+
+   ### Configuration Findings
+   [Summarize key findings from config-*.md]
+
+   ### External Findings
+   [Summarize key findings from external-*.md, or "No external sources gathered"]
+
+   ## Gaps and Uncertainties
+   [Aggregate gaps from all categories]
+
+   ## Next Steps for Synthesis
+   [What synthesis phase should focus on]
+   ```
+
+3. **Generate Verification** (`analysis/findings/99-verification.md`):
+   - Cross-reference findings across categories
+   - Identify contradictions between sources
+   - Assess confidence levels for cross-category findings
+   - Structure:
+
+   ```markdown
+   # Cross-Source Verification
+
+   ## Verification Checks
+
+   ### Code vs Documentation
+   [Compare findings from codebase-*.md with docs-*.md]
+
+   ### Code vs Configuration
+   [Compare findings from codebase-*.md with config-*.md]
+
+   ### Internal vs External
+   [Compare internal findings with external-*.md best practices]
+
+   ## Confidence Assessment
+
+   ### High Confidence Findings
+   [Multiple sources confirm]
+
+   ### Medium Confidence Findings
+   [Single source or partial evidence]
+
+   ### Low Confidence Findings
+   [Unclear or contradictory]
+
+   ## Identified Contradictions
+   [List any conflicting information between sources]
+
+   ## Missing Information
+   [Gaps identified across all categories]
+   ```
+
+**Outputs**: `analysis/findings/00-summary.md`, `analysis/findings/99-verification.md`
+
+**Success**: Summary and verification files created, all findings integrated
 
 **⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 3.
 
@@ -393,7 +592,8 @@ options:
 |-------|--------------|----------|
 | 0 | 1 | Prompt user for clarification if question unclear |
 | 1 | 2 | Expand search patterns, use fallback mixed methodology |
-| 2 | 3 | Retry with expanded patterns, try alternative sources, continue with available |
+| 2 | 3 | Retry failed agents only, continue with successful categories |
+| 2.5 | 2 | Merge available findings, note missing categories in summary |
 | 3 | 2 | Request targeted re-gathering for gaps, synthesize with limitations |
 | 4 | 2 | Generate standard outputs based on type, ask user in interactive |
 | 5 | 0 | Read-only, report only |
