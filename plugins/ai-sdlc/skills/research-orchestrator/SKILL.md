@@ -152,34 +152,57 @@ Read these during relevant phases:
 
 ### Phase 1: Research Planning
 
-**Delegate to**: `research-planner` subagent
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Task tool invocation**:
+❌ WRONG: Reading agents/research-planner.md and following its instructions directly
+❌ WRONG: Planning research methodology inline in the orchestrator thread
+❌ WRONG: Identifying data sources yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:research-planner"
-description: "Plan research methodology"
-prompt: |
-  You are the research-planner agent. Design research methodology
-  and identify data sources.
-
-  Task directory: [task-path]
-  Input: planning/research-brief.md
-
-  Please:
-  1. Analyze research question and type
-  2. Select appropriate methodology
-  3. Identify all relevant data sources (codebase, docs, config, external)
-  4. Create phased research plan
-  5. Define success criteria for each phase
-
-  Save to:
-  - planning/research-plan.md (methodology, approach)
-  - planning/sources.md (data sources with access paths)
-
-  Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+📤 Delegating Phase 1 to: research-planner subagent
+Method: Task tool
+Expected outputs: planning/research-plan.md, planning/sources.md
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:research-planner"
+  description: "Plan research methodology"
+  prompt: |
+    You are the research-planner agent. Design research methodology
+    and identify data sources.
+
+    Task directory: [task-path]
+    Input: planning/research-brief.md
+
+    Please:
+    1. Analyze research question and type
+    2. Select appropriate methodology
+    3. Identify all relevant data sources (codebase, docs, config, external)
+    4. Create phased research plan
+    5. Define success criteria for each phase
+
+    Save to:
+    - planning/research-plan.md (methodology, approach)
+    - planning/sources.md (data sources with access paths)
+
+    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `planning/research-plan.md`, `planning/sources.md`
+
+**SELF-CHECK (before proceeding to Phase 2):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Are `planning/research-plan.md` and `planning/sources.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **Success**: Methodology selected, sources identified (at least one), plan documented
 
@@ -189,13 +212,29 @@ prompt: |
 
 ### Phase 2: Information Gathering (Parallel)
 
-**Delegate to**: 4 parallel `information-gatherer` subagent instances
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+
+❌ WRONG: Reading agents/information-gatherer.md and following its instructions directly
+❌ WRONG: Gathering information from sources inline in the orchestrator thread
+❌ WRONG: Spawning agents one at a time instead of in parallel
+❌ WRONG: Doing information gathering yourself
+
+✅ RIGHT: Using the Task tool 4 times in ONE message for parallel execution
+
+**Output before invoking:**
+```
+📤 Delegating Phase 2 to: 4 parallel information-gatherer subagents
+Method: Task tool (4 calls in ONE message)
+Expected outputs: analysis/findings/codebase-*.md, docs-*.md, config-*.md, external-*.md
+```
 
 **CRITICAL: Spawn all 4 agents in ONE Task tool message for parallel execution.**
 
 Each agent gathers from ONE source category, runs independently, and writes to non-overlapping files.
 
-**Task tool invocation** (4 calls in ONE message):
+**INVOKE NOW (PARALLEL):**
+
+Launch these 4 agents in a SINGLE message with multiple Task tool calls:
 
 ```
 Use Task tool 4 times in ONE message:
@@ -302,11 +341,20 @@ Task 4: External Gatherer
     - Use WebSearch, WebFetch, Read, and Bash tools. Do NOT modify code.
 ```
 
+⏳ Wait for ALL 4 agents to complete before continuing.
+
 **Outputs from Phase 2**: Category-specific findings files only (no summary/verification yet)
 - `analysis/findings/codebase-*.md` (from Task 1)
 - `analysis/findings/docs-*.md` (from Task 2)
 - `analysis/findings/config-*.md` (from Task 3)
 - `analysis/findings/external-*.md` (from Task 4, if sources exist)
+
+**SELF-CHECK (before proceeding to Phase 2.5):**
+- [ ] Did you invoke 4 Task tools in ONE message? (not sequentially)
+- [ ] Did you wait for ALL agents to return results?
+- [ ] Are findings files present in `analysis/findings/`?
+
+If NO to any: STOP - go back and invoke all 4 Task tools in ONE message.
 
 **Success**: All 4 agents complete, category-specific findings files exist in `analysis/findings/`
 
@@ -422,38 +470,61 @@ Task 4: External Gatherer
 
 ### Phase 3: Analysis & Synthesis
 
-**Delegate to**: `research-synthesizer` subagent
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Task tool invocation**:
+❌ WRONG: Reading agents/research-synthesizer.md and following its instructions directly
+❌ WRONG: Synthesizing findings inline in the orchestrator thread
+❌ WRONG: Creating research report yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:research-synthesizer"
-description: "Analyze and synthesize"
-prompt: |
-  You are the research-synthesizer agent. Analyze findings
-  and generate comprehensive research report.
-
-  Task directory: [task-path]
-  Input: analysis/findings/ (all files)
-
-  Please:
-  1. Read all finding files systematically
-  2. Cross-reference findings across sources
-  3. Identify patterns, themes, relationships
-  4. Generate synthesis with pattern analysis
-  5. Generate comprehensive research report answering research question
-  6. Mark confidence levels (high/medium/low)
-  7. Document gaps and uncertainties
-
-  Save to:
-  - analysis/synthesis.md (patterns, insights)
-  - analysis/research-report.md (comprehensive report)
-
-  CRITICAL: Every insight must trace to findings, every conclusion evidence-based.
-
-  Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+📤 Delegating Phase 3 to: research-synthesizer subagent
+Method: Task tool
+Expected outputs: analysis/synthesis.md, analysis/research-report.md
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:research-synthesizer"
+  description: "Analyze and synthesize"
+  prompt: |
+    You are the research-synthesizer agent. Analyze findings
+    and generate comprehensive research report.
+
+    Task directory: [task-path]
+    Input: analysis/findings/ (all files)
+
+    Please:
+    1. Read all finding files systematically
+    2. Cross-reference findings across sources
+    3. Identify patterns, themes, relationships
+    4. Generate synthesis with pattern analysis
+    5. Generate comprehensive research report answering research question
+    6. Mark confidence levels (high/medium/low)
+    7. Document gaps and uncertainties
+
+    Save to:
+    - analysis/synthesis.md (patterns, insights)
+    - analysis/research-report.md (comprehensive report)
+
+    CRITICAL: Every insight must trace to findings, every conclusion evidence-based.
+
+    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `analysis/synthesis.md`, `analysis/research-report.md`
+
+**SELF-CHECK (before proceeding to Phase 4):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Are `analysis/synthesis.md` and `analysis/research-report.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **Success**: Research question answered, patterns identified, confidence documented
 

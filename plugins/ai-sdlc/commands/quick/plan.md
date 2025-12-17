@@ -71,6 +71,16 @@ During Phase 1 (Explore) and Phase 2 (Plan), instruct agents to:
    - Standards compliance checklist for verification after implementation
    - Post-implementation verification steps to confirm standards adherence
 
+**MANDATORY for Plan Agents**:
+
+When launching Plan agents, include in the prompt:
+1. "Read `.ai-sdlc/docs/INDEX.md` to discover all available standards"
+2. "Identify which standards apply to this task"
+3. **"READ the actual standard files"** (not just reference their paths)
+4. "Include a Standards Compliance section in the plan with exact file paths"
+
+**BLOCKING**: Plans must include which specific standard files were read and how they apply.
+
 ### Graceful Fallback
 
 **If `.ai-sdlc/docs/` does not exist:**
@@ -88,7 +98,8 @@ project documentation and coding standards for better consistency."
 2. **Checks** for project standards in `.ai-sdlc/docs/INDEX.md`
 3. **Enters** Claude Code's builtin planning mode via `EnterPlanMode`
 4. **Guides** the planning process with standards awareness
-5. **Produces** a plan file with implementation approach and applicable standards
+5. **READS** actual standard files (MANDATORY - not just INDEX.md)
+6. **Produces** a plan file with implementation approach, applicable standards, and Standards Compliance section
 
 ## Benefits Over Manual Planning
 

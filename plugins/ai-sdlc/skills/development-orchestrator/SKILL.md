@@ -199,14 +199,31 @@ This orchestrator follows shared patterns. See:
 
 ### Phase 1: Codebase Analysis
 
-**IMMEDIATE ACTION REQUIRED**: Invoke the codebase-analyzer skill NOW:
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
+❌ WRONG: Reading codebase-analyzer/SKILL.md and following its instructions directly
+❌ WRONG: Spawning your own Explore subagents to analyze the codebase
+❌ WRONG: Doing codebase analysis inline in the orchestrator thread
+❌ WRONG: Skipping this phase because you "already know" the codebase
+
+✅ RIGHT: Using the Skill tool below and waiting for completion
+
+**Output before invoking:**
 ```
-Use Skill tool:
+📤 Delegating Phase 1 to: codebase-analyzer skill
+Method: Skill tool
+Expected outputs: analysis/codebase-analysis.md
+```
+
+**INVOKE NOW:**
+
+Tool: `Skill`
+Parameters:
   skill: "ai-sdlc:codebase-analyzer"
-```
 
-**Do NOT analyze codebase directly.** The codebase-analyzer skill handles:
+⏳ Wait for skill completion before continuing.
+
+**What codebase-analyzer handles** (you do NOT do this):
 - 3 parallel Explore subagents for comprehensive analysis
 - Task-type-specific focus (bug/enhancement/feature)
 - Risk level assessment
@@ -221,6 +238,13 @@ Use Skill tool:
 | **Feature** | Find similar patterns | Analyze architecture | Find integration points |
 
 **Outputs**: `analysis/codebase-analysis.md`
+
+**SELF-CHECK (before proceeding to Phase 1.5):**
+- [ ] Did you invoke the Skill tool? (not just read this SKILL.md)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `analysis/codebase-analysis.md` present?
+
+If NO to any: STOP - go back and invoke the Skill tool.
 
 **State Update**: After codebase-analyzer completes:
 - Read structured output `risk_level` from analysis results
@@ -266,21 +290,35 @@ Use Skill tool:
 
 ### Phase 2: Gap Analysis
 
-**Agent**: `gap-analyzer` (subagent)
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Purpose**: Compare current state vs desired state
+❌ WRONG: Reading agents/gap-analyzer.md and following its instructions directly
+❌ WRONG: Doing gap analysis inline in the orchestrator thread
+❌ WRONG: Comparing current vs desired state yourself
 
-**Task tool invocation**:
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:gap-analyzer"
-description: "Analyze gaps"
-prompt: |
-  Analyze gaps for [task_type]: [description].
-  Task path: [task-path]
-  Analysis: analysis/codebase-analysis.md
-  Clarifications: analysis/clarifications.md
-  Task type: [task_type]
+📤 Delegating Phase 2 to: gap-analyzer subagent
+Method: Task tool
+Expected outputs: analysis/gap-analysis.md
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:gap-analyzer"
+  description: "Analyze gaps"
+  prompt: |
+    Analyze gaps for [task_type]: [description].
+    Task path: [task-path]
+    Analysis: analysis/codebase-analysis.md
+    Clarifications: analysis/clarifications.md
+    Task type: [task_type]
+
+⏳ Wait for subagent completion before continuing.
 
 **Gap Analysis by Task Type**:
 
@@ -291,6 +329,13 @@ prompt: |
 | **Feature** | No feature | Integrated feature | Integration points, patterns to follow |
 
 **Outputs**: `analysis/gap-analysis.md`
+
+**SELF-CHECK (before proceeding to Phase 3):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `analysis/gap-analysis.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **State Update**: After gap-analyzer completes, read structured output:
 - Update `task_context.ui_heavy` from output `ui_heavy` field
@@ -363,11 +408,47 @@ prompt: |
 
 ### Phase 4: UI Mockup Generation (Conditional)
 
-**Agent**: `ui-mockup-generator` (subagent)
-
 **When**: Enhancement or feature with `ui_heavy = true`
 
+**Skip if**: Bug fix OR `ui_heavy = false`
+
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+
+❌ WRONG: Reading agents/ui-mockup-generator.md and following its instructions directly
+❌ WRONG: Generating ASCII mockups inline in the orchestrator thread
+❌ WRONG: Skipping this phase when ui_heavy = true
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
+```
+📤 Delegating Phase 4 to: ui-mockup-generator subagent
+Method: Task tool
+Expected outputs: analysis/ui-mockups.md
+```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:ui-mockup-generator"
+  description: "Generate UI mockups"
+  prompt: |
+    Generate ASCII mockups for: [description]
+    Task path: [task-path]
+    Gap analysis: analysis/gap-analysis.md
+    UI clarifications: analysis/ui-clarifications.md
+
+⏳ Wait for subagent completion before continuing.
+
 **Outputs**: `analysis/ui-mockups.md`
+
+**SELF-CHECK (before proceeding to Phase 4.5):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `analysis/ui-mockups.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **→ Continue directly to Phase 4.5** (Clarify Technical Approach) if complex, otherwise skip to Phase 5 - no pause needed before clarifying phases.
 
@@ -417,14 +498,30 @@ prompt: |
 
 ### Phase 5: Specification
 
-**IMMEDIATE ACTION REQUIRED**: Invoke the specification-creator skill NOW:
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
+❌ WRONG: Reading specification-creator/SKILL.md and following its instructions directly
+❌ WRONG: Writing spec.md or requirements.md inline in the orchestrator thread
+❌ WRONG: Gathering requirements yourself instead of letting the skill do it
+
+✅ RIGHT: Using the Skill tool below and waiting for completion
+
+**Output before invoking:**
 ```
-Use Skill tool:
+📤 Delegating Phase 5 to: specification-creator skill
+Method: Skill tool
+Expected outputs: implementation/spec.md, implementation/requirements.md
+```
+
+**INVOKE NOW:**
+
+Tool: `Skill`
+Parameters:
   skill: "ai-sdlc:specification-creator"
-```
 
-**Do NOT create specification directly.** The specification-creator skill handles:
+⏳ Wait for skill completion before continuing.
+
+**What specification-creator handles** (you do NOT do this):
 - 4-phase spec creation (init → research → write → verify)
 - Standards awareness from docs/INDEX.md
 - Task-type-specific sections (bug/enhancement/feature)
@@ -436,6 +533,13 @@ Use Skill tool:
 - **Feature**: Architecture decisions, integration approach
 
 **Outputs**: `implementation/spec.md`, `implementation/requirements.md`
+
+**SELF-CHECK (before proceeding to Phase 5.5):**
+- [ ] Did you invoke the Skill tool? (not just read this SKILL.md)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `implementation/spec.md` present?
+
+If NO to any: STOP - go back and invoke the Skill tool.
 
 **⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 5.5.
 
@@ -471,11 +575,42 @@ Use Skill tool:
 
 ### Phase 6: Specification Audit
 
-**Agent**: `spec-auditor` (subagent)
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Purpose**: Verify specification completeness
+❌ WRONG: Reading agents/spec-auditor.md and following its instructions directly
+❌ WRONG: Auditing the specification inline in the orchestrator thread
+❌ WRONG: Creating spec-audit.md yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
+```
+📤 Delegating Phase 6 to: spec-auditor subagent
+Method: Task tool
+Expected outputs: verification/spec-audit.md
+```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:spec-auditor"
+  description: "Audit specification"
+  prompt: |
+    Audit specification for: [description]
+    Task path: [task-path]
+    Specification: implementation/spec.md
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `verification/spec-audit.md`
+
+**SELF-CHECK (before proceeding to Phase 7):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `verification/spec-audit.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 7.
 
@@ -483,14 +618,30 @@ Use Skill tool:
 
 ### Phase 7: Implementation Planning
 
-**IMMEDIATE ACTION REQUIRED**: Invoke the implementation-planner skill NOW:
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
+❌ WRONG: Reading implementation-planner/SKILL.md and following its instructions directly
+❌ WRONG: Creating implementation-plan.md inline in the orchestrator thread
+❌ WRONG: Breaking down the spec into tasks yourself
+
+✅ RIGHT: Using the Skill tool below and waiting for completion
+
+**Output before invoking:**
 ```
-Use Skill tool:
+📤 Delegating Phase 7 to: implementation-planner skill
+Method: Skill tool
+Expected outputs: implementation/implementation-plan.md
+```
+
+**INVOKE NOW:**
+
+Tool: `Skill`
+Parameters:
   skill: "ai-sdlc:implementation-planner"
-```
 
-**Do NOT create implementation plan directly.** The implementation-planner skill handles:
+⏳ Wait for skill completion before continuing.
+
+**What implementation-planner handles** (you do NOT do this):
 - Task groups organized by layer (database, API, frontend, testing)
 - Test-driven steps (2-8 tests per group)
 - Dependency ordering and acceptance criteria
@@ -503,26 +654,58 @@ Use Skill tool:
 
 **Outputs**: `implementation/implementation-plan.md`
 
+**SELF-CHECK (before proceeding to Phase 8):**
+- [ ] Did you invoke the Skill tool? (not just read this SKILL.md)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `implementation/implementation-plan.md` present?
+
+If NO to any: STOP - go back and invoke the Skill tool.
+
 **⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 8.
 
 ---
 
 ### Phase 8: Implementation
 
-**IMMEDIATE ACTION REQUIRED**: Invoke the implementer skill NOW:
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
+❌ WRONG: Reading implementer/SKILL.md and following its instructions directly
+❌ WRONG: Writing code inline in the orchestrator thread
+❌ WRONG: Executing implementation steps yourself
+❌ WRONG: Reading docs/INDEX.md and implementing standards yourself
+
+✅ RIGHT: Using the Skill tool below and waiting for completion
+
+**Output before invoking:**
 ```
-Use Skill tool:
+📤 Delegating Phase 8 to: implementer skill
+Method: Skill tool
+Expected outputs: Implemented code, implementation/work-log.md
+```
+
+**INVOKE NOW:**
+
+Tool: `Skill`
+Parameters:
   skill: "ai-sdlc:implementer"
-```
 
-**Do NOT implement directly.** The implementer skill handles:
+⏳ Wait for skill completion before continuing.
+
+**What implementer handles** (you do NOT do this):
 - Continuous standards discovery from docs/INDEX.md
 - Execution mode selection (direct/delegated/orchestrated based on complexity)
 - Progress tracking in work-log.md
 - Test-driven verification per task group
 
 **Outputs**: Implemented code, updated implementation-plan.md, `implementation/work-log.md`
+
+**SELF-CHECK (before proceeding to Phase 9):**
+- [ ] Did you invoke the Skill tool? (not just read this SKILL.md)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `implementation/work-log.md` present?
+- [ ] Are implementation steps marked complete in implementation-plan.md?
+
+If NO to any: STOP - go back and invoke the Skill tool.
 
 **⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 9.
 
@@ -575,14 +758,31 @@ Use Skill tool:
 
 ### Phase 11: Verification
 
-**IMMEDIATE ACTION REQUIRED**: Invoke the implementation-verifier skill NOW:
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
+❌ WRONG: Reading implementation-verifier/SKILL.md and following its instructions directly
+❌ WRONG: Running tests inline in the orchestrator thread
+❌ WRONG: Creating verification reports yourself
+❌ WRONG: Invoking code-reviewer or reality-assessor subagents yourself
+
+✅ RIGHT: Using the Skill tool below and waiting for completion
+
+**Output before invoking:**
 ```
-Use Skill tool:
+📤 Delegating Phase 11 to: implementation-verifier skill
+Method: Skill tool
+Expected outputs: verification/implementation-verification.md
+```
+
+**INVOKE NOW:**
+
+Tool: `Skill`
+Parameters:
   skill: "ai-sdlc:implementation-verifier"
-```
 
-**Do NOT verify implementation directly.** The implementation-verifier skill handles:
+⏳ Wait for skill completion before continuing.
+
+**What implementation-verifier handles** (you do NOT do this):
 - Full test suite execution (not just feature tests)
 - Standards compliance verification from docs/INDEX.md
 - Optional reviews (code, pragmatic, production, reality)
@@ -600,17 +800,59 @@ Use Skill tool:
 | `verification/production-readiness-report.md` | If production_check_enabled |
 | `verification/reality-check.md` | If reality_check_enabled |
 
+**SELF-CHECK (before proceeding to Phase 12):**
+- [ ] Did you invoke the Skill tool? (not just read this SKILL.md)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `verification/implementation-verification.md` present?
+
+If NO to any: STOP - go back and invoke the Skill tool.
+
 **⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 12.
 
 ---
 
 ### Phase 12: E2E Testing (Optional)
 
-**Agent**: `e2e-test-verifier`
+**When**: `options.e2e_enabled = true` (Interactive prompts, YOLO auto-runs if UI-related, or `--e2e` flag)
 
-**When**: Interactive prompts, YOLO auto-runs if UI-related, or `--e2e` flag
+**Skip if**: `options.e2e_enabled = false` or bug fix
+
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+
+❌ WRONG: Reading agents/e2e-test-verifier.md and following its instructions directly
+❌ WRONG: Running Playwright tests inline in the orchestrator thread
+❌ WRONG: Taking screenshots yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
+```
+📤 Delegating Phase 12 to: e2e-test-verifier subagent
+Method: Task tool
+Expected outputs: verification/e2e-verification-report.md, screenshots
+```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:e2e-test-verifier"
+  description: "E2E verification"
+  prompt: |
+    Run E2E tests for: [description]
+    Task path: [task-path]
+    Specification: implementation/spec.md
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `verification/e2e-verification-report.md`, screenshots
+
+**SELF-CHECK (before proceeding to Phase 13):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `verification/e2e-verification-report.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 13.
 
@@ -618,11 +860,46 @@ Use Skill tool:
 
 ### Phase 13: User Documentation (Optional)
 
-**Agent**: `user-docs-generator`
+**When**: `options.user_docs_enabled = true` (Feature or enhancement, not bugs, user request or `--user-docs` flag)
 
-**When**: Feature or enhancement (not bugs), user request or `--user-docs` flag
+**Skip if**: `options.user_docs_enabled = false` or bug fix
+
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+
+❌ WRONG: Reading agents/user-docs-generator.md and following its instructions directly
+❌ WRONG: Writing user documentation inline in the orchestrator thread
+❌ WRONG: Taking screenshots yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
+```
+📤 Delegating Phase 13 to: user-docs-generator subagent
+Method: Task tool
+Expected outputs: documentation/user-guide.md, screenshots
+```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:user-docs-generator"
+  description: "Generate user documentation"
+  prompt: |
+    Generate user documentation for: [description]
+    Task path: [task-path]
+    Specification: implementation/spec.md
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `documentation/user-guide.md`, screenshots
+
+**SELF-CHECK (before proceeding to Phase 14):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `documentation/user-guide.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 14.
 

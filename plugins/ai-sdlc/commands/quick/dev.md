@@ -61,20 +61,38 @@ Implement a task directly without entering planning mode, while still applying p
    - The categories and files listed in INDEX.md
    - The nature of the task
    - Keywords in the task description
-3. Read the applicable standard files to extract key guidelines
+3. **READ the applicable standard files** (see Standards Reading Enforcement below)
 
 **If not exists:**
 - Note that no standards are available
 - Suggest running `/init-sdlc` in completion message
 
+### Standards Reading Enforcement (MANDATORY)
+
+**BLOCKING**: Reading INDEX.md alone is NOT sufficient. You MUST read actual standard files.
+
+**Enforcement Process**:
+1. Read INDEX.md to discover available standards
+2. Identify which standards apply based on task description
+3. **READ each applicable standard file** using Read tool (not just note it exists)
+4. Apply standards during implementation
+5. List applied standards in completion summary
+
+**Examples of standard discovery**:
+- Task mentions "upload" → Read file-handling standards
+- Task mentions "form" → Read validation and accessibility standards
+- Task mentions "API" → Read api and error-handling standards
+
 ### Step 3: Implement with Standards
 
-**Proceed directly to implementation:**
+**MANDATORY**: During implementation:
 
 1. Explore the codebase to understand context (using Glob, Grep, Read)
-2. Apply the discovered standards during implementation
-3. Make the necessary code changes
-4. Run relevant tests if applicable
+2. **Apply discovered standards** - Reference the standard files you read
+3. For each code change, verify it follows applicable standards
+4. If you encounter new areas while coding (e.g., auth, database), read applicable standards before proceeding
+5. Make the necessary code changes
+6. Run relevant tests if applicable
 
 ### Step 4: Verify Standards Compliance
 
@@ -99,9 +117,10 @@ Implement a task directly without entering planning mode, while still applying p
 
 1. **Parses** task description from user input
 2. **Discovers** applicable standards from `.ai-sdlc/docs/INDEX.md`
-3. **Implements** directly without planning mode approval
-4. **Verifies** standards were followed
-5. **Summarizes** what was done and which standards applied
+3. **READS** actual standard files (MANDATORY - not just INDEX.md)
+4. **Implements** directly without planning mode approval
+5. **Verifies** standards were followed
+6. **Summarizes** what was done and which standards were read and applied
 
 ## Graceful Fallback
 

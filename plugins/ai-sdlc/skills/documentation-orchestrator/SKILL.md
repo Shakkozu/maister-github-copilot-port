@@ -113,33 +113,56 @@ Read these during relevant phases:
 
 ### Phase 0: Documentation Planning & Audience Analysis
 
-**Delegate to**: `documentation-planner` subagent
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Task tool invocation**:
+❌ WRONG: Reading agents/documentation-planner.md and following its instructions directly
+❌ WRONG: Planning documentation structure inline in the orchestrator thread
+❌ WRONG: Creating the documentation outline yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:documentation-planner"
-description: "Plan documentation structure"
-prompt: |
-  You are the documentation-planner agent. Analyze documentation requirements
-  and create structured content outline.
-
-  Documentation Request: [user description]
-  Task directory: [task-path]
-
-  Please:
-  1. Classify documentation type (user guide, tutorial, reference, FAQ, API docs)
-  2. Identify target audience (end users, developers, admins, power users)
-  3. Determine appropriate tone and complexity level
-  4. Create detailed content outline with sections
-  5. Identify required screenshots and visual examples
-  6. Estimate documentation scope (pages, screenshots, time)
-  7. Generate comprehensive documentation plan
-
-  Save to: planning/documentation-outline.md
-  Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+📤 Delegating Phase 0 to: documentation-planner subagent
+Method: Task tool
+Expected outputs: planning/documentation-outline.md
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:documentation-planner"
+  description: "Plan documentation structure"
+  prompt: |
+    You are the documentation-planner agent. Analyze documentation requirements
+    and create structured content outline.
+
+    Documentation Request: [user description]
+    Task directory: [task-path]
+
+    Please:
+    1. Classify documentation type (user guide, tutorial, reference, FAQ, API docs)
+    2. Identify target audience (end users, developers, admins, power users)
+    3. Determine appropriate tone and complexity level
+    4. Create detailed content outline with sections
+    5. Identify required screenshots and visual examples
+    6. Estimate documentation scope (pages, screenshots, time)
+    7. Generate comprehensive documentation plan
+
+    Save to: planning/documentation-outline.md
+    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `planning/documentation-outline.md`
+
+**SELF-CHECK (before proceeding to Phase 1):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `planning/documentation-outline.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **Success**: Doc type classified, audience identified, outline complete with screenshot requirements
 
@@ -149,37 +172,60 @@ prompt: |
 
 ### Phase 1: Content Creation with Screenshots
 
-**Delegate to**: `user-docs-generator` subagent
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Task tool invocation**:
+❌ WRONG: Reading agents/user-docs-generator.md and following its instructions directly
+❌ WRONG: Writing documentation content inline in the orchestrator thread
+❌ WRONG: Capturing screenshots yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:user-docs-generator"
-description: "Create content with screenshots"
-prompt: |
-  You are the user-docs-generator agent. Generate documentation content
-  with screenshots using the structured outline.
-
-  Task directory: [task-path]
-  Input: planning/documentation-outline.md
-
-  Please:
-  1. Read documentation outline and requirements
-  2. Identify user-facing workflows from outline
-  3. Generate content following outline structure
-  4. Capture clear screenshots using Playwright for each step
-  5. Write step-by-step instructions in appropriate tone
-  6. Include realistic examples with proper data
-  7. Add tips, warnings, and best practices
-  8. Create comprehensive user documentation
-
-  Save to: documentation/[doc-filename].md
-  Screenshots: documentation/screenshots/
-  Use Read, Write, Bash, and Playwright tools for screenshot capture.
+📤 Delegating Phase 1 to: user-docs-generator subagent
+Method: Task tool
+Expected outputs: documentation/user-guide.md, documentation/screenshots/
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:user-docs-generator"
+  description: "Create content with screenshots"
+  prompt: |
+    You are the user-docs-generator agent. Generate documentation content
+    with screenshots using the structured outline.
+
+    Task directory: [task-path]
+    Input: planning/documentation-outline.md
+
+    Please:
+    1. Read documentation outline and requirements
+    2. Identify user-facing workflows from outline
+    3. Generate content following outline structure
+    4. Capture clear screenshots using Playwright for each step
+    5. Write step-by-step instructions in appropriate tone
+    6. Include realistic examples with proper data
+    7. Add tips, warnings, and best practices
+    8. Create comprehensive user documentation
+
+    Save to: documentation/[doc-filename].md
+    Screenshots: documentation/screenshots/
+    Use Read, Write, Bash, and Playwright tools for screenshot capture.
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**:
 - `documentation/user-guide.md` (or appropriate filename)
 - `documentation/screenshots/*.png`
+
+**SELF-CHECK (before proceeding to Phase 2):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `documentation/user-guide.md` (or equivalent) present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **Success**: All sections written, screenshots captured, examples included
 
@@ -189,41 +235,64 @@ prompt: |
 
 ### Phase 2: Review & Validation
 
-**Delegate to**: `documentation-reviewer` subagent
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Task tool invocation**:
+❌ WRONG: Reading agents/documentation-reviewer.md and following its instructions directly
+❌ WRONG: Reviewing documentation inline in the orchestrator thread
+❌ WRONG: Creating review report yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:documentation-reviewer"
-description: "Review and validate"
-prompt: |
-  You are the documentation-reviewer agent. Validate documentation
-  completeness and readability.
-
-  Task directory: [task-path]
-  Inputs:
-  - planning/documentation-outline.md
-  - documentation/[doc-filename].md
-
-  Please:
-  1. Check completeness (all sections from outline present)
-  2. Calculate readability metrics (Flesch Reading Ease, Grade Level)
-  3. Validate screenshots exist and are clear
-  4. Check for broken links and references
-  5. Flag technical jargon (recommend simplification)
-  6. Verify examples are clear and realistic
-  7. Assess overall clarity and usefulness
-  8. Generate review report with PASS/FAIL verdict
-
-  Save to: verification/documentation-review.md
-  Use only Read, Grep, Glob, and Bash tools. Do NOT modify content.
-
-  Verdict Criteria:
-  - PASS: All sections present, readability targets met, screenshots valid
-  - PASS with Issues: Minor issues but usable
-  - FAIL: Missing sections, poor readability (<50 ease), broken links
+📤 Delegating Phase 2 to: documentation-reviewer subagent
+Method: Task tool
+Expected outputs: verification/documentation-review.md
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:documentation-reviewer"
+  description: "Review and validate"
+  prompt: |
+    You are the documentation-reviewer agent. Validate documentation
+    completeness and readability.
+
+    Task directory: [task-path]
+    Inputs:
+    - planning/documentation-outline.md
+    - documentation/[doc-filename].md
+
+    Please:
+    1. Check completeness (all sections from outline present)
+    2. Calculate readability metrics (Flesch Reading Ease, Grade Level)
+    3. Validate screenshots exist and are clear
+    4. Check for broken links and references
+    5. Flag technical jargon (recommend simplification)
+    6. Verify examples are clear and realistic
+    7. Assess overall clarity and usefulness
+    8. Generate review report with PASS/FAIL verdict
+
+    Save to: verification/documentation-review.md
+    Use only Read, Grep, Glob, and Bash tools. Do NOT modify content.
+
+    Verdict Criteria:
+    - PASS: All sections present, readability targets met, screenshots valid
+    - PASS with Issues: Minor issues but usable
+    - FAIL: Missing sections, poor readability (<50 ease), broken links
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `verification/documentation-review.md` with verdict
+
+**SELF-CHECK (before proceeding to Phase 3):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `verification/documentation-review.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **Gate**: Cannot proceed to Phase 3 if verdict = FAIL
 

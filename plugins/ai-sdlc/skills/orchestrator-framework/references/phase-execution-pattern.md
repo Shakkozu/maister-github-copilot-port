@@ -61,6 +61,29 @@ Execute the phase according to its definition in the orchestrator's Workflow Pha
 
 This is where domain-specific logic runs (e.g., security analysis, performance profiling, codebase analysis).
 
+**⚠️ CRITICAL: Delegation Enforcement**
+
+If this phase requires delegation to a skill or subagent:
+
+1. **Output pre-delegation announcement**:
+   ```
+   📤 Delegating Phase [N] to: [skill/agent name]
+   Method: [Skill tool / Task tool]
+   Expected outputs: [list]
+   ```
+
+2. **Invoke the tool** (Skill or Task) - do NOT execute inline
+
+3. **Wait for completion** before proceeding
+
+**See**: `delegation-enforcement.md` for complete enforcement patterns.
+
+**Anti-patterns to AVOID**:
+- ❌ Reading a SKILL.md file and following its instructions directly
+- ❌ Spawning your own subagents to do delegated work
+- ❌ Executing analysis/planning/implementation inline
+- ❌ Skipping delegation because you "already know" the answer
+
 ### STEP 5: Handle Errors
 
 If phase fails:

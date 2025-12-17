@@ -164,18 +164,37 @@ Read these during relevant phases:
 
 ### Phase 0: Current State Analysis
 
-**Delegate to**: `codebase-analyzer` skill
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Skill invocation**:
+❌ WRONG: Reading codebase-analyzer/SKILL.md and following its instructions directly
+❌ WRONG: Spawning your own Explore subagents to analyze the codebase
+❌ WRONG: Analyzing the current system inline in the orchestrator thread
+
+✅ RIGHT: Using the Skill tool below and waiting for completion
+
+**Output before invoking:**
 ```
-Invoke codebase-analyzer skill with:
-- task_type: "enhancement" (migration analyzes existing code)
-- description: [migration description]
-- task_path: [.ai-sdlc/tasks/migrations/YYYY-MM-DD-name/]
-- artifact_name: "current-state-analysis.md"
+📤 Delegating Phase 0 to: codebase-analyzer skill
+Method: Skill tool
+Expected outputs: analysis/current-state-analysis.md
 ```
+
+**INVOKE NOW:**
+
+Tool: `Skill`
+Parameters:
+  skill: "ai-sdlc:codebase-analyzer"
+
+⏳ Wait for skill completion before continuing.
 
 **Outputs**: `analysis/current-state-analysis.md`
+
+**SELF-CHECK (before proceeding to Phase 1):**
+- [ ] Did you invoke the Skill tool? (not just read the SKILL.md)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `analysis/current-state-analysis.md` present?
+
+If NO to any: STOP - go back and invoke the Skill tool.
 
 **Success**: Current system files identified, technologies documented, complexity assessed
 
@@ -185,36 +204,57 @@ Invoke codebase-analyzer skill with:
 
 ### Phase 1: Target State Planning & Gap Analysis
 
-**Delegate to**: `gap-analyzer` subagent
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Task tool invocation**:
+❌ WRONG: Reading agents/gap-analyzer.md and following its instructions directly
+❌ WRONG: Analyzing migration gaps inline in the orchestrator thread
+❌ WRONG: Classifying migration type yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:gap-analyzer"
-description: "Analyze migration gaps and target state"
-prompt: |
-  You are the gap-analyzer agent. Perform comprehensive gap analysis
-  for this migration.
-
-  Migration Description: [description]
-  Task directory: [task-path]
-  Existing Analysis: analysis/current-state-analysis.md
-
-  Please:
-  1. Define target system from migration description
-  2. Identify gaps (features to migrate, APIs to adapt, data to transform)
-  3. Classify migration type (code/data/architecture)
-  4. Recommend migration strategy (incremental/big-bang/dual-run/phased)
-  5. Assess risk level and breaking changes
-  6. Document rollback requirements
-  7. Perform external research (WebSearch) for version upgrades or technology migrations
-
-  Save to: analysis/target-state-plan.md
-  Use only Read, Grep, Glob, WebSearch, and Bash tools. Do NOT modify code.
+📤 Delegating Phase 1 to: gap-analyzer subagent
+Method: Task tool
+Expected outputs: analysis/target-state-plan.md
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:gap-analyzer"
+  description: "Analyze migration gaps and target state"
+  prompt: |
+    You are the gap-analyzer agent. Perform comprehensive gap analysis
+    for this migration.
+
+    Migration Description: [description]
+    Task directory: [task-path]
+    Existing Analysis: analysis/current-state-analysis.md
+
+    Please:
+    1. Define target system from migration description
+    2. Identify gaps (features to migrate, APIs to adapt, data to transform)
+    3. Classify migration type (code/data/architecture)
+    4. Recommend migration strategy (incremental/big-bang/dual-run/phased)
+    5. Assess risk level and breaking changes
+    6. Document rollback requirements
+    7. Perform external research (WebSearch) for version upgrades or technology migrations
+
+    Save to: analysis/target-state-plan.md
+    Use only Read, Grep, Glob, WebSearch, and Bash tools. Do NOT modify code.
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `analysis/target-state-plan.md`
 
-**Success**: Migration type classified, strategy recommended, breaking changes documented
+**SELF-CHECK (before proceeding to Phase 2):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `analysis/target-state-plan.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **State Update**: After gap-analyzer completes, read structured output:
 - Update `migration_context.migration_type` from output (code/data/architecture/general)
@@ -231,17 +271,28 @@ prompt: |
 
 ### Phase 2: Migration Strategy Specification
 
-**Delegate to**: `specification-creator` skill
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Process**:
-1. Invoke specification-creator with migration context
-2. Pass current_system, target_system, migration_type, migration_strategy from state
-3. Create specification with migration-specific details:
-   - Rollback requirements for each phase
-   - Dual-run synchronization (if dual-run strategy)
-   - Incremental milestone definitions (if incremental)
-   - Data migration procedures (if data migration)
-4. Create rollback plan
+❌ WRONG: Reading specification-creator/skill.md and following its instructions directly
+❌ WRONG: Writing migration specification inline in the orchestrator thread
+❌ WRONG: Creating rollback plan yourself
+
+✅ RIGHT: Using the Skill tool below and waiting for completion
+
+**Output before invoking:**
+```
+📤 Delegating Phase 2 to: specification-creator skill
+Method: Skill tool
+Expected outputs: implementation/spec.md, analysis/rollback-plan.md
+```
+
+**INVOKE NOW:**
+
+Tool: `Skill`
+Parameters:
+  skill: "ai-sdlc:specification-creator"
+
+⏳ Wait for skill completion before continuing.
 
 **Outputs**:
 - `implementation/spec.md` - Migration specification
@@ -249,7 +300,12 @@ prompt: |
 - `analysis/dual-run-plan.md` - (if dual-run strategy)
 - `verification/spec-verification.md`
 
-**Success**: Specification complete, rollback plan documented
+**SELF-CHECK (before proceeding to Phase 3):**
+- [ ] Did you invoke the Skill tool? (not just read the skill.md)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `implementation/spec.md` present?
+
+If NO to any: STOP - go back and invoke the Skill tool.
 
 **State Update**: After specification-creator completes:
 - Set `migration_context.rollback_plan_created: true` (if rollback-plan.md created)
@@ -261,19 +317,37 @@ prompt: |
 
 ### Phase 3: Implementation Planning
 
-**Delegate to**: `implementation-planner` skill
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Process**:
-1. Invoke implementation-planner with migration specification
-2. Break migration into task groups by strategy:
-   - **Incremental**: Task group per migration phase
-   - **Big-bang**: Standard task groups (prep, migrate, verify)
-   - **Dual-run**: Task groups (old system, new system, sync, cutover)
-   - **Phased**: Task groups per phase with dependencies
-3. Include rollback steps in each task group
-4. Define verification points between phases
+❌ WRONG: Reading implementation-planner/skill.md and following its instructions directly
+❌ WRONG: Creating implementation plan inline in the orchestrator thread
+❌ WRONG: Breaking migration into task groups yourself
+
+✅ RIGHT: Using the Skill tool below and waiting for completion
+
+**Output before invoking:**
+```
+📤 Delegating Phase 3 to: implementation-planner skill
+Method: Skill tool
+Expected outputs: implementation/implementation-plan.md
+```
+
+**INVOKE NOW:**
+
+Tool: `Skill`
+Parameters:
+  skill: "ai-sdlc:implementation-planner"
+
+⏳ Wait for skill completion before continuing.
 
 **Outputs**: `implementation/implementation-plan.md` with rollback procedures
+
+**SELF-CHECK (before proceeding to Phase 4):**
+- [ ] Did you invoke the Skill tool? (not just read the skill.md)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `implementation/implementation-plan.md` present?
+
+If NO to any: STOP - go back and invoke the Skill tool.
 
 **Success**: Plan complete with rollback steps, dependencies correct
 
@@ -283,21 +357,42 @@ prompt: |
 
 ### Phase 4: Migration Execution
 
-**Delegate to**: `implementer` skill
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+
+❌ WRONG: Reading implementer/SKILL.md and following its instructions directly
+❌ WRONG: Executing migration steps inline in the orchestrator thread
+❌ WRONG: Making code changes yourself without invoking implementer
+
+✅ RIGHT: Using the Skill tool below and waiting for completion
+
+**Output before invoking:**
+```
+📤 Delegating Phase 4 to: implementer skill
+Method: Skill tool
+Expected outputs: Migration changes, updated implementation-plan.md
+```
 
 **Standards Reminder**: Review `.ai-sdlc/docs/INDEX.md` for project standards before implementing.
 
-**Process**:
-1. Invoke implementer to execute implementation-plan.md
-2. Execute migration incrementally per task group
-3. Run tests after each migration phase (not just at end)
-4. Enable pause/resume at task group boundaries (critical for migrations)
-5. Log progress in implementation/work-log.md
+**INVOKE NOW:**
+
+Tool: `Skill`
+Parameters:
+  skill: "ai-sdlc:implementer"
+
+⏳ Wait for skill completion before continuing.
 
 **Outputs**:
 - Implemented migration changes
 - Updated `implementation-plan.md` (all steps complete)
 - `implementation/work-log.md`
+
+**SELF-CHECK (before proceeding to Phase 5):**
+- [ ] Did you invoke the Skill tool? (not just read the SKILL.md)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `implementation-plan.md` showing steps as complete?
+
+If NO to any: STOP - go back and invoke the Skill tool.
 
 **Success**: All migration steps complete, tests pass after each task group
 
@@ -307,9 +402,30 @@ prompt: |
 
 ### Phase 5: Verification + Compatibility Testing
 
-**Delegate to**: `implementation-verifier` skill
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Migration-Specific Checks**:
+❌ WRONG: Reading implementation-verifier/skill.md and following its instructions directly
+❌ WRONG: Running verification checks inline in the orchestrator thread
+❌ WRONG: Creating verification report yourself
+
+✅ RIGHT: Using the Skill tool below and waiting for completion
+
+**Output before invoking:**
+```
+📤 Delegating Phase 5 to: implementation-verifier skill
+Method: Skill tool
+Expected outputs: verification/implementation-verification.md
+```
+
+**INVOKE NOW:**
+
+Tool: `Skill`
+Parameters:
+  skill: "ai-sdlc:implementation-verifier"
+
+⏳ Wait for skill completion before continuing.
+
+**Migration-Specific Checks** (performed by verifier):
 - Verify old system still works (if dual-run)
 - Test rollback procedures (non-destructive test)
 - Validate data integrity (for data migrations)
@@ -320,6 +436,13 @@ prompt: |
 - `verification/implementation-verification.md`
 - `verification/compatibility-test-results.md`
 
+**SELF-CHECK (before proceeding to Phase 6):**
+- [ ] Did you invoke the Skill tool? (not just read the skill.md)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `verification/implementation-verification.md` present?
+
+If NO to any: STOP - go back and invoke the Skill tool.
+
 **Gate**: Cannot complete if data integrity issues in data migration
 
 **⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 6.
@@ -328,22 +451,60 @@ prompt: |
 
 ### Phase 6: Documentation (Optional)
 
-**Delegate to**: `user-docs-generator` subagent
-
 **Enable if**: Complex migration (medium-high risk), `--docs` flag, or user requests in interactive
 
 **State Update**: When deciding whether to run documentation (Interactive or YOLO):
 - Set `options.docs_enabled` based on user choice, `--docs` flag, or auto-decision (true for medium-high risk migrations)
 
-**Content**:
-- Migration overview and goals
-- Prerequisites and preparation steps
-- Step-by-step migration procedure
-- Rollback procedures
-- Troubleshooting common issues
-- Verification checklist
+**Skip if**: `options.docs_enabled = false`
+
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+
+❌ WRONG: Reading agents/user-docs-generator.md and following its instructions directly
+❌ WRONG: Writing migration documentation inline in the orchestrator thread
+❌ WRONG: Creating migration guide yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
+```
+📤 Delegating Phase 6 to: user-docs-generator subagent
+Method: Task tool
+Expected outputs: documentation/migration-guide.md
+```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:user-docs-generator"
+  description: "Generate migration documentation"
+  prompt: |
+    You are the user-docs-generator agent. Create comprehensive migration
+    documentation for end users.
+
+    Task directory: [task-path]
+
+    Please create documentation covering:
+    - Migration overview and goals
+    - Prerequisites and preparation steps
+    - Step-by-step migration procedure
+    - Rollback procedures
+    - Troubleshooting common issues
+    - Verification checklist
+
+    Save to: documentation/migration-guide.md
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `documentation/migration-guide.md`
+
+**SELF-CHECK (after documentation generation):**
+- [ ] Did you invoke the Task tool? (not just skip or do inline)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `documentation/migration-guide.md` present?
+
+If NO to any and `options.docs_enabled = true`: STOP - go back and invoke the Task tool.
 
 ---
 

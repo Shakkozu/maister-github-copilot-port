@@ -113,36 +113,57 @@ Read these during relevant phases:
 
 ### Phase 0: Performance Baseline & Profiling
 
-**Delegate to**: `performance-profiler` subagent
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Task tool invocation**:
+❌ WRONG: Reading agents/performance-profiler.md and following its instructions directly
+❌ WRONG: Running profiling commands inline in the orchestrator thread
+❌ WRONG: Measuring performance metrics yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:performance-profiler"
-description: "Profile and establish baseline"
-prompt: |
-  You are the performance-profiler agent. Analyze application performance
-  and create a comprehensive baseline report.
-
-  Performance Issue: [user description]
-  Task directory: [task-path]
-
-  Please:
-  1. Identify performance target from description
-  2. Measure response time (p50, p95, p99) using load testing
-  3. Measure throughput (req/sec, saturation point)
-  4. Profile CPU usage (hot functions)
-  5. Profile memory usage (heap size, growth, leaks)
-  6. Count database queries (N+1 patterns, slow queries)
-  7. Identify performance hotspots
-  8. Generate comprehensive baseline report
-
-  Save to: analysis/performance-baseline.md
-  Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+📤 Delegating Phase 0 to: performance-profiler subagent
+Method: Task tool
+Expected outputs: analysis/performance-baseline.md
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:performance-profiler"
+  description: "Profile and establish baseline"
+  prompt: |
+    You are the performance-profiler agent. Analyze application performance
+    and create a comprehensive baseline report.
+
+    Performance Issue: [user description]
+    Task directory: [task-path]
+
+    Please:
+    1. Identify performance target from description
+    2. Measure response time (p50, p95, p99) using load testing
+    3. Measure throughput (req/sec, saturation point)
+    4. Profile CPU usage (hot functions)
+    5. Profile memory usage (heap size, growth, leaks)
+    6. Count database queries (N+1 patterns, slow queries)
+    7. Identify performance hotspots
+    8. Generate comprehensive baseline report
+
+    Save to: analysis/performance-baseline.md
+    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `analysis/performance-baseline.md`, profiling artifacts
 
-**Success**: All metrics measured, hotspots identified, baseline documented
+**SELF-CHECK (before proceeding to Phase 1):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `analysis/performance-baseline.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **State Update**: After performance-profiler completes:
 - Update `performance_context.baseline_p95` from output p95 response time (milliseconds)
@@ -154,35 +175,56 @@ prompt: |
 
 ### Phase 1: Bottleneck Analysis & Optimization Planning
 
-**Delegate to**: `bottleneck-analyzer` subagent
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Task tool invocation**:
+❌ WRONG: Reading agents/bottleneck-analyzer.md and following its instructions directly
+❌ WRONG: Analyzing performance baseline inline in the orchestrator thread
+❌ WRONG: Creating optimization plan yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:bottleneck-analyzer"
-description: "Analyze bottlenecks and plan"
-prompt: |
-  You are the bottleneck-analyzer agent. Analyze performance baseline
-  data and create prioritized optimization plan.
-
-  Task directory: [task-path]
-
-  Please:
-  1. Load performance baseline from analysis/performance-baseline.md
-  2. Analyze database performance (detect N+1 queries, missing indexes)
-  3. Review CPU hotspots (identify inefficient algorithms)
-  4. Detect memory issues (leaks, excessive allocations)
-  5. Identify I/O bottlenecks (blocking operations, slow APIs)
-  6. Classify bottlenecks by type
-  7. Assess impact and effort for each bottleneck
-  8. Create prioritized optimization plan (P0/P1/P2/P3)
-
-  Save to: implementation/optimization-plan.md
-  Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+📤 Delegating Phase 1 to: bottleneck-analyzer subagent
+Method: Task tool
+Expected outputs: implementation/optimization-plan.md
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:bottleneck-analyzer"
+  description: "Analyze bottlenecks and plan"
+  prompt: |
+    You are the bottleneck-analyzer agent. Analyze performance baseline
+    data and create prioritized optimization plan.
+
+    Task directory: [task-path]
+
+    Please:
+    1. Load performance baseline from analysis/performance-baseline.md
+    2. Analyze database performance (detect N+1 queries, missing indexes)
+    3. Review CPU hotspots (identify inefficient algorithms)
+    4. Detect memory issues (leaks, excessive allocations)
+    5. Identify I/O bottlenecks (blocking operations, slow APIs)
+    6. Classify bottlenecks by type
+    7. Assess impact and effort for each bottleneck
+    8. Create prioritized optimization plan (P0/P1/P2/P3)
+
+    Save to: implementation/optimization-plan.md
+    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `implementation/optimization-plan.md`
 
-**Success**: Bottlenecks identified, priorities assigned, implementation steps documented
+**SELF-CHECK (before proceeding to Phase 2):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `implementation/optimization-plan.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **State Update**: After bottleneck-analyzer completes:
 - Update `performance_context.optimizations_planned` from output total optimization count
@@ -193,7 +235,7 @@ prompt: |
 
 ### Phase 2: Implementation with Benchmarking
 
-**Execution**: Main orchestrator (delegates complex optimizations to `implementation-changes-planner`)
+**Execution**: Main orchestrator (direct for simple, delegates for complex)
 
 **Standards Reminder**: Review `.ai-sdlc/docs/INDEX.md` for performance standards before implementing.
 
@@ -201,12 +243,45 @@ prompt: |
 
 1. **Read Optimization Details** from `implementation/optimization-plan.md`
 2. **Benchmark Before** - Measure current performance for target endpoint
-3. **Implement Optimization** - Simple: Edit directly. Complex: Delegate to `implementation-changes-planner`
+3. **Implement Optimization**:
+   - Simple (1-3 files): Edit directly
+   - Complex (4+ files): **MUST delegate** to `implementation-changes-planner`
 4. **Benchmark After** - Re-measure performance
 5. **Verify Improvement** - Calculate percentage improvement vs target
 6. **Run Tests** - Ensure no regressions
 7. **Update Plan** - Mark optimization complete/failed, document results
 8. **State Update** - After each optimization completes: Increment `performance_context.optimizations_completed`
+
+**For Complex Optimizations (4+ files):**
+
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+
+❌ WRONG: Reading agents/implementation-changes-planner.md and following instructions directly
+❌ WRONG: Planning changes for 4+ files inline in the orchestrator thread
+❌ WRONG: Implementing complex optimizations without a structured change plan
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
+```
+📤 Delegating optimization change planning to: implementation-changes-planner subagent
+Method: Task tool
+Expected outputs: Change plan for current optimization
+```
+
+**INVOKE NOW (for complex optimizations):**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:implementation-changes-planner"
+  description: "Plan performance optimization changes"
+  prompt: |
+    Plan changes for optimization [N]: [optimization description]
+    Task directory: [task-path]
+    Optimization plan: implementation/optimization-plan.md
+    Target files: [list of files for this optimization]
+
+⏳ Wait for subagent completion, then apply changes.
 
 **Outputs**:
 - Modified code files
@@ -221,37 +296,60 @@ prompt: |
 
 ### Phase 3: Performance Verification
 
-**Delegate to**: `performance-verifier` subagent
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Task tool invocation**:
+❌ WRONG: Reading agents/performance-verifier.md and following its instructions directly
+❌ WRONG: Running verification benchmarks inline in the orchestrator thread
+❌ WRONG: Creating verification report yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:performance-verifier"
-description: "Verify performance improvements"
-prompt: |
-  You are the performance-verifier agent. Verify performance optimizations
-  achieved target improvements.
-
-  Task directory: [task-path]
-
-  Please:
-  1. Load baseline metrics from analysis/performance-baseline.md
-  2. Load optimization targets from implementation/optimization-plan.md
-  3. Re-measure all performance metrics (same methodology as baseline)
-  4. Compare baseline vs optimized (calculate improvement percentages)
-  5. Verify optimization targets met
-  6. Check for regressions (other endpoints slower)
-  7. Generate verification report with PASS/FAIL verdict
-
-  Save to: verification/performance-verification.md
-  Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
-
-  Verdict Criteria:
-  - PASS: All critical targets met, no critical regressions
-  - PASS with Concerns: Most targets met (>80%), minor regressions only
-  - FAIL: Critical targets not met (<80%) or critical regressions
+📤 Delegating Phase 3 to: performance-verifier subagent
+Method: Task tool
+Expected outputs: verification/performance-verification.md
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:performance-verifier"
+  description: "Verify performance improvements"
+  prompt: |
+    You are the performance-verifier agent. Verify performance optimizations
+    achieved target improvements.
+
+    Task directory: [task-path]
+
+    Please:
+    1. Load baseline metrics from analysis/performance-baseline.md
+    2. Load optimization targets from implementation/optimization-plan.md
+    3. Re-measure all performance metrics (same methodology as baseline)
+    4. Compare baseline vs optimized (calculate improvement percentages)
+    5. Verify optimization targets met
+    6. Check for regressions (other endpoints slower)
+    7. Generate verification report with PASS/FAIL verdict
+
+    Save to: verification/performance-verification.md
+    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+
+    Verdict Criteria:
+    - PASS: All critical targets met, no critical regressions
+    - PASS with Concerns: Most targets met (>80%), minor regressions only
+    - FAIL: Critical targets not met (<80%) or critical regressions
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `verification/performance-verification.md` with verdict
+
+**SELF-CHECK (before proceeding to Phase 4):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `verification/performance-verification.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **Gate**: Cannot proceed to Phase 4 if verdict = FAIL
 
@@ -279,7 +377,7 @@ prompt: |
 2. **Run Load Tests** - Execute using k6 or similar tool
 3. **Monitor Resources** - CPU (<90%), memory (stable), connections, error rates (<1%)
 4. **Analyze Results** - Response times under load, throughput capacity
-5. **Production Readiness** (optional) - Delegate to `production-readiness-checker`
+5. **Production Readiness** (if `options.skip_production_check = false`) - Delegate to `production-readiness-checker`
 6. **Generate Report** - Create `verification/load-test-results.md`
 
 **Load Test Scenarios**:
@@ -287,9 +385,41 @@ prompt: |
 - Sustained: 500 VUs for 30 minutes
 - Spike: 10x sudden increase to 1000 VUs
 
+**For Production Readiness Check (Step 5):**
+
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+
+❌ WRONG: Reading production-readiness-checker/skill.md and following its instructions directly
+❌ WRONG: Running production readiness checks inline in the orchestrator thread
+❌ WRONG: Creating production readiness report yourself
+
+✅ RIGHT: Using the Skill tool below and waiting for completion
+
+**Output before invoking:**
+```
+📤 Delegating production readiness check to: production-readiness-checker skill
+Method: Skill tool
+Expected outputs: verification/production-readiness-report.md
+```
+
+**INVOKE NOW (for production readiness):**
+
+Tool: `Skill`
+Parameters:
+  skill: "ai-sdlc:production-readiness-checker"
+
+⏳ Wait for skill completion before continuing.
+
+**SELF-CHECK (after production readiness check):**
+- [ ] Did you invoke the Skill tool? (not just skip or do inline)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `verification/production-readiness-report.md` present?
+
+If NO to any and `options.skip_production_check = false`: STOP - go back and invoke the Skill tool.
+
 **Outputs**:
 - `verification/load-test-results.md`
-- `verification/production-readiness-report.md` (optional)
+- `verification/production-readiness-report.md` (if production check enabled)
 
 **Success**: Load tests pass, production readiness verified
 

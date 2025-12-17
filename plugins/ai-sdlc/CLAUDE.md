@@ -550,6 +550,7 @@ Before considering an orchestrator complete, verify ALL items:
 | **Inline STOP reminders** | ✓ | Does EACH phase end with "⏸️ INTERACTIVE MODE: STOP HERE"? |
 | Explicit AskUserQuestion for all decisions | ✓ | Do ALL user prompts have tool call examples? |
 | Explicit Task tool for subagents | ✓ | Do ALL subagent invocations show Task parameters? |
+| **Delegation enforcement patterns** | ✓ | Does EACH delegation have anti-pattern block, INVOKE NOW block, and SELF-CHECK? |
 | Standards discovery in Phases 5,7,8,11 | ✓ | Is INDEX.md referenced in each? |
 | Reality check (Phase 11) | ✓ | Is reality-assessor invoked via implementation-verifier? |
 | Pragmatic review (Phase 11) | ✓ | Is code-quality-pragmatist invoked via implementation-verifier? |
@@ -563,9 +564,13 @@ Before considering an orchestrator complete, verify ALL items:
 ❌ **Missing inline STOP reminders**: Phase definitions without "⏸️ INTERACTIVE MODE: STOP HERE" at the end
 ❌ **Orchestration logic at file end only**: Relying on instructions at the end of the file (often missed during execution)
 ❌ **Vague subagent calls**: Saying "invoke X" without Task tool parameters
+❌ **Inline execution in YOLO mode**: Executing delegated work inline instead of invoking skills/subagents (see `delegation-enforcement.md`)
+❌ **Missing delegation patterns**: Delegation points without anti-pattern block, INVOKE NOW block, and SELF-CHECK
 ❌ **Missing standards**: Not referencing INDEX.md in relevant phases
 ❌ **Incomplete verification**: Running tests without reality check and pragmatic review
 ❌ **No state management**: Not creating/updating orchestrator-state.yml
+
+**See**: `skills/orchestrator-framework/references/delegation-enforcement.md` for complete delegation enforcement patterns.
 
 ## Available Skills
 
@@ -594,6 +599,7 @@ All orchestrators share common patterns documented in `skills/orchestrator-frame
 | State Management | `state-management.md` | orchestrator-state.yml schema and operations |
 | Interactive Mode | `interactive-mode.md` | Post-phase prompts and user decisions |
 | Initialization | `initialization-pattern.md` | Startup sequence and directory setup |
+| Delegation Enforcement | `delegation-enforcement.md` | Anti-pattern blocks, invocation blocks, self-checks |
 
 Each orchestrator references these patterns (via `../orchestrator-framework/references/`) and implements domain-specific behavior. This approach:
 - **Single source of truth**: Patterns documented once, referenced everywhere

@@ -122,43 +122,66 @@ Read these during relevant phases:
 
 ### Phase 0: Initiative Planning
 
-**Delegate to**: `initiative-planner` subagent
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Task tool invocation**:
+❌ WRONG: Reading agents/initiative-planner.md and following its instructions directly
+❌ WRONG: Breaking down the initiative inline in the orchestrator thread
+❌ WRONG: Creating initiative.yml and dependency graph yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:initiative-planner"
-description: "Plan initiative tasks"
-prompt: |
-  You are the initiative-planner agent. Break down epic into
-  concrete tasks with dependency relationships.
-
-  Initiative description: [description]
-  Initiative directory: [.ai-sdlc/docs/project/initiatives/YYYY-MM-DD-name/]
-
-  Please:
-  1. Gather requirements via AskUserQuestion
-  2. Analyze codebase (INDEX.md, existing features)
-  3. Decompose into 3-15 tasks
-  4. Construct dependency graph
-  5. Recommend execution strategy
-  6. Define milestones
-  7. Assess risks
-
-  Create:
-  - initiative.yml (task list, dependencies, metadata)
-  - spec.md (initiative goals, success criteria)
-  - task-plan.md (dependency graph, milestones)
-
-  Use Read, Grep, Glob, Bash, and AskUserQuestion tools. Do NOT modify code.
+📤 Delegating Phase 0 to: initiative-planner subagent
+Method: Task tool
+Expected outputs: initiative.yml, spec.md, task-plan.md
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:initiative-planner"
+  description: "Plan initiative tasks"
+  prompt: |
+    You are the initiative-planner agent. Break down epic into
+    concrete tasks with dependency relationships.
+
+    Initiative description: [description]
+    Initiative directory: [.ai-sdlc/docs/project/initiatives/YYYY-MM-DD-name/]
+
+    Please:
+    1. Gather requirements via AskUserQuestion
+    2. Analyze codebase (INDEX.md, existing features)
+    3. Decompose into 3-15 tasks
+    4. Construct dependency graph
+    5. Recommend execution strategy
+    6. Define milestones
+    7. Assess risks
+
+    Create:
+    - initiative.yml (task list, dependencies, metadata)
+    - spec.md (initiative goals, success criteria)
+    - task-plan.md (dependency graph, milestones)
+
+    Use Read, Grep, Glob, Bash, and AskUserQuestion tools. Do NOT modify code.
+
+⏳ Wait for subagent completion before continuing.
+
+**Outputs**: `initiative.yml`, `spec.md`, `task-plan.md`
+
+**SELF-CHECK (before proceeding to Phase 1):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Are `initiative.yml`, `spec.md`, and `task-plan.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **Validation**:
 - ✅ initiative.yml exists with 3-15 tasks
 - ✅ No circular dependencies
 - ✅ All task IDs unique
 - ✅ All dependency references valid
-
-**Outputs**: `initiative.yml`, `spec.md`, `task-plan.md`
 
 **⏸️ INTERACTIVE MODE: STOP HERE** - After this phase completes, use `AskUserQuestion` before proceeding to Phase 1.
 
@@ -210,31 +233,68 @@ prompt: |
 
 ### Phase 3: Task Execution
 
-**Execution**: Main orchestrator (invokes task orchestrators via Skill tool)
+**⚠️ DELEGATION REQUIRED FOR EACH TASK - DO NOT EXECUTE TASKS INLINE**
+
+❌ WRONG: Reading task orchestrator SKILL.md files and following instructions directly
+❌ WRONG: Implementing task work inline in the initiative orchestrator thread
+❌ WRONG: Spawning your own subagents to do task work
+
+✅ RIGHT: Invoking appropriate orchestrator skill for each task and waiting for completion
 
 **IMPORTANT**: Execute tasks ONE AT A TIME (sequential execution)
 
 **Task Type to Orchestrator Mapping**:
 
-| Task Type | Orchestrator |
-|-----------|--------------|
-| new-feature | development-orchestrator --type=feature |
-| enhancement | development-orchestrator --type=enhancement |
-| bug-fix | development-orchestrator --type=bug |
-| migration | migration-orchestrator |
-| refactoring | refactoring-orchestrator |
-| performance | performance-orchestrator |
-| security | security-orchestrator |
-| documentation | documentation-orchestrator |
+| Task Type | Orchestrator Skill |
+|-----------|-------------------|
+| new-feature | ai-sdlc:development-orchestrator |
+| enhancement | ai-sdlc:development-orchestrator |
+| bug-fix | ai-sdlc:development-orchestrator |
+| migration | ai-sdlc:migration-orchestrator |
+| refactoring | ai-sdlc:refactoring-orchestrator |
+| performance | ai-sdlc:performance-orchestrator |
+| security | ai-sdlc:security-orchestrator |
+| documentation | ai-sdlc:documentation-orchestrator |
+
+**INVOKE FOR EACH TASK:**
+
+For each task in queue where status != "completed":
+
+1. **Output announcement:**
+   ```
+   📤 Executing task [N]/[total]: [task name]
+   Type: [task type]
+   Orchestrator: [orchestrator skill name]
+   ```
+
+2. **Invoke orchestrator:**
+
+   Tool: `Skill`
+   Parameters:
+     skill: "ai-sdlc:[task-type]-orchestrator"
+
+3. **Wait for orchestrator to complete**
+
+4. **Update state after completion**
+
+⚠️ Do NOT batch execute - invoke one skill, wait for completion, then proceed to next.
 
 **Execution Loop**:
 1. Select next task from queue (respecting dependency order)
 2. Read task's metadata.yml to determine type
-3. Invoke appropriate orchestrator via Skill tool
-4. Wait for orchestrator to complete
-5. Update initiative-state.yml with completion status
-6. Unblock dependent tasks (check if their dependencies now satisfied)
-7. Repeat until all tasks complete
+3. **Output pre-delegation announcement** (see above)
+4. **Invoke appropriate orchestrator via Skill tool**
+5. **Wait for orchestrator to complete**
+6. Update initiative-state.yml with completion status
+7. Unblock dependent tasks (check if their dependencies now satisfied)
+8. Repeat until all tasks complete
+
+**SELF-CHECK (after each task):**
+- [ ] Did you invoke the Skill tool for this task? (not execute inline)
+- [ ] Did you wait for the skill to complete?
+- [ ] Is the task's status updated in initiative-state.yml?
+
+If NO to any: STOP - go back and invoke the Skill tool for this task.
 
 **Dependency Unblocking**:
 - On task completion, read its `blocks` field

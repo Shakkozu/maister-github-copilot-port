@@ -116,38 +116,59 @@ Read these during relevant phases:
 
 ### Phase 0: Vulnerability Analysis & Security Baseline
 
-**Delegate to**: `security-analyzer` subagent
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Task tool invocation**:
+❌ WRONG: Reading agents/security-analyzer.md and following its instructions directly
+❌ WRONG: Running security scans inline in the orchestrator thread
+❌ WRONG: Analyzing vulnerabilities yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:security-analyzer"
-description: "Analyze vulnerabilities and baseline"
-prompt: |
-  You are the security-analyzer agent. Analyze application security and create
-  a comprehensive baseline of vulnerabilities.
-
-  Security Issue Description: [user description]
-  Task directory: [task-path]
-
-  Please:
-  1. Scan dependencies for known vulnerabilities (npm audit, pip-audit, etc.)
-  2. Analyze authentication and authorization code
-  3. Detect injection vulnerabilities (SQL, XSS, command injection)
-  4. Find sensitive data exposure (hardcoded secrets, logging)
-  5. Check for security misconfigurations
-  6. Identify insecure dependencies
-  7. Detect business logic vulnerabilities
-  8. Score each vulnerability using CVSS v3.1
-  9. Classify by OWASP Top 10 categories
-  10. Generate comprehensive security baseline report
-
-  Save to: analysis/security-baseline.md
-  Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+📤 Delegating Phase 0 to: security-analyzer subagent
+Method: Task tool
+Expected outputs: analysis/security-baseline.md
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:security-analyzer"
+  description: "Analyze vulnerabilities and baseline"
+  prompt: |
+    You are the security-analyzer agent. Analyze application security and create
+    a comprehensive baseline of vulnerabilities.
+
+    Security Issue Description: [user description]
+    Task directory: [task-path]
+
+    Please:
+    1. Scan dependencies for known vulnerabilities (npm audit, pip-audit, etc.)
+    2. Analyze authentication and authorization code
+    3. Detect injection vulnerabilities (SQL, XSS, command injection)
+    4. Find sensitive data exposure (hardcoded secrets, logging)
+    5. Check for security misconfigurations
+    6. Identify insecure dependencies
+    7. Detect business logic vulnerabilities
+    8. Score each vulnerability using CVSS v3.1
+    9. Classify by OWASP Top 10 categories
+    10. Generate comprehensive security baseline report
+
+    Save to: analysis/security-baseline.md
+    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `analysis/security-baseline.md`, scan artifacts
 
-**Success**: All vulnerability types checked, CVSS scores assigned, evidence documented
+**SELF-CHECK (before proceeding to Phase 1):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `analysis/security-baseline.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **State Update**: After security-analyzer completes:
 - Update `security_context.baseline_vulnerabilities` from output total vulnerability count
@@ -159,36 +180,57 @@ prompt: |
 
 ### Phase 1: Security Planning & Remediation Strategy
 
-**Delegate to**: `security-planner` subagent
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Task tool invocation**:
+❌ WRONG: Reading agents/security-planner.md and following its instructions directly
+❌ WRONG: Creating remediation plan inline in the orchestrator thread
+❌ WRONG: Prioritizing vulnerabilities yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:security-planner"
-description: "Plan security remediation"
-prompt: |
-  You are the security-planner agent. Analyze security baseline and create
-  prioritized remediation plan.
-
-  Task directory: [task-path]
-
-  Please:
-  1. Load security baseline from analysis/security-baseline.md
-  2. Classify fix types (dependency, code pattern, config, cryptography, etc.)
-  3. Assess impact and effort for each fix
-  4. Calculate priority scores (CVSS × 10 + Impact × 2 - Effort)
-  5. Group fixes by type and dependency
-  6. Break into incremental steps (max 3 files per increment)
-  7. Define verification steps for each fix
-  8. Identify breaking change risks with mitigation
-  9. Create comprehensive remediation plan
-
-  Save to: implementation/security-remediation-plan.md
-  Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+📤 Delegating Phase 1 to: security-planner subagent
+Method: Task tool
+Expected outputs: implementation/security-remediation-plan.md
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:security-planner"
+  description: "Plan security remediation"
+  prompt: |
+    You are the security-planner agent. Analyze security baseline and create
+    prioritized remediation plan.
+
+    Task directory: [task-path]
+
+    Please:
+    1. Load security baseline from analysis/security-baseline.md
+    2. Classify fix types (dependency, code pattern, config, cryptography, etc.)
+    3. Assess impact and effort for each fix
+    4. Calculate priority scores (CVSS × 10 + Impact × 2 - Effort)
+    5. Group fixes by type and dependency
+    6. Break into incremental steps (max 3 files per increment)
+    7. Define verification steps for each fix
+    8. Identify breaking change risks with mitigation
+    9. Create comprehensive remediation plan
+
+    Save to: implementation/security-remediation-plan.md
+    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `implementation/security-remediation-plan.md`
 
-**Success**: All vulnerabilities planned, priorities assigned, increments defined
+**SELF-CHECK (before proceeding to Phase 2):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `implementation/security-remediation-plan.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **State Update**: After security-planner completes:
 - Update `security_context.fixes_planned` from output total fix count
@@ -199,7 +241,7 @@ prompt: |
 
 ### Phase 2: Security Implementation with Testing
 
-**Execution**: Main orchestrator (delegates complex fixes to `implementation-changes-planner`)
+**Execution**: Main orchestrator (direct for simple, delegates for complex)
 
 **Standards Reminder**: Review `.ai-sdlc/docs/INDEX.md` for security standards before implementing.
 
@@ -207,12 +249,45 @@ prompt: |
 
 1. **Read Fix Details** from `implementation/security-remediation-plan.md`
 2. **Security Scan Before** - Run relevant scanner, save baseline
-3. **Implement Fix** - Simple: Edit directly. Complex: Delegate to `implementation-changes-planner`
+3. **Implement Fix**:
+   - Simple (1-3 files): Edit directly
+   - Complex (4+ files): **MUST delegate** to `implementation-changes-planner`
 4. **Security Scan After** - Re-run scanner
 5. **Verify Fix** - Compare before/after (eliminated/reduced/unchanged)
 6. **Run Tests** - Ensure no regressions
 7. **Update Plan** - Mark fix complete/failed, document results
 8. **State Update** - After each fix completes: Increment `security_context.fixes_completed`
+
+**For Complex Fixes (4+ files):**
+
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+
+❌ WRONG: Reading agents/implementation-changes-planner.md and following instructions directly
+❌ WRONG: Planning changes for 4+ files inline in the orchestrator thread
+❌ WRONG: Implementing complex security fixes without a structured change plan
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
+```
+📤 Delegating fix change planning to: implementation-changes-planner subagent
+Method: Task tool
+Expected outputs: Change plan for current fix
+```
+
+**INVOKE NOW (for complex fixes):**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:implementation-changes-planner"
+  description: "Plan security fix changes"
+  prompt: |
+    Plan changes for security fix [N]: [fix description]
+    Task directory: [task-path]
+    Remediation plan: implementation/security-remediation-plan.md
+    Target files: [list of files for this fix]
+
+⏳ Wait for subagent completion, then apply changes.
 
 **Outputs**:
 - Fixed code files
@@ -227,38 +302,61 @@ prompt: |
 
 ### Phase 3: Security Verification
 
-**Delegate to**: `security-verifier` subagent
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Task tool invocation**:
+❌ WRONG: Reading agents/security-verifier.md and following its instructions directly
+❌ WRONG: Running verification scans inline in the orchestrator thread
+❌ WRONG: Creating verification report yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:security-verifier"
-description: "Verify security improvements"
-prompt: |
-  You are the security-verifier agent. Verify security fixes resolved
-  vulnerabilities without regressions.
-
-  Task directory: [task-path]
-
-  Please:
-  1. Load baseline from analysis/security-baseline.md
-  2. Load remediation plan from implementation/security-remediation-plan.md
-  3. Re-run all dependency vulnerability scans
-  4. Re-scan code for vulnerability patterns
-  5. Verify each fix individually
-  6. Check for new vulnerabilities introduced
-  7. Calculate security improvement metrics
-  8. Generate verification report with PASS/FAIL verdict
-
-  Save to: verification/security-verification-report.md
-  Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
-
-  Verdict Criteria:
-  - PASS: All P0 fixed, no critical new vulns, risk reduction >70%
-  - PASS with Issues: Most P0 fixed (>80%), risk reduction >50%
-  - FAIL: Critical vulnerabilities remain or new critical vulns introduced
+📤 Delegating Phase 3 to: security-verifier subagent
+Method: Task tool
+Expected outputs: verification/security-verification-report.md
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:security-verifier"
+  description: "Verify security improvements"
+  prompt: |
+    You are the security-verifier agent. Verify security fixes resolved
+    vulnerabilities without regressions.
+
+    Task directory: [task-path]
+
+    Please:
+    1. Load baseline from analysis/security-baseline.md
+    2. Load remediation plan from implementation/security-remediation-plan.md
+    3. Re-run all dependency vulnerability scans
+    4. Re-scan code for vulnerability patterns
+    5. Verify each fix individually
+    6. Check for new vulnerabilities introduced
+    7. Calculate security improvement metrics
+    8. Generate verification report with PASS/FAIL verdict
+
+    Save to: verification/security-verification-report.md
+    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+
+    Verdict Criteria:
+    - PASS: All P0 fixed, no critical new vulns, risk reduction >70%
+    - PASS with Issues: Most P0 fixed (>80%), risk reduction >50%
+    - FAIL: Critical vulnerabilities remain or new critical vulns introduced
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `verification/security-verification-report.md` with verdict
+
+**SELF-CHECK (before proceeding to Phase 4):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `verification/security-verification-report.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **Gate**: Cannot proceed to Phase 4 if verdict = FAIL
 
@@ -277,30 +375,55 @@ prompt: |
 - Set `options.skip_compliance_audit` based on user choice or auto-decision (default: false if applicable frameworks detected)
 - Set `options.compliance_frameworks` based on detected application type (healthcare→HIPAA, payments→PCI DSS, EU users→GDPR, enterprise→SOC 2)
 
-**Delegate to**: `compliance-auditor` subagent
-
 **Prerequisites**: Phase 3 verdict = PASS or PASS with Issues
 
-**Task tool invocation**:
+**Skip if**: `options.skip_compliance_audit = true`
+
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+
+❌ WRONG: Reading agents/compliance-auditor.md and following its instructions directly
+❌ WRONG: Running compliance checks inline in the orchestrator thread
+❌ WRONG: Creating compliance report yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:compliance-auditor"
-description: "Audit compliance"
-prompt: |
-  You are the compliance-auditor agent. Audit application compliance with
-  regulatory frameworks.
-
-  Task directory: [task-path]
-
-  Please:
-  1. Determine applicable frameworks (GDPR, HIPAA, SOC 2, PCI DSS)
-  2. Audit each applicable framework for compliance
-  3. Generate compliance assessment report with gaps and remediation roadmap
-
-  Save to: verification/compliance-assessment-report.md
-  Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+📤 Delegating Phase 4 to: compliance-auditor subagent
+Method: Task tool
+Expected outputs: verification/compliance-assessment-report.md
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:compliance-auditor"
+  description: "Audit compliance"
+  prompt: |
+    You are the compliance-auditor agent. Audit application compliance with
+    regulatory frameworks.
+
+    Task directory: [task-path]
+
+    Please:
+    1. Determine applicable frameworks (GDPR, HIPAA, SOC 2, PCI DSS)
+    2. Audit each applicable framework for compliance
+    3. Generate compliance assessment report with gaps and remediation roadmap
+
+    Save to: verification/compliance-assessment-report.md
+    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `verification/compliance-assessment-report.md`
+
+**SELF-CHECK (before completing Phase 4):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `verification/compliance-assessment-report.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 ---
 

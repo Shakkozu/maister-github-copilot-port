@@ -132,34 +132,55 @@ Read these during relevant phases:
 
 ### Phase 0: Code Quality Baseline Analysis
 
-**Delegate to**: `refactoring-analyzer` subagent
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Task tool invocation**:
+❌ WRONG: Reading agents/refactoring-analyzer.md and following its instructions directly
+❌ WRONG: Analyzing code quality inline in the orchestrator thread
+❌ WRONG: Calculating complexity metrics yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:refactoring-analyzer"
-description: "Analyze code quality baseline"
-prompt: |
-  You are the refactoring-analyzer agent. Establish quantitative
-  baseline to measure refactoring success.
-
-  Task directory: [task-path]
-  Refactoring description: [description]
-
-  Please:
-  1. Locate target code files
-  2. Analyze cyclomatic complexity (per function, average, max)
-  3. Measure code duplication (percentage, instances)
-  4. Identify code smells (long methods, god classes, deep nesting)
-  5. Assess test coverage (line, branch, function)
-  6. Generate comprehensive quality baseline report
-
-  Save to: analysis/code-quality-baseline.md
-  Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+📤 Delegating Phase 0 to: refactoring-analyzer subagent
+Method: Task tool
+Expected outputs: analysis/code-quality-baseline.md
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:refactoring-analyzer"
+  description: "Analyze code quality baseline"
+  prompt: |
+    You are the refactoring-analyzer agent. Establish quantitative
+    baseline to measure refactoring success.
+
+    Task directory: [task-path]
+    Refactoring description: [description]
+
+    Please:
+    1. Locate target code files
+    2. Analyze cyclomatic complexity (per function, average, max)
+    3. Measure code duplication (percentage, instances)
+    4. Identify code smells (long methods, god classes, deep nesting)
+    5. Assess test coverage (line, branch, function)
+    6. Generate comprehensive quality baseline report
+
+    Save to: analysis/code-quality-baseline.md
+    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `analysis/code-quality-baseline.md`, `analysis/target-code-analysis.md`
 
-**Success**: Target files identified, all metrics measured, baseline documented
+**SELF-CHECK (before proceeding to Phase 1):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `analysis/code-quality-baseline.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **State Update**: After refactoring-analyzer completes:
 - If structured output includes `risk_level`, update `refactoring_context.risk_level`
@@ -170,34 +191,55 @@ prompt: |
 
 ### Phase 1: Refactoring Planning
 
-**Delegate to**: `refactoring-planner` subagent
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Task tool invocation**:
+❌ WRONG: Reading agents/refactoring-planner.md and following its instructions directly
+❌ WRONG: Creating refactoring-plan.md inline in the orchestrator thread
+❌ WRONG: Breaking down refactoring into increments yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:refactoring-planner"
-description: "Create refactoring plan"
-prompt: |
-  You are the refactoring-planner agent. Create detailed incremental
-  refactoring plan with git checkpoints.
-
-  Task directory: [task-path]
-  Input: analysis/code-quality-baseline.md
-
-  Please:
-  1. Classify refactoring type (Extract, Rename, Simplify, Duplication, Restructure)
-  2. Break into small, testable increments (1 change per increment)
-  3. Define git checkpoint for each increment
-  4. Identify affected tests and regression tiers (Tier 1, 2, 3)
-  5. Assess complexity and risk per increment
-  6. Generate comprehensive refactoring plan with rollback procedures
-
-  Save to: implementation/refactoring-plan.md
-  Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+📤 Delegating Phase 1 to: refactoring-planner subagent
+Method: Task tool
+Expected outputs: implementation/refactoring-plan.md
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:refactoring-planner"
+  description: "Create refactoring plan"
+  prompt: |
+    You are the refactoring-planner agent. Create detailed incremental
+    refactoring plan with git checkpoints.
+
+    Task directory: [task-path]
+    Input: analysis/code-quality-baseline.md
+
+    Please:
+    1. Classify refactoring type (Extract, Rename, Simplify, Duplication, Restructure)
+    2. Break into small, testable increments (1 change per increment)
+    3. Define git checkpoint for each increment
+    4. Identify affected tests and regression tiers (Tier 1, 2, 3)
+    5. Assess complexity and risk per increment
+    6. Generate comprehensive refactoring plan with rollback procedures
+
+    Save to: implementation/refactoring-plan.md
+    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `implementation/refactoring-plan.md`
 
-**Success**: Type classified, increments defined, risk assessed
+**SELF-CHECK (before proceeding to Phase 2):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `implementation/refactoring-plan.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **State Update**: After refactoring-planner completes:
 - Update `refactoring_context.refactoring_type` from output
@@ -210,37 +252,58 @@ prompt: |
 
 ### Phase 2: Behavioral Snapshot Capture
 
-**Delegate to**: `behavioral-snapshot-capturer` subagent
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Task tool invocation**:
+❌ WRONG: Reading agents/behavioral-snapshot-capturer.md and following its instructions directly
+❌ WRONG: Capturing behavioral snapshot inline in the orchestrator thread
+❌ WRONG: Running tests and analyzing signatures yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:behavioral-snapshot-capturer"
-description: "Capture behavioral snapshot"
-prompt: |
-  You are the behavioral-snapshot-capturer agent. Capture comprehensive
-  behavioral baseline for comparison after refactoring.
-
-  Task directory: [task-path]
-  Input: implementation/refactoring-plan.md (target files list)
-
-  Please:
-  1. Identify all functions in target files (signatures, parameters, returns)
-  2. Analyze test coverage (direct tests, integration tests)
-  3. Run full test suite, capture baseline results
-  4. Identify observable side effects (DB, API, files, logs, state changes)
-  5. Create behavioral fingerprint (hash of signatures + tests + side effects)
-  6. Generate behavioral snapshot report
-
-  Save to:
-  - analysis/behavioral-snapshot.md
-  - analysis/behavioral-fingerprint.yml
-
-  Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+📤 Delegating Phase 2 to: behavioral-snapshot-capturer subagent
+Method: Task tool
+Expected outputs: analysis/behavioral-snapshot.md, analysis/behavioral-fingerprint.yml
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:behavioral-snapshot-capturer"
+  description: "Capture behavioral snapshot"
+  prompt: |
+    You are the behavioral-snapshot-capturer agent. Capture comprehensive
+    behavioral baseline for comparison after refactoring.
+
+    Task directory: [task-path]
+    Input: implementation/refactoring-plan.md (target files list)
+
+    Please:
+    1. Identify all functions in target files (signatures, parameters, returns)
+    2. Analyze test coverage (direct tests, integration tests)
+    3. Run full test suite, capture baseline results
+    4. Identify observable side effects (DB, API, files, logs, state changes)
+    5. Create behavioral fingerprint (hash of signatures + tests + side effects)
+    6. Generate behavioral snapshot report
+
+    Save to:
+    - analysis/behavioral-snapshot.md
+    - analysis/behavioral-fingerprint.yml
+
+    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `analysis/behavioral-snapshot.md`, `analysis/behavioral-fingerprint.yml`
 
-**Success**: Functions inventoried, tests run, side effects documented, fingerprint created
+**SELF-CHECK (before proceeding to Phase 2.5):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `analysis/behavioral-snapshot.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **State Update**: After behavioral-snapshot-capturer completes:
 - Update `refactoring_context.baseline_fingerprint` from output fingerprint hash
@@ -274,7 +337,7 @@ prompt: |
 
 ### Phase 3: Refactoring Execution
 
-**Execution**: Main orchestrator (direct)
+**Execution**: Main orchestrator (direct for simple, delegates for complex)
 
 **Standards Reminder**: Review `.ai-sdlc/docs/INDEX.md` for coding style before executing.
 
@@ -282,7 +345,38 @@ prompt: |
 
 1. **Apply Refactoring Changes**
    - Simple (1-3 files): Apply directly with Edit tool
-   - Complex (4+ files): Delegate to `implementation-changes-planner` for change plan, then apply
+   - Complex (4+ files): **MUST delegate** to `implementation-changes-planner`
+
+**For Complex Increments (4+ files):**
+
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+
+❌ WRONG: Reading agents/implementation-changes-planner.md and following instructions directly
+❌ WRONG: Planning changes for 4+ files inline in the orchestrator thread
+❌ WRONG: Editing many files without a structured change plan
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
+```
+📤 Delegating increment change planning to: implementation-changes-planner subagent
+Method: Task tool
+Expected outputs: Change plan for current increment
+```
+
+**INVOKE NOW (for complex increments):**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:implementation-changes-planner"
+  description: "Plan refactoring changes"
+  prompt: |
+    Plan changes for refactoring increment [N]: [increment description]
+    Task directory: [task-path]
+    Refactoring plan: implementation/refactoring-plan.md
+    Target files: [list of files for this increment]
+
+⏳ Wait for subagent completion, then apply changes.
 
 2. **Run Regression Tests** (appropriate tiers based on risk)
    - Tier 1: Direct tests (always)
@@ -312,40 +406,63 @@ prompt: |
 
 ### Phase 4: Behavior Verification
 
-**Delegate to**: `behavioral-verifier` subagent
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
-**Task tool invocation**:
+❌ WRONG: Reading agents/behavioral-verifier.md and following its instructions directly
+❌ WRONG: Verifying behavior preservation inline in the orchestrator thread
+❌ WRONG: Comparing fingerprints yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
 ```
-subagent_type: "ai-sdlc:behavioral-verifier"
-description: "Verify behavior preserved"
-prompt: |
-  You are the behavioral-verifier agent. Verify refactored code
-  behavior matches baseline exactly.
-
-  Task directory: [task-path]
-  Input: analysis/behavioral-snapshot.md (baseline)
-
-  Please:
-  1. Capture post-refactoring state (same process as Phase 2)
-  2. Compare function signatures (must match unless explicit rename)
-  3. Validate test results (must be identical)
-  4. Confirm side effects preserved (must be identical)
-  5. Compare behavioral fingerprints
-  6. Generate comparison report with PASS/FAIL verdict
-
-  Save to:
-  - verification/behavior-verification-report.md
-  - verification/post-refactoring-snapshot.md
-  - verification/fingerprint-comparison.yml
-
-  Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
-
-  Verdict Criteria:
-  - PASS: All signatures match, tests identical, side effects preserved
-  - FAIL: Any behavioral discrepancy found
+📤 Delegating Phase 4 to: behavioral-verifier subagent
+Method: Task tool
+Expected outputs: verification/behavior-verification-report.md
 ```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:behavioral-verifier"
+  description: "Verify behavior preserved"
+  prompt: |
+    You are the behavioral-verifier agent. Verify refactored code
+    behavior matches baseline exactly.
+
+    Task directory: [task-path]
+    Input: analysis/behavioral-snapshot.md (baseline)
+
+    Please:
+    1. Capture post-refactoring state (same process as Phase 2)
+    2. Compare function signatures (must match unless explicit rename)
+    3. Validate test results (must be identical)
+    4. Confirm side effects preserved (must be identical)
+    5. Compare behavioral fingerprints
+    6. Generate comparison report with PASS/FAIL verdict
+
+    Save to:
+    - verification/behavior-verification-report.md
+    - verification/post-refactoring-snapshot.md
+    - verification/fingerprint-comparison.yml
+
+    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
+
+    Verdict Criteria:
+    - PASS: All signatures match, tests identical, side effects preserved
+    - FAIL: Any behavioral discrepancy found
+
+⏳ Wait for subagent completion before continuing.
 
 **Outputs**: `verification/behavior-verification-report.md` with verdict
+
+**SELF-CHECK (before proceeding to Phase 5):**
+- [ ] Did you invoke the Task tool? (not just read the agent file)
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `verification/behavior-verification-report.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **Gate**: Cannot proceed to Phase 5 if verdict = FAIL
 
@@ -360,13 +477,52 @@ prompt: |
 
 ### Phase 5: Final Quality Verification
 
-**Execution**: Main orchestrator (optionally delegates to code-reviewer, production-readiness-checker)
+**Execution**: Main orchestrator (re-measures metrics, delegates pragmatic review)
 
 **Process**:
-1. **Re-measure Quality Metrics** - Same analysis as Phase 0
+1. **Re-measure Quality Metrics** - Same analysis as Phase 0 (orchestrator direct)
 2. **Calculate Improvements** - Compare baseline vs post-refactoring
-3. **Run Pragmatic Review** - Invoke `code-quality-pragmatist` to check for over-engineering
+3. **Run Pragmatic Review** - Delegate to `code-quality-pragmatist` (required)
 4. **Generate Quality Improvement Report** - Document improvements and goals met
+
+**For Step 3 (Pragmatic Review):**
+
+**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+
+❌ WRONG: Reading agents/code-quality-pragmatist.md and following instructions directly
+❌ WRONG: Checking for over-engineering inline in the orchestrator thread
+❌ WRONG: Generating pragmatic-review.md yourself
+
+✅ RIGHT: Using the Task tool below and waiting for completion
+
+**Output before invoking:**
+```
+📤 Delegating pragmatic review to: code-quality-pragmatist subagent
+Method: Task tool
+Expected outputs: verification/pragmatic-review.md
+```
+
+**INVOKE NOW:**
+
+Tool: `Task`
+Parameters:
+  subagent_type: "ai-sdlc:code-quality-pragmatist"
+  description: "Pragmatic code review"
+  prompt: |
+    Run pragmatic code review for refactored code.
+    Task directory: [task-path]
+    Baseline: analysis/code-quality-baseline.md
+    Check for over-engineering introduced during refactoring.
+    Save to: verification/pragmatic-review.md
+
+⏳ Wait for subagent completion before continuing.
+
+**SELF-CHECK (before completing Phase 5):**
+- [ ] Did you invoke the Task tool for pragmatic review?
+- [ ] Did you wait for the tool to return results?
+- [ ] Is `verification/pragmatic-review.md` present?
+
+If NO to any: STOP - go back and invoke the Task tool.
 
 **Outputs**:
 - `verification/quality-improvement-report.md`
