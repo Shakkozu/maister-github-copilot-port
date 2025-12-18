@@ -573,7 +573,49 @@ If NO to any: STOP - go back and invoke the Skill tool.
 
 ---
 
-### Phase 6: Specification Audit
+### Phase 6: Specification Audit (Conditional)
+
+**Purpose**: Independent review of specification before implementation planning. Catches ambiguities, unstated assumptions, and implementability issues.
+
+**When to Run** (complexity-based):
+
+| Condition | Run Audit? |
+|-----------|------------|
+| Task type is `bug` | Skip (tight scope) |
+| Task type is `feature` | Run (more unknowns) |
+| Task type is `enhancement` with >5 files affected | Run |
+| Task type is `enhancement` with ≤5 files affected | Skip |
+| Spec has >50 lines or >5 requirements | Run |
+| Security-sensitive work (auth, payments, PII) | Run |
+| User requests via `--audit` flag | Run |
+| Architectural decisions made in Phase 5.5 | Run |
+
+**Interactive Mode Decision**:
+
+After Phase 5.5 (or Phase 5 if 5.5 skipped), assess complexity and use AskUserQuestion:
+
+```
+Use AskUserQuestion tool:
+  Question: "Run independent specification audit before implementation?"
+  Header: "Spec Audit"
+  Options:
+  1. "[Skip/Run] audit [Recommended]" - [Based on complexity assessment]
+  2. "[Run/Skip] audit" - [Opposite of recommendation]
+```
+
+**Recommendation logic**:
+- If complexity indicators suggest audit → Recommend "Run audit"
+- If simple task → Recommend "Skip audit"
+
+**YOLO Mode**: Auto-decide based on complexity table above. No user prompt.
+
+**State Update**: Set `options.spec_audit_enabled` to true/false based on decision.
+
+---
+
+**If `options.spec_audit_enabled = false`**: Skip to Phase 7.
+
+**If `options.spec_audit_enabled = true`**:
 
 **⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
 
@@ -923,6 +965,7 @@ Development-specific fields in `orchestrator-state.yml`:
 orchestrator:
   task_type: bug | enhancement | feature
   options:
+    spec_audit_enabled: null      # Conditional based on complexity (Phase 6)
     e2e_enabled: null             # Default true for features/enhancements with UI (Phase 10)
     user_docs_enabled: null       # Default true for features/enhancements (Phase 10)
     code_review_enabled: null
@@ -962,7 +1005,7 @@ orchestrator:
 │   ├── tdd-green-gate.md             # Phase 9 (bug only)
 │   └── tdd-exception.md              # If TDD skipped (bug only)
 ├── verification/
-│   ├── spec-audit.md                 # Phase 6
+│   ├── spec-audit.md                 # Phase 6 (conditional)
 │   ├── implementation-verification.md # Phase 11
 │   ├── reality-check.md              # Phase 11
 │   ├── pragmatic-review.md           # Phase 11
@@ -1004,6 +1047,7 @@ orchestrator:
 | `--type=bug\|enhancement\|feature` | Override task type detection |
 | `--yolo` | Continuous execution (TDD gates still enforced) |
 | `--from=PHASE` | Start from specific phase |
+| `--audit` / `--no-audit` | Force/skip specification audit (Phase 6) |
 | `--e2e` / `--no-e2e` | Force/skip E2E testing |
 | `--user-docs` / `--no-user-docs` | Force/skip user documentation |
 | `--code-review` / `--no-code-review` | Force/skip code review |

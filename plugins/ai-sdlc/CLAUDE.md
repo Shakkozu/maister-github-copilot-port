@@ -276,7 +276,7 @@ YYYY-MM-DD-task-name/
 │   ├── implementation-plan.md   # Implementation steps breakdown (HOW to build)
 │   └── work-log.md              # Chronological activity log
 ├── verification/                 # Verification results
-│   └── spec-verification.md    # Specification verification report
+│   └── spec-audit.md            # Independent spec audit (conditional, complex tasks only)
 └── documentation/                # User-facing docs (if applicable)
 ```
 

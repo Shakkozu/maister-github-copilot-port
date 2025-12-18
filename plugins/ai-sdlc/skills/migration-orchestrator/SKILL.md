@@ -298,7 +298,6 @@ Parameters:
 - `implementation/spec.md` - Migration specification
 - `analysis/rollback-plan.md` - Rollback procedures for each phase
 - `analysis/dual-run-plan.md` - (if dual-run strategy)
-- `verification/spec-verification.md`
 
 **SELF-CHECK (before proceeding to Phase 3):**
 - [ ] Did you invoke the Skill tool? (not just read the skill.md)
@@ -557,7 +556,6 @@ options:
 │   ├── implementation-plan.md       # Phase 3
 │   └── work-log.md                  # Phase 4
 ├── verification/
-│   ├── spec-verification.md         # Phase 2
 │   ├── implementation-verification.md  # Phase 5
 │   └── compatibility-test-results.md   # Phase 5
 └── documentation/
