@@ -139,23 +139,7 @@ This agent focuses on **evidence-based verification** through automated browser 
 
 ---
 
-### 5. Organize Screenshots
-
-**Purpose**: Copy screenshots to task verification folder
-
-**MANDATORY STEP**: Execute before generating report to ensure screenshots are accessible
-
-**Actions**:
-- Create `[task-path]/verification/screenshots/` directory
-- Copy screenshots from Playwright working directories (`.playwright-mcp/`, `screenshots/`, etc.)
-- Verify all referenced screenshots were successfully copied
-- Use relative paths in report (`screenshots/filename.png` relative to verification/)
-
-**Output**: All screenshots organized in `verification/screenshots/` directory
-
----
-
-### 6. Generate Verification Report
+### 5. Generate Verification Report
 
 **Purpose**: Create comprehensive evidence-based report
 
@@ -212,6 +196,24 @@ Categorized by severity (Critical/Major/Minor/Cosmetic):
 - Next steps
 
 **Save Location**: `[task-path]/verification/e2e-verification-report.md`
+
+---
+
+### 6. Organize Screenshots
+
+**Purpose**: Copy only referenced screenshots and validate all references
+
+**Actions**:
+- Create `[task-path]/verification/screenshots/` directory
+- Read generated report from `[task-path]/verification/e2e-verification-report.md`
+- Extract image references: `!\[.*?\]\(screenshots/(.*?\.png)\)`
+- For each referenced screenshot:
+  - Find in `.playwright-mcp/` directory
+  - Copy to `verification/screenshots/`: `cp .playwright-mcp/FILENAME verification/screenshots/`
+  - Verify copied: `test -f verification/screenshots/FILENAME`
+- Error if any referenced screenshot missing
+
+**Output**: All referenced screenshots in `verification/screenshots/`, validated
 
 ---
 

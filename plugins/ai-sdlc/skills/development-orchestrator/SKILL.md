@@ -1101,6 +1101,8 @@ Parameters:
 - [ ] Did you invoke the Task tool? (not just read the agent file)
 - [ ] Did you wait for the tool to return results?
 - [ ] Is `verification/e2e-verification-report.md` present?
+- [ ] Is `verification/screenshots/` directory present and populated?
+- [ ] Do all image references in report resolve to existing files?
 
 If NO to any: STOP - go back and invoke the Task tool.
 
@@ -1164,6 +1166,8 @@ Parameters:
 - [ ] Did you invoke the Task tool? (not just read the agent file)
 - [ ] Did you wait for the tool to return results?
 - [ ] Is `documentation/user-guide.md` present?
+- [ ] Is `documentation/screenshots/` directory present and populated?
+- [ ] Do all image references in user guide resolve to existing files?
 
 If NO to any: STOP - go back and invoke the Task tool.
 

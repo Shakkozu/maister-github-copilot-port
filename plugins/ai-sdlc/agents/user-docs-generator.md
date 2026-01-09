@@ -112,6 +112,21 @@ The user documentation generator transforms technical specifications into user-f
 
 ---
 
+### 3.5. Check E2E Screenshot Reuse (Optional)
+
+**Purpose**: Reuse existing E2E test screenshots when applicable
+
+**Actions**:
+- Check if `verification/screenshots/` directory exists
+- If exists, list available screenshots with filenames
+- Identify screenshots applicable to user documentation workflows
+- Note which E2E screenshots can be reused instead of re-capturing
+- Benefits: Consistency between tests and docs, reduced capture time
+
+**Output**: List of E2E screenshots available for reuse
+
+---
+
 ### 4. Capture Screenshots
 
 **Purpose**: Take clear, professional screenshots for each step
@@ -223,16 +238,26 @@ The user documentation generator transforms technical specifications into user-f
 
 **Save Location**: `[task-path]/documentation/user-guide.md`
 
-**Screenshot Organization**:
-- Create `[task-path]/documentation/screenshots/` directory
-- Copy screenshots from all possible Playwright source locations:
-  - `.playwright-mcp/` directory
-  - `screenshots/` in working directory
-  - Project root screenshots
-- Verify all referenced screenshots exist
-- Re-capture or update documentation if references are broken
+**Output**: Documentation saved as markdown file
 
-**Output**: Complete user guide saved with organized screenshots
+---
+
+### 7. Organize Screenshots
+
+**Purpose**: Copy only referenced screenshots and validate all references
+
+**Actions**:
+- Create `[task-path]/documentation/screenshots/` directory
+- Read generated user guide from `[task-path]/documentation/user-guide.md`
+- Extract image references: `!\[.*?\]\(screenshots/(.*?\.png)\)`
+- For each referenced screenshot, check sources in order:
+  1. `verification/screenshots/` (reused from E2E tests)
+  2. `.playwright-mcp/` (newly captured)
+- Copy to `documentation/screenshots/`: `cp SOURCE_PATH documentation/screenshots/`
+- Verify copied: `test -f documentation/screenshots/FILENAME`
+- Error if any referenced screenshot missing
+
+**Output**: All referenced screenshots in `documentation/screenshots/`, validated
 
 ---
 
