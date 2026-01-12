@@ -138,6 +138,36 @@ This orchestrator follows shared patterns. See:
 
 ---
 
+## Phase Flow Quick Reference
+
+| Transition | Type | Reason |
+|------------|------|--------|
+| Phase 0 → 1 | 🚦 GATE | Standard pause point |
+| **Phase 1 → 1.5** | ⚡ AUTO | Phase 1.5 handles interaction |
+| Phase 1.5 → 2 | 🚦 GATE | Standard pause point |
+| Phase 2 → 3 | 🚦 GATE | Standard pause point |
+| **Phase 3 → 3.5** | ⚡ AUTO (conditional) | If ui_heavy; skip to 4.5 otherwise |
+| Phase 3.5 → 4 | 🚦 GATE | Standard pause point |
+| **Phase 4 → 4.5** | ⚡ AUTO (conditional) | If complex; skip to 5 otherwise |
+| Phase 4.5 → 5 | 🚦 GATE | Standard pause point |
+| Phase 5 → 5.5 | 🚦 GATE | Standard pause point |
+| Phase 5.5 → 6 | 🚦 GATE | Standard pause point |
+| Phase 6 → 7 | 🚦 GATE | Standard pause point |
+| Phase 7 → 8 | 🚦 GATE | Standard pause point |
+| Phase 8 → 9 | 🚦 GATE (conditional) | TDD gate for bugs only |
+| Phase 9 → 10 | 🚦 GATE | Standard pause point |
+| Phase 10 → 11 | 🚦 GATE | Standard pause point |
+| Phase 11 → 12 | 🚦 GATE | Standard pause point |
+| Phase 12 → 13 | 🚦 GATE | Standard pause point |
+| Phase 13 → 14 | 🚦 GATE | Standard pause point |
+
+**Legend**:
+- 🚦 GATE = Check mode, prompt if interactive, auto-continue if YOLO
+- ⚡ AUTO = Always continue immediately (no mode check, no user prompt)
+- (conditional) = Check conditions before applying pattern
+
+---
+
 ## Task Type Detection
 
 **Automatic Detection** from task description:
@@ -266,7 +296,16 @@ If NO to any: STOP - go back and invoke the Skill tool.
 - Read structured output `risk_level` from analysis results
 - Update `task_context.risk_level` in orchestrator-state.yml
 
-**→ Continue directly to Phase 1.5** (Clarify Requirements) - no pause needed, that phase handles user interaction.
+---
+
+## ⚡ AUTO-CONTINUE: Phase 1 → Phase 1.5
+
+**DO NOT STOP. DO NOT PROMPT USER. PROCEED IMMEDIATELY.**
+
+Phase 1.5 (Clarifying Questions) handles user interaction internally via AskUserQuestion prompts.
+Pausing here would create double-prompting.
+
+**NEXT ACTION**: Continue directly to Phase 1.5 below.
 
 ---
 
@@ -414,7 +453,21 @@ If NO to any: STOP - go back and invoke the Task tool.
 
 **Outputs**: `implementation/tdd-red-gate.md`, failing test file
 
-**→ Continue directly to Phase 3.5** (Clarify UI Approach) if ui_heavy, otherwise skip to Phase 4.5/5 - no pause needed before clarifying phases.
+---
+
+## ⚡ AUTO-CONTINUE: Phase 3 → Phase 3.5/4.5 (Conditional)
+
+**DO NOT STOP. DO NOT PROMPT USER. PROCEED IMMEDIATELY.**
+
+**Evaluate condition:**
+1. Read `task_context.ui_heavy` from `orchestrator-state.yml`
+2. **If ui_heavy = true**: Continue to Phase 3.5 (Clarify UI Approach)
+3. **If ui_heavy = false**: Skip to Phase 4.5 (Clarify Technical Approach) or Phase 5 if not complex
+
+Phase 3.5 handles user interaction internally via AskUserQuestion.
+No pause needed before clarifying phases.
+
+**NEXT ACTION**: Continue based on condition above.
 
 ---
 
@@ -514,7 +567,21 @@ Parameters:
 
 If NO to any: STOP - go back and invoke the Task tool.
 
-**→ Continue directly to Phase 4.5** (Clarify Technical Approach) if complex, otherwise skip to Phase 5 - no pause needed before clarifying phases.
+---
+
+## ⚡ AUTO-CONTINUE: Phase 4 → Phase 4.5/5 (Conditional)
+
+**DO NOT STOP. DO NOT PROMPT USER. PROCEED IMMEDIATELY.**
+
+**Evaluate condition:**
+1. Read `task_context.risk_level` from `orchestrator-state.yml`
+2. **If risk_level = medium/high OR complex task detected**: Continue to Phase 4.5
+3. **If risk_level = low AND simple task**: Skip to Phase 5 (Specification)
+
+Phase 4.5 handles user interaction internally via AskUserQuestion.
+No pause needed before clarifying phases.
+
+**NEXT ACTION**: Continue based on condition above.
 
 ---
 

@@ -125,6 +125,71 @@ For phases that may be skipped based on conditions:
 
 ---
 
+## Auto-Continue Pattern
+
+Some phase transitions bypass gates entirely. Use when the next phase handles user interaction internally or when conditional routing is needed.
+
+### Auto-Continue Template (Unconditional)
+
+Place BETWEEN phases that should always auto-continue:
+
+```markdown
+---
+
+## ⚡ AUTO-CONTINUE: Phase [N] → Phase [N+1]
+
+**DO NOT STOP. DO NOT PROMPT USER. PROCEED IMMEDIATELY.**
+
+[Reason why no pause is needed - e.g., next phase handles interaction internally]
+
+**NEXT ACTION**: Continue directly to Phase [N+1] below.
+
+---
+```
+
+### Auto-Continue Template (Conditional)
+
+Place BETWEEN phases with conditional routing:
+
+```markdown
+---
+
+## ⚡ AUTO-CONTINUE: Phase [N] → Phase [N+1]/[N+2] (Conditional)
+
+**DO NOT STOP. DO NOT PROMPT USER. PROCEED IMMEDIATELY.**
+
+**Evaluate condition:**
+1. Read `[field]` from `orchestrator-state.yml`
+2. **If [condition]**: Continue to Phase [N+1]
+3. **If [else condition]**: Skip to Phase [N+2]
+
+[Reason why no pause is needed]
+
+**NEXT ACTION**: Continue based on condition above.
+
+---
+```
+
+### When to Use Auto-Continue vs Gate
+
+| Scenario | Pattern |
+|----------|---------|
+| Next phase has internal AskUserQuestion | ⚡ AUTO-CONTINUE |
+| Conditional routing to different phases | ⚡ AUTO-CONTINUE (conditional) |
+| Next phase is optional and may be skipped | 🚦 GATE (conditional) |
+| Normal phase boundary | 🚦 GATE (standard) |
+
+### Key Differences
+
+| Aspect | 🚦 GATE | ⚡ AUTO-CONTINUE |
+|--------|---------|------------------|
+| Mode check | Yes (interactive vs YOLO) | No |
+| User prompt | Yes (in interactive mode) | Never |
+| Placement | BEFORE next phase | BETWEEN phases |
+| Purpose | Allow user review/control | Avoid double-prompting |
+
+---
+
 ## Post-Phase Prompt Templates
 
 ### Standard Phase Complete Prompt
