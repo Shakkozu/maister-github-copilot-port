@@ -45,22 +45,22 @@ Auto-classifies tasks and routes to the appropriate workflow orchestrator. Suppo
 
 1. **Detect existing task** - If input is a task folder path, route to resume
 2. **Classify new task** - Invoke task-classifier skill to determine type
-3. **Route to workflow** - Use SlashCommand to invoke appropriate `:new` or `:resume` command
+3. **Route to workflow** - Use Skill tool to invoke appropriate orchestrator skill
 
 ## Task Type Routing
 
-| Classification | Routes To |
-|----------------|-----------|
-| bug-fix | `/ai-sdlc:bug-fix:new` |
-| new-feature | `/ai-sdlc:feature:new` |
-| enhancement | `/ai-sdlc:enhancement:new` |
-| refactoring | `/ai-sdlc:refactoring:new` |
-| performance | `/ai-sdlc:performance:new` |
-| security | `/ai-sdlc:security:new` |
-| migration | `/ai-sdlc:migration:new` |
-| documentation | `/ai-sdlc:documentation:new` |
-| research | `/ai-sdlc:research:new` |
-| initiative | `/ai-sdlc:initiative:new` |
+| Classification | Routes To (Skill) |
+|----------------|-------------------|
+| bug-fix | `ai-sdlc:development-orchestrator` (task_type=bug) |
+| new-feature | `ai-sdlc:development-orchestrator` (task_type=feature) |
+| enhancement | `ai-sdlc:development-orchestrator` (task_type=enhancement) |
+| refactoring | `ai-sdlc:refactoring-orchestrator` |
+| performance | `ai-sdlc:performance-orchestrator` |
+| security | `ai-sdlc:security-orchestrator` |
+| migration | `ai-sdlc:migration-orchestrator` |
+| documentation | `ai-sdlc:documentation-orchestrator` |
+| research | `ai-sdlc:research-orchestrator` |
+| initiative | `ai-sdlc:initiative-orchestrator` |
 
 ---
 
@@ -137,17 +137,18 @@ Options:
 4. Cancel
 ```
 
-5. **Route using SlashCommand tool:**
+5. **Route using Skill tool:**
 
 ```
-Use SlashCommand tool:
-  command: "/ai-sdlc:[task-type]:resume [task_path] [flags]"
+Use Skill tool:
+  skill: "ai-sdlc:[orchestrator-name]"
+  args: "--resume [task_path] [flags]"
 ```
 
 Examples:
-- Resume: `/ai-sdlc:bug-fix:resume .ai-sdlc/tasks/bug-fixes/2025-10-23-fix`
-- Restart: `/ai-sdlc:feature:resume .ai-sdlc/tasks/new-features/2025-10-26-auth --from=verify`
-- Fresh attempts: `/ai-sdlc:migration:resume .ai-sdlc/tasks/migrations/2025-10-20-redux --reset-attempts`
+- Resume bug-fix: `skill: "ai-sdlc:development-orchestrator"` with `args: "--resume .ai-sdlc/tasks/bug-fixes/2025-10-23-fix"`
+- Restart feature: `skill: "ai-sdlc:development-orchestrator"` with `args: "--resume .ai-sdlc/tasks/new-features/2025-10-26-auth --from=verify"`
+- Fresh attempts: `skill: "ai-sdlc:migration-orchestrator"` with `args: "--resume .ai-sdlc/tasks/migrations/2025-10-20-redux --reset-attempts"`
 
 ### Step 3: Classify & Route New Task
 
@@ -176,22 +177,23 @@ classification:
   reasoning: [explanation]
 ```
 
-3. **Route to appropriate workflow using SlashCommand tool:**
+3. **Route to appropriate workflow using Skill tool:**
 
 ```
 Display:
   Task classified as: [task_type] ([confidence]% confidence)
   Routing to [task_type] workflow...
 
-Use SlashCommand tool:
-  command: "/ai-sdlc:[task-type]:new [description]"
+Use Skill tool:
+  skill: "ai-sdlc:[orchestrator-name]"
+  args: "[description]"
 ```
 
 **Routing examples:**
-- bug-fix (92%): `/ai-sdlc:bug-fix:new "Fix login timeout error"`
-- enhancement (88%): `/ai-sdlc:enhancement:new "Add filtering to user table"`
-- new-feature (85%): `/ai-sdlc:feature:new "Add user authentication"`
-- security (98%): `/ai-sdlc:security:new "Fix SQL injection in search"`
+- bug-fix (92%): `skill: "ai-sdlc:development-orchestrator"` with `args: "--type=bug Fix login timeout error"`
+- enhancement (88%): `skill: "ai-sdlc:development-orchestrator"` with `args: "--type=enhancement Add filtering to user table"`
+- new-feature (85%): `skill: "ai-sdlc:development-orchestrator"` with `args: "--type=feature Add user authentication"`
+- security (98%): `skill: "ai-sdlc:security-orchestrator"` with `args: "Fix SQL injection in search"`
 
 ---
 
@@ -216,7 +218,7 @@ Use AskUserQuestion with options:
 9. Research - Investigate and document findings
 10. Initiative - Epic-level multi-task project
 
-Then route to selected workflow using SlashCommand.
+Then route to selected workflow using Skill tool.
 ```
 
 ### User Cancels
@@ -225,26 +227,26 @@ Then route to selected workflow using SlashCommand.
 Display:
 "Task cancelled. You can:
 - Run /work again when ready
-- Use specific commands directly:
-  /ai-sdlc:bug-fix:new, /ai-sdlc:feature:new, etc."
+- Use specific workflow commands directly:
+  /ai-sdlc:development:new, /ai-sdlc:refactoring:new, etc."
 ```
 
 ---
 
-## Resume Command Reference
+## Resume Skill Reference
 
-| Task Type | Resume Command |
-|-----------|----------------|
-| bug-fix | `/ai-sdlc:bug-fix:resume [path] [--from=PHASE] [--reset-attempts]` |
-| new-feature | `/ai-sdlc:feature:resume [path] [--from=PHASE]` |
-| enhancement | `/ai-sdlc:enhancement:resume [path] [--from=PHASE]` |
-| refactoring | `/ai-sdlc:refactoring:resume [path] [--from=PHASE]` |
-| performance | `/ai-sdlc:performance:resume [path] [--from=PHASE]` |
-| security | `/ai-sdlc:security:resume [path] [--from=PHASE]` |
-| migration | `/ai-sdlc:migration:resume [path] [--from=PHASE]` |
-| documentation | `/ai-sdlc:documentation:resume [path] [--from=PHASE]` |
-| research | `/ai-sdlc:research:resume [path] [--from=PHASE]` |
-| initiative | `/ai-sdlc:initiative:resume [path] [--from=PHASE]` |
+| Task Type | Skill | Args |
+|-----------|-------|------|
+| bug-fix | `ai-sdlc:development-orchestrator` | `--resume [path] [--from=PHASE] [--reset-attempts]` |
+| new-feature | `ai-sdlc:development-orchestrator` | `--resume [path] [--from=PHASE]` |
+| enhancement | `ai-sdlc:development-orchestrator` | `--resume [path] [--from=PHASE]` |
+| refactoring | `ai-sdlc:refactoring-orchestrator` | `--resume [path] [--from=PHASE]` |
+| performance | `ai-sdlc:performance-orchestrator` | `--resume [path] [--from=PHASE]` |
+| security | `ai-sdlc:security-orchestrator` | `--resume [path] [--from=PHASE]` |
+| migration | `ai-sdlc:migration-orchestrator` | `--resume [path] [--from=PHASE]` |
+| documentation | `ai-sdlc:documentation-orchestrator` | `--resume [path] [--from=PHASE]` |
+| research | `ai-sdlc:research-orchestrator` | `--resume [path] [--from=PHASE]` |
+| initiative | `ai-sdlc:initiative-orchestrator` | `--resume [path] [--from=PHASE]` |
 
 ---
 
@@ -260,7 +262,7 @@ The `/work` command delegates classification to the task-classifier skill, which
 
 ### With Orchestrators
 
-After classification/detection, this command routes to the appropriate orchestrator via SlashCommand:
+After classification/detection, this command routes to the appropriate orchestrator via Skill tool:
 - Each orchestrator handles its specific workflow (spec, plan, implement, verify, etc.)
 - State is persisted in `orchestrator-state.yml` for pause/resume
 - Auto-recovery handles common failures
@@ -279,5 +281,5 @@ Uses project documentation for context:
 2. **Auto-classification** - Intelligent routing based on task description
 3. **Resume support** - Detects and resumes existing tasks
 4. **Issue integration** - Fetches details from GitHub/Jira
-5. **Explicit routing** - Uses SlashCommand for reliable orchestrator invocation
+5. **Direct skill invocation** - Uses Skill tool for immediate orchestrator loading
 6. **Graceful fallback** - Manual selection if classification fails

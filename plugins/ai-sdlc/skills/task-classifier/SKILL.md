@@ -186,9 +186,9 @@ This skill is typically invoked by the `/work` command:
 ### With Orchestrators
 
 Classification result routes to:
-- **bug-fix** → bug-fix-orchestrator skill
-- **enhancement** → enhancement-orchestrator skill
-- **new-feature** → feature-orchestrator skill
+- **bug-fix** → development-orchestrator skill (task_type=bug)
+- **enhancement** → development-orchestrator skill (task_type=enhancement)
+- **new-feature** → development-orchestrator skill (task_type=feature)
 - **refactoring** → refactoring-orchestrator skill
 - **performance** → performance-orchestrator skill
 - **security** → security-orchestrator skill
