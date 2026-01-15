@@ -587,3 +587,42 @@ Security remediation successfully addressed 18 of 24 vulnerabilities (75%), achi
 - Calculate quantitative improvement
 
 Security verification provides objective, evidence-based assessment of remediation success with quantitative improvement metrics and clear PASS/FAIL verdict.
+
+---
+
+## Structured Output for Orchestrator
+
+When invoked by an orchestrator, return structured result alongside the report:
+
+```yaml
+status: "passed" | "passed_with_issues" | "failed"
+report_path: "verification/security-verification-report.md"
+
+# Issue summary for orchestrator to process
+issues:
+  - source: "dependency_scan" | "code_pattern" | "config" | "crypto" | "new_vulnerability"
+    severity: "critical" | "warning" | "info"
+    description: "[Brief description of the issue]"
+    location: "[File path or package name]"
+    fixable: true | false
+    suggestion: "[How to fix, if obvious]"
+
+# Counts for quick assessment
+issue_counts:
+  critical: 0
+  warning: 0
+  info: 0
+
+# Security-specific metrics
+metrics:
+  vulnerabilities_fixed: 0
+  vulnerabilities_remaining: 0
+  new_vulnerabilities: 0
+  risk_reduction_percent: 0
+```
+
+**Guidelines for `fixable` assessment**:
+- `true`: Dependency version bumps, simple config changes, obvious permission fixes
+- `false`: Architectural security changes, complex auth fixes, design decisions
+
+**The orchestrator decides** what to actually fix based on this data.

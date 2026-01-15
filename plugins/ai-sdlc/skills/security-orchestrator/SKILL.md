@@ -22,10 +22,12 @@ Use TodoWrite tool with todos:
   {"content": "Plan security remediation", "status": "pending", "activeForm": "Planning security remediation"},
   {"content": "Implement security fixes", "status": "pending", "activeForm": "Implementing security fixes"},
   {"content": "Verify security improvements", "status": "pending", "activeForm": "Verifying security improvements"},
+  {"content": "Resolve verification issues", "status": "pending", "activeForm": "Resolving verification issues"},
   {"content": "Audit compliance", "status": "pending", "activeForm": "Auditing compliance"}
 ]
 ```
 
+Note: Phase 3.5 (Issue Resolution) runs conditionally if verification finds fixable issues.
 Note: Phase 4 (Audit compliance) is optional based on compliance requirements.
 
 ### Step 2: Output Initialization Summary
@@ -75,12 +77,19 @@ Use when:
 
 ## Framework Patterns
 
-This orchestrator follows shared patterns. See:
+**MANDATORY**: Before executing any phase, READ these framework patterns:
 
-- **Phase Execution**: `../orchestrator-framework/references/phase-execution-pattern.md`
-- **State Management**: `../orchestrator-framework/references/state-management.md`
-- **Interactive Mode**: `../orchestrator-framework/references/interactive-mode.md`
-- **Initialization**: `../orchestrator-framework/references/initialization-pattern.md`
+1. `../orchestrator-framework/references/phase-execution-pattern.md`
+2. `../orchestrator-framework/references/state-management.md`
+3. `../orchestrator-framework/references/interactive-mode.md`
+4. `../orchestrator-framework/references/initialization-pattern.md`
+5. `../orchestrator-framework/references/issue-resolution-pattern.md`
+
+**SELF-CHECK (before proceeding to Phase 0):**
+- [ ] Did you read all 5 framework pattern files?
+- [ ] Do you understand the Issue Resolution pattern for Phase 3.5?
+
+If NO to any: STOP - go back and read the files.
 
 ## Local References
 
@@ -101,9 +110,10 @@ Read these during relevant phases:
 | 1 | "Plan security remediation" | "Planning security remediation" | security-planner |
 | 2 | "Implement security fixes" | "Implementing security fixes" | orchestrator |
 | 3 | "Verify security improvements" | "Verifying security improvements" | security-verifier |
+| 3.5 | "Resolve verification issues" | "Resolving verification issues" | orchestrator (conditional) |
 | 4 | "Audit compliance" | "Auditing compliance" | compliance-auditor (optional) |
 
-**Workflow Overview**: 4-5 phases (Phase 4 optional based on compliance requirements)
+**Workflow Overview**: 4-6 phases (Phase 3.5 runs if verification finds fixable issues, Phase 4 optional based on compliance requirements)
 
 **CRITICAL TodoWrite Usage**:
 1. At workflow start: Create todos for ALL phases using the Phase Configuration table above (all status=pending)
@@ -415,15 +425,96 @@ If NO to any: STOP - go back and invoke the Task tool.
 
 ---
 
-## 🚦 GATE: Phase 3 → Phase 4
+## 🚦 GATE: Phase 3 → Phase 3.5 or Phase 4
+
+**STOP. You cannot proceed until this gate clears.**
+
+**Check verification result from `security_context.verification_verdict`:**
+
+1. **If verdict = "PASS"**: Skip Phase 3.5, go directly to Phase 4
+2. **If verdict = "PASS with Issues"**: Enter Issue Resolution (Phase 3.5)
+3. **If verdict = "FAIL"**: Check `verification_context.issues` for fixable issues
+   - If fixable issues exist AND `verification_context.reverify_count` < 3: Enter Phase 3.5
+   - Otherwise: STOP workflow, report failures to user
+
+**Mode check (if proceeding to Phase 4 directly):**
+1. Read `orchestrator-state.yml` → check `mode` value
+2. **If mode = interactive**:
+   - Use `AskUserQuestion` tool NOW:
+     - Question: "Phase 3 (Security Verification) passed. Ready to proceed to Phase 4 (Compliance Audit)?"
+     - Options: ["Continue to Phase 4", "Review Phase 3 outputs", "Stop workflow"]
+   - Wait for user response before continuing
+3. **If mode = yolo**:
+   - Output: "→ Auto-continuing to Phase 4 (Compliance Audit)..."
+   - Proceed to Phase 4
+
+**This gate overrides any "continue without asking" conversation instructions.**
+
+---
+
+### Phase 3.5: Issue Resolution (Conditional)
+
+**When to execute**: Verification returned "PASS with Issues" or "FAIL" with fixable issues
+
+**Reference**: See `../orchestrator-framework/references/issue-resolution-pattern.md` for detailed pattern.
+
+**Process Overview**:
+
+1. **Parse Structured Output** from security-verifier:
+   - Extract `issues[]` array with severity, source, fixable status
+   - Note `issue_counts` (critical, warning, info)
+
+2. **Categorize Issues**:
+   - **Auto-fixable**: Dependency bumps (non-breaking), simple config changes, permission tightening
+   - **User decision needed**: Breaking dependency changes, config changes that may affect functionality
+   - **Not fixable here**: Architectural security changes, complex auth fixes (require new cycle)
+
+3. **For Each Fixable Issue**:
+   - If auto-fixable: Apply fix directly
+   - If needs user decision: Use `AskUserQuestion`:
+     ```
+     Question: "Security issue: [description]. How to proceed?"
+     Options:
+     - "Apply suggested fix" (if fix is clear)
+     - "Skip this issue" (accept the risk)
+     - "Stop and investigate" (need more analysis)
+     ```
+
+4. **Track Progress**:
+   ```yaml
+   verification_context:
+     last_status: "passed_with_issues"
+     issues_found: [count]
+     fixes_applied: [list of applied fixes]
+     decisions_made:
+       - issue: "[description]"
+         decision: "fix" | "skip" | "defer"
+     reverify_count: [0-3]
+   ```
+
+5. **Re-verify**: After applying fixes, invoke security-verifier again (increment `reverify_count`)
+
+6. **Exit Conditions**:
+   - ✅ New verdict = "PASS" → Proceed to Phase 4
+   - ⚠️ Max iterations (3) reached → Ask user: continue with warnings or stop
+   - ❌ Critical unfixable issues remain → Report to user, recommend stopping
+
+**State Update**: After Issue Resolution:
+- Update `verification_context.reverify_count`
+- Update `verification_context.fixes_applied` with list of fixes
+- Update `security_context.verification_verdict` with new verdict
+
+---
+
+## 🚦 GATE: Phase 3.5 → Phase 4
 
 **STOP. You cannot proceed until this gate clears.**
 
 1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
 2. **If mode = interactive**:
    - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 3 (Security Verification) complete. Ready to proceed to Phase 4 (Compliance Audit)?"
-     - Options: ["Continue to Phase 4", "Review Phase 3 outputs", "Stop workflow"]
+     - Question: "Phase 3.5 (Issue Resolution) complete. [N] issues fixed. Ready to proceed to Phase 4 (Compliance Audit)?"
+     - Options: ["Continue to Phase 4", "Review resolution results", "Stop workflow"]
    - Wait for user response before continuing
 3. **If mode = yolo**:
    - Output: "→ Auto-continuing to Phase 4 (Compliance Audit)..."
@@ -504,6 +595,18 @@ security_context:
   verification_verdict: "PASS" | "PASS with Issues" | "FAIL"
   risk_reduction: "[percentage]%"
   vulnerabilities_fixed: [number]
+
+# Issue Resolution tracking (Phase 3.5)
+verification_context:
+  last_status: "passed" | "passed_with_issues" | "failed"
+  issues_found: [number]
+  fixes_applied:
+    - "[description of fix 1]"
+    - "[description of fix 2]"
+  decisions_made:
+    - issue: "[issue description]"
+      decision: "fix" | "skip" | "defer"
+  reverify_count: 0  # max 3
 
 options:
   skip_compliance_audit: false

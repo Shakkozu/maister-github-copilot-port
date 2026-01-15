@@ -499,3 +499,44 @@ Focus on readability: if users can't understand it, it's not good documentation.
 ---
 
 This agent ensures documentation is complete, readable, and accurate before publication.
+
+---
+
+## Structured Output for Orchestrator
+
+When invoked by an orchestrator, return structured result alongside the report:
+
+```yaml
+status: "passed" | "passed_with_issues" | "failed"
+report_path: "verification/documentation-review.md"
+
+# Issue summary for orchestrator to process
+issues:
+  - source: "completeness" | "readability" | "screenshot" | "link" | "jargon" | "example"
+    severity: "critical" | "warning" | "info"
+    description: "[Brief description of the issue]"
+    location: "[Section or line reference]"
+    fixable: true | false
+    suggestion: "[How to fix, if obvious]"
+
+# Counts for quick assessment
+issue_counts:
+  critical: 0
+  warning: 0
+  info: 0
+
+# Documentation-specific metrics
+metrics:
+  completeness_percent: 0
+  flesch_reading_ease: 0
+  flesch_grade_level: 0
+  screenshots_present: 0
+  screenshots_required: 0
+  broken_links: 0
+```
+
+**Guidelines for `fixable` assessment**:
+- `true`: Typos, formatting issues, broken internal links, missing alt text, simple rewording
+- `false`: Missing sections (need content creation), screenshot issues (need retake), structural reorganization
+
+**The orchestrator decides** what to actually fix based on this data.

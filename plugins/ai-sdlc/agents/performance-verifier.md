@@ -549,3 +549,42 @@ Performance verification is complete when:
 ---
 
 This agent provides objective verification that performance optimizations achieved target improvements without introducing regressions.
+
+---
+
+## Structured Output for Orchestrator
+
+When invoked by an orchestrator, return structured result alongside the report:
+
+```yaml
+status: "passed" | "passed_with_concerns" | "failed"
+report_path: "verification/performance-verification.md"
+
+# Issue summary for orchestrator to process
+issues:
+  - source: "response_time" | "throughput" | "cpu" | "memory" | "database" | "regression"
+    severity: "critical" | "warning" | "info"
+    description: "[Brief description of the issue]"
+    location: "[Endpoint or component affected]"
+    fixable: true | false
+    suggestion: "[How to fix, if obvious]"
+
+# Counts for quick assessment
+issue_counts:
+  critical: 0
+  warning: 0
+  info: 0
+
+# Performance-specific metrics
+metrics:
+  targets_met: 0
+  targets_total: 0
+  regressions_found: 0
+  overall_improvement_percent: 0
+```
+
+**Guidelines for `fixable` assessment**:
+- `true`: Cache config tuning, query hints, simple index additions, config adjustments
+- `false`: Algorithm redesign, architecture changes, complex optimization trade-offs
+
+**The orchestrator decides** what to actually fix based on this data.

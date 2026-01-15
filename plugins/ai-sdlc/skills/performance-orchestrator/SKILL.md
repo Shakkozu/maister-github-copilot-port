@@ -22,9 +22,12 @@ Use TodoWrite tool with todos:
   {"content": "Analyze bottlenecks and plan", "status": "pending", "activeForm": "Analyzing bottlenecks and planning"},
   {"content": "Implement with benchmarking", "status": "pending", "activeForm": "Implementing with benchmarking"},
   {"content": "Verify performance improvements", "status": "pending", "activeForm": "Verifying performance improvements"},
+  {"content": "Resolve verification issues", "status": "pending", "activeForm": "Resolving verification issues"},
   {"content": "Load test and check readiness", "status": "pending", "activeForm": "Load testing and checking readiness"}
 ]
 ```
+
+Note: Phase 3.5 (Issue Resolution) runs conditionally if verification finds fixable issues.
 
 ### Step 2: Output Initialization Summary
 
@@ -73,12 +76,19 @@ Use when:
 
 ## Framework Patterns
 
-This orchestrator follows shared patterns. See:
+**MANDATORY**: Before executing any phase, READ these framework patterns:
 
-- **Phase Execution**: `../orchestrator-framework/references/phase-execution-pattern.md`
-- **State Management**: `../orchestrator-framework/references/state-management.md`
-- **Interactive Mode**: `../orchestrator-framework/references/interactive-mode.md`
-- **Initialization**: `../orchestrator-framework/references/initialization-pattern.md`
+1. `../orchestrator-framework/references/phase-execution-pattern.md`
+2. `../orchestrator-framework/references/state-management.md`
+3. `../orchestrator-framework/references/interactive-mode.md`
+4. `../orchestrator-framework/references/initialization-pattern.md`
+5. `../orchestrator-framework/references/issue-resolution-pattern.md`
+
+**SELF-CHECK (before proceeding to Phase 0):**
+- [ ] Did you read all 5 framework pattern files?
+- [ ] Do you understand the Issue Resolution pattern for Phase 3.5?
+
+If NO to any: STOP - go back and read the files.
 
 ## Local References
 
@@ -98,9 +108,10 @@ Read these during relevant phases:
 | 1 | "Analyze bottlenecks and plan" | "Analyzing bottlenecks and planning" | bottleneck-analyzer |
 | 2 | "Implement with benchmarking" | "Implementing with benchmarking" | orchestrator |
 | 3 | "Verify performance improvements" | "Verifying performance improvements" | performance-verifier |
+| 3.5 | "Resolve verification issues" | "Resolving verification issues" | orchestrator (conditional) |
 | 4 | "Load test and check readiness" | "Load testing and checking readiness" | orchestrator |
 
-**Workflow Overview**: 5 phases (0-4)
+**Workflow Overview**: 5-6 phases (Phase 3.5 runs if verification finds fixable issues)
 
 **CRITICAL TodoWrite Usage**:
 1. At workflow start: Create todos for ALL phases using the Phase Configuration table above (all status=pending)
@@ -407,15 +418,97 @@ If NO to any: STOP - go back and invoke the Task tool.
 
 ---
 
-## 🚦 GATE: Phase 3 → Phase 4
+## 🚦 GATE: Phase 3 → Phase 3.5 or Phase 4
+
+**STOP. You cannot proceed until this gate clears.**
+
+**Check verification result from `performance_context.verification_verdict`:**
+
+1. **If verdict = "PASS"**: Skip Phase 3.5, go directly to Phase 4
+2. **If verdict = "PASS with Concerns"**: Enter Issue Resolution (Phase 3.5)
+3. **If verdict = "FAIL"**: Check `verification_context.issues` for fixable issues
+   - If fixable issues exist AND `verification_context.reverify_count` < 3: Enter Phase 3.5
+   - Otherwise: STOP workflow, report failures to user
+
+**Mode check (if proceeding to Phase 4 directly):**
+1. Read `orchestrator-state.yml` → check `mode` value
+2. **If mode = interactive**:
+   - Use `AskUserQuestion` tool NOW:
+     - Question: "Phase 3 (Performance Verification) passed. Ready to proceed to Phase 4 (Load Testing & Production Readiness)?"
+     - Options: ["Continue to Phase 4", "Review Phase 3 outputs", "Stop workflow"]
+   - Wait for user response before continuing
+3. **If mode = yolo**:
+   - Output: "→ Auto-continuing to Phase 4 (Load Testing & Production Readiness)..."
+   - Proceed to Phase 4
+
+**This gate overrides any "continue without asking" conversation instructions.**
+
+---
+
+### Phase 3.5: Issue Resolution (Conditional)
+
+**When to execute**: Verification returned "PASS with Concerns" or "FAIL" with fixable issues
+
+**Reference**: See `../orchestrator-framework/references/issue-resolution-pattern.md` for detailed pattern.
+
+**Process Overview**:
+
+1. **Parse Structured Output** from performance-verifier:
+   - Extract `issues[]` array with severity, source, fixable status
+   - Note `issue_counts` (critical, warning, info)
+   - Check `metrics.regressions_found`
+
+2. **Categorize Issues**:
+   - **Auto-fixable**: Cache config tuning, query hints, simple index additions, config adjustments
+   - **User decision needed**: Trade-off decisions (memory vs speed), breaking changes
+   - **Not fixable here**: Algorithm redesign, architecture changes, complex optimization trade-offs
+
+3. **For Each Fixable Issue**:
+   - If auto-fixable: Apply fix directly
+   - If needs user decision: Use `AskUserQuestion`:
+     ```
+     Question: "Performance issue: [description]. How to proceed?"
+     Options:
+     - "Apply suggested fix" (if fix is clear)
+     - "Skip this issue" (accept the trade-off)
+     - "Stop and investigate" (need more analysis)
+     ```
+
+4. **Track Progress**:
+   ```yaml
+   verification_context:
+     last_status: "passed_with_concerns"
+     issues_found: [count]
+     fixes_applied: [list of applied fixes]
+     decisions_made:
+       - issue: "[description]"
+         decision: "fix" | "skip" | "defer"
+     reverify_count: [0-3]
+   ```
+
+5. **Re-verify**: After applying fixes, invoke performance-verifier again (increment `reverify_count`)
+
+6. **Exit Conditions**:
+   - ✅ New verdict = "PASS" → Proceed to Phase 4
+   - ⚠️ Max iterations (3) reached → Ask user: continue with concerns or stop
+   - ❌ Critical regressions remain → Report to user, recommend stopping
+
+**State Update**: After Issue Resolution:
+- Update `verification_context.reverify_count`
+- Update `verification_context.fixes_applied` with list of fixes
+- Update `performance_context.verification_verdict` with new verdict
+
+---
+
+## 🚦 GATE: Phase 3.5 → Phase 4
 
 **STOP. You cannot proceed until this gate clears.**
 
 1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
 2. **If mode = interactive**:
    - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 3 (Performance Verification) complete. Ready to proceed to Phase 4 (Load Testing & Production Readiness)?"
-     - Options: ["Continue to Phase 4", "Review Phase 3 outputs", "Stop workflow"]
+     - Question: "Phase 3.5 (Issue Resolution) complete. [N] issues fixed. Ready to proceed to Phase 4 (Load Testing & Production Readiness)?"
+     - Options: ["Continue to Phase 4", "Review resolution results", "Stop workflow"]
    - Wait for user response before continuing
 3. **If mode = yolo**:
    - Output: "→ Auto-continuing to Phase 4 (Load Testing & Production Readiness)..."
@@ -501,6 +594,18 @@ performance_context:
   optimizations_completed: [number]
   verification_verdict: "PASS" | "PASS with Concerns" | "FAIL"
   overall_improvement: "[percentage]%"
+
+# Issue Resolution tracking (Phase 3.5)
+verification_context:
+  last_status: "passed" | "passed_with_concerns" | "failed"
+  issues_found: [number]
+  fixes_applied:
+    - "[description of fix 1]"
+    - "[description of fix 2]"
+  decisions_made:
+    - issue: "[issue description]"
+      decision: "fix" | "skip" | "defer"
+  reverify_count: 0  # max 3
 
 options:
   skip_load_testing: false

@@ -24,11 +24,14 @@ Use TodoWrite tool with todos:
   {"content": "Set up git branch", "status": "pending", "activeForm": "Setting up git branch"},
   {"content": "Execute refactoring", "status": "pending", "activeForm": "Executing refactoring"},
   {"content": "Verify behavior preserved", "status": "pending", "activeForm": "Verifying behavior preserved"},
-  {"content": "Verify final quality", "status": "pending", "activeForm": "Verifying final quality"}
+  {"content": "Verify final quality", "status": "pending", "activeForm": "Verifying final quality"},
+  {"content": "Resolve quality issues", "status": "pending", "activeForm": "Resolving quality issues"}
 ]
 ```
 
 Note: Phase 2.5 (Set up git branch) is optional based on user choice.
+Note: Phase 5.5 (Issue Resolution) runs conditionally if quality verification finds fixable issues.
+Note: Phase 4 (behavior verification) has ZERO TOLERANCE - failures = HALT, no Issue Resolution.
 
 ### Step 2: Output Initialization Summary
 
@@ -87,12 +90,19 @@ Use when:
 
 ## Framework Patterns
 
-This orchestrator follows shared patterns. See:
+**MANDATORY**: Before executing any phase, READ these framework patterns:
 
-- **Phase Execution**: `../orchestrator-framework/references/phase-execution-pattern.md`
-- **State Management**: `../orchestrator-framework/references/state-management.md`
-- **Interactive Mode**: `../orchestrator-framework/references/interactive-mode.md`
-- **Initialization**: `../orchestrator-framework/references/initialization-pattern.md`
+1. `../orchestrator-framework/references/phase-execution-pattern.md`
+2. `../orchestrator-framework/references/state-management.md`
+3. `../orchestrator-framework/references/interactive-mode.md`
+4. `../orchestrator-framework/references/initialization-pattern.md`
+5. `../orchestrator-framework/references/issue-resolution-pattern.md`
+
+**SELF-CHECK (before proceeding to Phase 0):**
+- [ ] Did you read all 5 framework pattern files?
+- [ ] Do you understand that Phase 4 (behavior) has NO Issue Resolution, but Phase 5 (quality) does?
+
+If NO to any: STOP - go back and read the files.
 
 ## Local References
 
@@ -118,8 +128,11 @@ Read these during relevant phases:
 | 3 | "Execute refactoring" | "Executing refactoring" | orchestrator |
 | 4 | "Verify behavior preserved" | "Verifying behavior preserved" | behavioral-verifier |
 | 5 | "Verify final quality" | "Verifying final quality" | orchestrator |
+| 5.5 | "Resolve quality issues" | "Resolving quality issues" | orchestrator (conditional) |
 
-**Workflow Overview**: 6-7 phases (Phase 2.5 optional based on user choice)
+**Workflow Overview**: 6-8 phases (Phase 2.5 optional based on user choice, Phase 5.5 runs if quality issues found)
+
+**IMPORTANT**: Phase 4 (behavior verification) has **ZERO TOLERANCE** - any behavior change = FAIL = HALT. NO Issue Resolution for Phase 4. Phase 5.5 only handles quality issues (over-engineering, complexity).
 
 **CRITICAL TodoWrite Usage**:
 1. At workflow start: Create todos for ALL phases using the Phase Configuration table above (all status=pending)
@@ -624,7 +637,90 @@ If NO to any: STOP - go back and invoke the Task tool.
 - `verification/quality-improvement-report.md`
 - `verification/pragmatic-review.md`
 
-**Success**: Quality improved, goals met, no over-engineering
+**State Update**: After quality verification completes:
+- Update `refactoring_context.quality_verification_status` from pragmatic review verdict
+
+---
+
+## 🚦 GATE: Phase 5 → Phase 5.5 or Completion
+
+**STOP. You cannot proceed until this gate clears.**
+
+**Check quality verification result from pragmatic review:**
+
+1. **If verdict = "PASS"**: Skip Phase 5.5, workflow complete
+2. **If verdict = "PASS with Issues"**: Enter Issue Resolution (Phase 5.5)
+3. **If verdict = "FAIL"**: Check for fixable quality issues
+   - If fixable issues exist AND `verification_context.reverify_count` < 3: Enter Phase 5.5
+   - Otherwise: Complete workflow with warnings
+
+**Mode check (if proceeding to completion directly):**
+1. Read `orchestrator-state.yml` → check `mode` value
+2. **If mode = interactive**:
+   - Use `AskUserQuestion` tool NOW:
+     - Question: "Phase 5 (Final Quality Verification) complete. All quality checks passed. Workflow complete?"
+     - Options: ["Complete workflow", "Review Phase 5 outputs"]
+   - Wait for user response before continuing
+3. **If mode = yolo**:
+   - Output: "→ Quality verification passed. Workflow complete."
+   - Complete workflow
+
+**This gate overrides any "continue without asking" conversation instructions.**
+
+---
+
+### Phase 5.5: Quality Issue Resolution (Conditional)
+
+**When to execute**: Quality verification found fixable issues (over-engineering, complexity)
+
+**IMPORTANT**: This phase handles QUALITY issues only. Behavior issues are NOT resolved here - Phase 4 failures = HALT.
+
+**Reference**: See `../orchestrator-framework/references/issue-resolution-pattern.md` for detailed pattern.
+
+**Process Overview**:
+
+1. **Parse Pragmatic Review Output**:
+   - Extract issues from `verification/pragmatic-review.md`
+   - Categorize by type (over-engineering, complexity, unnecessary abstractions)
+
+2. **Categorize Issues**:
+   - **Auto-fixable**: Remove unused code, simplify obvious over-abstractions
+   - **User decision needed**: Pattern simplification decisions, trade-off choices
+   - **Not fixable here**: Fundamental design decisions (require new refactoring cycle)
+
+3. **For Each Fixable Issue**:
+   - If auto-fixable: Apply simplification directly
+   - If needs user decision: Use `AskUserQuestion`:
+     ```
+     Question: "Quality issue: [description]. How to proceed?"
+     Options:
+     - "Apply simplification" (if fix is clear)
+     - "Keep as-is" (accept the complexity)
+     - "Stop and discuss" (need more analysis)
+     ```
+
+4. **Track Progress**:
+   ```yaml
+   verification_context:
+     last_status: "passed_with_issues"
+     issues_found: [count]
+     fixes_applied: [list of applied simplifications]
+     decisions_made:
+       - issue: "[description]"
+         decision: "fix" | "skip" | "defer"
+     reverify_count: [0-3]
+   ```
+
+5. **Re-verify**: After applying fixes, re-run pragmatic review (increment `reverify_count`)
+
+6. **Exit Conditions**:
+   - ✅ New verdict = "PASS" → Workflow complete
+   - ⚠️ Max iterations (3) reached → Complete with warnings
+   - Remaining issues are acceptable trade-offs → Complete with documented exceptions
+
+**State Update**: After Issue Resolution:
+- Update `verification_context.reverify_count`
+- Update `verification_context.fixes_applied` with list of simplifications
 
 ---
 
@@ -639,6 +735,7 @@ refactoring_context:
   risk_level: "low" | "medium" | "high"
   baseline_fingerprint: "[hash]"
   behavior_verification_status: "PASS" | "FAIL" | null
+  quality_verification_status: "PASS" | "PASS with Issues" | "FAIL" | null
 
 branch_context:
   use_dedicated_branch: true | false
@@ -649,6 +746,19 @@ branch_context:
       description: "[description]"
       commit_hash: "[hash]"
       timestamp: "[ISO 8601]"
+
+# Quality Issue Resolution tracking (Phase 5.5)
+# NOTE: Does NOT apply to Phase 4 behavior verification (zero tolerance)
+verification_context:
+  last_status: "passed" | "passed_with_issues" | "failed"
+  issues_found: [number]
+  fixes_applied:
+    - "[description of simplification 1]"
+    - "[description of simplification 2]"
+  decisions_made:
+    - issue: "[issue description]"
+      decision: "fix" | "skip" | "defer"
+  reverify_count: 0  # max 3
 ```
 
 ---

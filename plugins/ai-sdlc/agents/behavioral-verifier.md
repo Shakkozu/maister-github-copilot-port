@@ -375,3 +375,44 @@ Compare side effects across categories:
 ---
 
 This agent provides the critical verification that refactoring preserved behavior exactly, enabling confident approval or immediate rollback.
+
+---
+
+## Structured Output for Orchestrator
+
+When invoked by an orchestrator, return structured result alongside the report:
+
+```yaml
+status: "passed" | "failed"
+report_path: "verification/behavior-verification-report.md"
+
+# Issue summary for orchestrator to process
+issues:
+  - source: "signature" | "test_failure" | "side_effect" | "fingerprint"
+    severity: "critical" | "warning" | "info"
+    description: "[Brief description of the issue]"
+    location: "[Function or test name]"
+    fixable: true | false
+    suggestion: "[How to fix, if obvious]"
+
+# Counts for quick assessment
+issue_counts:
+  critical: 0
+  warning: 0
+  info: 0
+
+# Behavior-specific metrics
+metrics:
+  signatures_matched: 0
+  signatures_changed: 0
+  tests_passed: 0
+  tests_failed: 0
+  new_failures: 0
+  side_effects_preserved: true | false
+```
+
+**Guidelines for `fixable` assessment**:
+- `true`: Test assertion updates for renamed functions, minor signature adjustments documented in plan
+- `false`: Behavior changes (these should trigger ROLLBACK, not fix)
+
+**Important**: Behavioral verification has **zero tolerance** for behavior changes. Most issues should trigger ROLLBACK rather than fix attempts. The orchestrator uses this data primarily for reporting, not fixing.

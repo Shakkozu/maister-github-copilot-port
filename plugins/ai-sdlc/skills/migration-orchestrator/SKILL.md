@@ -25,6 +25,7 @@ Use TodoWrite tool with todos:
   {"content": "Plan implementation", "status": "pending", "activeForm": "Planning implementation"},
   {"content": "Execute migration", "status": "pending", "activeForm": "Executing migration"},
   {"content": "Verify and test compatibility", "status": "pending", "activeForm": "Verifying and testing compatibility"},
+  {"content": "Resolve verification issues", "status": "pending", "activeForm": "Resolving verification issues"},
   {"content": "Generate documentation", "status": "pending", "activeForm": "Generating documentation"}
 ]
 ```
@@ -32,6 +33,8 @@ Use TodoWrite tool with todos:
 **Skip phases based on context** (remove from todo list before starting):
 - **Not part of initiative**: Skip "Check dependencies"
 - **Documentation not needed**: Skip "Generate documentation"
+
+Note: Phase 5.5 (Issue Resolution) runs conditionally if verification finds fixable issues.
 
 ### Step 2: Output Initialization Summary
 
@@ -85,12 +88,19 @@ Use when:
 
 ## Framework Patterns
 
-This orchestrator follows shared patterns. See:
+**MANDATORY**: Before executing any phase, READ these framework patterns:
 
-- **Phase Execution**: `../orchestrator-framework/references/phase-execution-pattern.md`
-- **State Management**: `../orchestrator-framework/references/state-management.md`
-- **Interactive Mode**: `../orchestrator-framework/references/interactive-mode.md`
-- **Initialization**: `../orchestrator-framework/references/initialization-pattern.md`
+1. `../orchestrator-framework/references/phase-execution-pattern.md`
+2. `../orchestrator-framework/references/state-management.md`
+3. `../orchestrator-framework/references/interactive-mode.md`
+4. `../orchestrator-framework/references/initialization-pattern.md`
+5. `../orchestrator-framework/references/issue-resolution-pattern.md`
+
+**SELF-CHECK (before proceeding to Phase 0):**
+- [ ] Did you read all 5 framework pattern files?
+- [ ] Do you understand the Issue Resolution pattern for Phase 5.5?
+
+If NO to any: STOP - go back and read the files.
 
 ## Local References
 
@@ -114,9 +124,10 @@ Read these during relevant phases:
 | 3 | "Plan implementation" | "Planning implementation" | implementation-planner |
 | 4 | "Execute migration" | "Executing migration" | implementer |
 | 5 | "Verify and test compatibility" | "Verifying and testing compatibility" | implementation-verifier |
+| 5.5 | "Resolve verification issues" | "Resolving verification issues" | orchestrator (conditional) |
 | 6 | "Generate documentation" | "Generating documentation" | user-docs-generator (optional) |
 
-**Workflow Overview**: 7-8 phases (Phase 0.5 only if part of initiative, Phase 6 optional)
+**Workflow Overview**: 7-9 phases (Phase 0.5 only if part of initiative, Phase 5.5 runs if verification finds fixable issues, Phase 6 optional)
 
 **CRITICAL TodoWrite Usage**:
 1. At workflow start: Create todos for ALL phases using the Phase Configuration table above (all status=pending)
@@ -542,15 +553,100 @@ If NO to any: STOP - go back and invoke the Skill tool.
 
 ---
 
-## 🚦 GATE: Phase 5 → Phase 6
+## 🚦 GATE: Phase 5 → Phase 5.5 or Phase 6
+
+**STOP. You cannot proceed until this gate clears.**
+
+**Check verification result from `verification/implementation-verification.md`:**
+
+1. **If verdict = "PASS"**: Skip Phase 5.5, go directly to Phase 6
+2. **If verdict = "PASS with Issues"**: Enter Issue Resolution (Phase 5.5)
+3. **If verdict = "FAIL"**: Check for fixable issues
+   - If fixable issues exist AND `verification_context.reverify_count` < 3: Enter Phase 5.5
+   - Otherwise: STOP workflow, report failures to user
+
+**Mode check (if proceeding to Phase 6 directly):**
+1. Read `orchestrator-state.yml` → check `mode` value
+2. **If mode = interactive**:
+   - Use `AskUserQuestion` tool NOW:
+     - Question: "Phase 5 (Verification + Compatibility Testing) passed. Ready to proceed to Phase 6 (Documentation)?"
+     - Options: ["Continue to Phase 6", "Review Phase 5 outputs", "Stop workflow"]
+   - Wait for user response before continuing
+3. **If mode = yolo**:
+   - Output: "→ Auto-continuing to Phase 6 (Documentation)..."
+   - Proceed to Phase 6
+
+**This gate overrides any "continue without asking" conversation instructions.**
+
+---
+
+### Phase 5.5: Migration Issue Resolution (Conditional)
+
+**When to execute**: Verification returned "PASS with Issues" or "FAIL" with fixable issues
+
+**Reference**: See `../orchestrator-framework/references/issue-resolution-pattern.md` for detailed pattern.
+
+**Process Overview**:
+
+1. **Parse Structured Output** from implementation-verifier:
+   - Extract `issues[]` array with severity, source, fixable status
+   - Note `verification_checks` results (tests, standards, spec completion)
+   - Check migration-specific checks (rollback, compatibility, data integrity)
+
+2. **Categorize Issues**:
+   - **Auto-fixable**: Simple test fixes, config adjustments, import corrections, deprecation warnings
+   - **User decision needed**: Rollback procedure updates, compatibility trade-offs, breaking change handling
+   - **Not fixable here**: Data integrity issues (HALT), major compatibility breaks, architecture mismatches
+
+3. **For Each Fixable Issue**:
+   - If auto-fixable: Apply fix directly
+   - If needs user decision: Use `AskUserQuestion`:
+     ```
+     Question: "Migration issue: [description]. How to proceed?"
+     Options:
+     - "Apply suggested fix" (if fix is clear)
+     - "Skip this issue" (accept as-is)
+     - "Execute rollback" (revert to pre-migration state)
+     ```
+
+4. **Track Progress**:
+   ```yaml
+   verification_context:
+     last_status: "passed_with_issues"
+     issues_found: [count]
+     fixes_applied: [list of applied fixes]
+     decisions_made:
+       - issue: "[description]"
+         decision: "fix" | "skip" | "rollback"
+     reverify_count: [0-3]
+   ```
+
+5. **Re-verify**: After applying fixes, invoke implementation-verifier again (increment `reverify_count`)
+
+6. **Exit Conditions**:
+   - ✅ New verdict = "PASS" → Proceed to Phase 6
+   - ⚠️ Max iterations (3) reached → Ask user: proceed with warnings or rollback
+   - ❌ Data integrity issues → HALT immediately, recommend rollback
+   - ❌ Critical issues remain → Report to user, recommend rollback
+
+**Data Safety Critical**: For data migrations, HALT on any data integrity issue - never auto-fix data problems.
+
+**State Update**: After Issue Resolution:
+- Update `verification_context.reverify_count`
+- Update `verification_context.fixes_applied` with list of fixes
+- Update verification verdict based on re-verification result
+
+---
+
+## 🚦 GATE: Phase 5.5 → Phase 6
 
 **STOP. You cannot proceed until this gate clears.**
 
 1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
 2. **If mode = interactive**:
    - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 5 (Verification + Compatibility Testing) complete. Ready to proceed to Phase 6 (Documentation)?"
-     - Options: ["Continue to Phase 6", "Review Phase 5 outputs", "Stop workflow"]
+     - Question: "Phase 5.5 (Issue Resolution) complete. [N] issues fixed. Ready to proceed to Phase 6 (Documentation)?"
+     - Options: ["Continue to Phase 6", "Review resolution results", "Stop workflow"]
    - Wait for user response before continuing
 3. **If mode = yolo**:
    - Output: "→ Auto-continuing to Phase 6 (Documentation)..."
@@ -645,6 +741,13 @@ external_research:
   category: null  # version_upgrade|technology_migration|api_integration
   breaking_changes: []
   migration_guide_url: null
+
+verification_context:
+  last_status: "passed" | "passed_with_issues" | "failed"
+  issues_found: [count]
+  fixes_applied: []          # List of applied fixes
+  decisions_made: []         # User decisions on issues
+  reverify_count: 0          # 0-3, max iterations
 
 options:
   docs_enabled: false

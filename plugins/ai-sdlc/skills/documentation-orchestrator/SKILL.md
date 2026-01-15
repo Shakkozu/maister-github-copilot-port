@@ -21,9 +21,12 @@ Use TodoWrite tool with todos:
   {"content": "Plan documentation structure", "status": "pending", "activeForm": "Planning documentation structure"},
   {"content": "Create content with screenshots", "status": "pending", "activeForm": "Creating content with screenshots"},
   {"content": "Review and validate", "status": "pending", "activeForm": "Reviewing and validating"},
+  {"content": "Resolve documentation issues", "status": "pending", "activeForm": "Resolving documentation issues"},
   {"content": "Publish and integrate", "status": "pending", "activeForm": "Publishing and integrating"}
 ]
 ```
+
+Note: Phase 2.5 (Issue Resolution) runs conditionally if review finds fixable issues.
 
 ### Step 2: Output Initialization Summary
 
@@ -72,12 +75,19 @@ Use when:
 
 ## Framework Patterns
 
-This orchestrator follows shared patterns. See:
+**MANDATORY**: Before executing any phase, READ these framework patterns:
 
-- **Phase Execution**: `../orchestrator-framework/references/phase-execution-pattern.md`
-- **State Management**: `../orchestrator-framework/references/state-management.md`
-- **Interactive Mode**: `../orchestrator-framework/references/interactive-mode.md`
-- **Initialization**: `../orchestrator-framework/references/initialization-pattern.md`
+1. `../orchestrator-framework/references/phase-execution-pattern.md`
+2. `../orchestrator-framework/references/state-management.md`
+3. `../orchestrator-framework/references/interactive-mode.md`
+4. `../orchestrator-framework/references/initialization-pattern.md`
+5. `../orchestrator-framework/references/issue-resolution-pattern.md`
+
+**SELF-CHECK (before proceeding to Phase 0):**
+- [ ] Did you read all 5 framework pattern files?
+- [ ] Do you understand the Issue Resolution pattern for Phase 2.5?
+
+If NO to any: STOP - go back and read the files.
 
 ## Local References
 
@@ -98,9 +108,10 @@ Read these during relevant phases:
 | 0 | "Plan documentation structure" | "Planning documentation structure" | documentation-planner |
 | 1 | "Create content with screenshots" | "Creating content with screenshots" | user-docs-generator |
 | 2 | "Review and validate" | "Reviewing and validating" | documentation-reviewer |
+| 2.5 | "Resolve documentation issues" | "Resolving documentation issues" | orchestrator (conditional) |
 | 3 | "Publish and integrate" | "Publishing and integrating" | orchestrator |
 
-**Workflow Overview**: 4 phases (0-3)
+**Workflow Overview**: 4-5 phases (Phase 2.5 runs if review finds fixable issues)
 
 **CRITICAL TodoWrite Usage**:
 1. At workflow start: Create todos for ALL phases using the Phase Configuration table above (all status=pending)
@@ -330,15 +341,97 @@ If NO to any: STOP - go back and invoke the Task tool.
 
 ---
 
-## 🚦 GATE: Phase 2 → Phase 3
+## 🚦 GATE: Phase 2 → Phase 2.5 or Phase 3
+
+**STOP. You cannot proceed until this gate clears.**
+
+**Check review result from `documentation_context.verdict`:**
+
+1. **If verdict = "PASS"**: Skip Phase 2.5, go directly to Phase 3
+2. **If verdict = "PASS with Issues"**: Enter Issue Resolution (Phase 2.5)
+3. **If verdict = "FAIL"**: Check for fixable issues
+   - If fixable issues exist AND `verification_context.reverify_count` < 3: Enter Phase 2.5
+   - Otherwise: STOP workflow, report failures to user
+
+**Mode check (if proceeding to Phase 3 directly):**
+1. Read `orchestrator-state.yml` → check `mode` value
+2. **If mode = interactive**:
+   - Use `AskUserQuestion` tool NOW:
+     - Question: "Phase 2 (Review and validate) passed. Ready to proceed to Phase 3 (Publish and integrate)?"
+     - Options: ["Continue to Phase 3", "Review Phase 2 outputs", "Stop workflow"]
+   - Wait for user response before continuing
+3. **If mode = yolo**:
+   - Output: "→ Auto-continuing to Phase 3 (Publish and integrate)..."
+   - Proceed to Phase 3
+
+**This gate overrides any "continue without asking" conversation instructions.**
+
+---
+
+### Phase 2.5: Documentation Issue Resolution (Conditional)
+
+**When to execute**: Review returned "PASS with Issues" or "FAIL" with fixable issues
+
+**Reference**: See `../orchestrator-framework/references/issue-resolution-pattern.md` for detailed pattern.
+
+**Process Overview**:
+
+1. **Parse Structured Output** from documentation-reviewer:
+   - Extract `issues[]` array with severity, source, fixable status
+   - Note `issue_counts` (critical, warning, info)
+   - Check `metrics` (completeness, readability, screenshots, broken_links)
+
+2. **Categorize Issues**:
+   - **Auto-fixable**: Typos, formatting issues, broken internal links, simple rewording, missing alt text
+   - **User decision needed**: Screenshot retakes, content restructuring, tone adjustments
+   - **Not fixable here**: Missing sections (need content creation), structural reorganization
+
+3. **For Each Fixable Issue**:
+   - If auto-fixable: Apply fix directly
+   - If needs user decision: Use `AskUserQuestion`:
+     ```
+     Question: "Documentation issue: [description]. How to proceed?"
+     Options:
+     - "Apply suggested fix" (if fix is clear)
+     - "Skip this issue" (accept as-is)
+     - "Stop and revise" (need manual content work)
+     ```
+
+4. **Track Progress**:
+   ```yaml
+   verification_context:
+     last_status: "passed_with_issues"
+     issues_found: [count]
+     fixes_applied: [list of applied fixes]
+     decisions_made:
+       - issue: "[description]"
+         decision: "fix" | "skip" | "defer"
+     reverify_count: [0-3]
+   ```
+
+5. **Re-verify**: After applying fixes, invoke documentation-reviewer again (increment `reverify_count`)
+
+6. **Exit Conditions**:
+   - ✅ New verdict = "PASS" → Proceed to Phase 3
+   - ⚠️ Max iterations (3) reached → Ask user: publish with warnings or stop
+   - ❌ Critical issues remain → Report to user, recommend revision
+
+**State Update**: After Issue Resolution:
+- Update `verification_context.reverify_count`
+- Update `verification_context.fixes_applied` with list of fixes
+- Update `documentation_context.verdict` with new verdict
+
+---
+
+## 🚦 GATE: Phase 2.5 → Phase 3
 
 **STOP. You cannot proceed until this gate clears.**
 
 1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
 2. **If mode = interactive**:
    - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 2 (Review and validate) complete. Ready to proceed to Phase 3 (Publish and integrate)?"
-     - Options: ["Continue to Phase 3", "Review Phase 2 outputs", "Stop workflow"]
+     - Question: "Phase 2.5 (Issue Resolution) complete. [N] issues fixed. Ready to proceed to Phase 3 (Publish and integrate)?"
+     - Options: ["Continue to Phase 3", "Review resolution results", "Stop workflow"]
    - Wait for user response before continuing
 3. **If mode = yolo**:
    - Output: "→ Auto-continuing to Phase 3 (Publish and integrate)..."
@@ -392,6 +485,13 @@ documentation_context:
     ease: [actual score]
     grade: [actual grade]
   verdict: "PASS" | "PASS with Issues" | "FAIL"
+
+verification_context:
+  last_status: "passed" | "passed_with_issues" | "failed"
+  issues_found: [count]
+  fixes_applied: []          # List of applied fixes
+  decisions_made: []         # User decisions on issues
+  reverify_count: 0          # 0-3, max iterations
 
 options:
   skip_screenshots: false

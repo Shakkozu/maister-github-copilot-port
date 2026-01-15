@@ -67,9 +67,18 @@ task:
 
 ## Extension Pattern
 
-Orchestrators add domain-specific fields under a `*_context` key:
+Orchestrators add domain-specific fields using naming convention `[domain]_context`:
 
-### Development Orchestrator
+- `task_context` (development)
+- `security_context` (security)
+- `performance_context` (performance)
+- `migration_context` (migration)
+- `refactoring_context` (refactoring)
+- `documentation_context` (documentation)
+
+**See each orchestrator's SKILL.md "Domain Context" section for full schema.**
+
+### Example: Development Orchestrator
 
 ```yaml
 orchestrator:
@@ -82,74 +91,23 @@ orchestrator:
     tdd_applicable: true | false         # Bug only
     reproduction_data: null              # Bug only
     architecture_decision: null          # Feature/Enhancement only
+```
 
-  # Phase 11.5 Issue Resolution tracking
+### Shared: verification_context
+
+All orchestrators with Issue Resolution phases add this shared schema:
+
+```yaml
+  # Added after verification phase (e.g., Phase 11.5, 3.5, 5.5, 2.5)
   verification_context:
     last_status: passed | passed_with_issues | failed | null
     issues_found: []                     # Issue summaries from verifier
     fixes_applied: []                    # What was auto-fixed
-    decisions_made: []                   # User decisions on non-trivial issues
+    decisions_made: []                   # User decisions on issues
     reverify_count: 0                    # Current iteration (max 3)
 ```
 
-### Security Orchestrator
-
-```yaml
-orchestrator:
-  # ... common fields ...
-
-  security_context:
-    baseline_vulnerabilities: [number]
-    critical_vulnerabilities: [number]
-    fixes_planned: [number]
-    compliance_frameworks: []            # GDPR, HIPAA, SOC2, PCI-DSS
-```
-
-### Performance Orchestrator
-
-```yaml
-orchestrator:
-  # ... common fields ...
-
-  performance_context:
-    baseline_metrics:
-      p50: null
-      p95: null
-      p99: null
-      throughput: null
-    optimization_target: null
-    bottlenecks_identified: [number]
-```
-
-### Migration Orchestrator
-
-```yaml
-orchestrator:
-  # ... common fields ...
-
-  migration_context:
-    migration_type: code | data | architecture | general
-    current_system: {}
-    target_system: {}
-    breaking_changes: []
-    rollback_strategy: null
-```
-
-### Refactoring Orchestrator
-
-```yaml
-orchestrator:
-  # ... common fields ...
-
-  refactoring_context:
-    refactoring_type: extract | rename | restructure | simplify
-    baseline_metrics:
-      complexity: null
-      duplication: null
-      coverage: null
-    behavioral_fingerprint: null
-    branch_created: false
-```
+Orchestrators with Issue Resolution: development, security, performance, migration, refactoring, documentation
 
 ---
 
@@ -268,25 +226,17 @@ orchestrator:
 - **Downstream decisions need context**: Risk level affects verification depth
 - **Missing updates = broken logic**: `ui_heavy` staying `null` means UI mockups never trigger
 
-### Common State Update Points
+### State Update Categories
 
-| Orchestrator | Phase | Subagent | State Fields Updated |
-|--------------|-------|----------|---------------------|
-| Development | 1 | codebase-analyzer | `task_context.risk_level` |
-| Development | 2 | gap-analyzer | `task_context.ui_heavy`, `risk_level`, `reproduction_data` |
-| Development | 11 | implementation-verifier | `verification_context.last_status`, `issues_found` |
-| Development | 11.5 | (inline) | `verification_context.fixes_applied`, `decisions_made`, `reverify_count` |
-| Refactoring | 1 | refactoring-planner | `refactoring_context.refactoring_type`, `total_increments` |
-| Refactoring | 2 | behavioral-snapshot-capturer | `refactoring_context.baseline_fingerprint` |
-| Security | 0 | security-analyzer | `security_context.baseline_vulnerabilities`, `critical_vulnerabilities` |
-| Performance | 0 | performance-profiler | `performance_context.baseline_p95`, `target_p95` |
-| Migration | 1 | gap-analyzer | `migration_context.migration_type`, `current_system`, `target_system` |
-
-### Implementation Notes
-
-- Each orchestrator's `SKILL.md` documents specific state updates after each phase
+**1. Domain-specific updates** - Vary by orchestrator, documented in each SKILL.md:
+- Analysis phases → populate `[domain]_context` fields (risk_level, ui_heavy, etc.)
 - Look for `**State Update**:` sections in phase definitions
-- State updates are mandatory, not optional documentation
+
+**2. Verification updates** - Shared pattern across all orchestrators with Issue Resolution:
+- Verification phase → `verification_context.last_status`, `issues_found`
+- Issue Resolution phase → `fixes_applied`, `decisions_made`, `reverify_count`
+
+**Reference**: See each orchestrator's SKILL.md for specific state update points per phase.
 
 ---
 
