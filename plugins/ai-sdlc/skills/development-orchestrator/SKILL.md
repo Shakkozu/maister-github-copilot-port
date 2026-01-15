@@ -1200,53 +1200,21 @@ If NO to any: STOP - go back and invoke the Skill tool.
 
 **Purpose**: Fix detected issues through agent reasoning, user decisions, and re-verification.
 
-**Process**:
+**See**: `../orchestrator-framework/references/issue-resolution-pattern.md` for the complete pattern.
 
-1. **Read verification results** from implementation-verifier structured output:
-   - Parse `issues[]` array with severity, description, location, fixable, suggestion
-   - Note `issue_counts` for quick assessment
+**Development-specific notes**:
+- Verifier: `ai-sdlc:implementation-verifier`
+- Typical fixable issues: lint errors, formatting, missing imports, obvious typos
+- State: `verification_context` in orchestrator-state.yml
+- Re-verify by re-invoking the implementation-verifier skill
 
-2. **For each issue, reason about how to handle it**:
-   - **Trivial/auto-fixable** (lint, formatting, missing imports, obvious typos): Fix silently, log to work-log.md
-   - **Non-trivial** (design decisions, unclear requirements, logic errors): Use `AskUserQuestion` to present issue and get user decision
+**Process summary**:
+1. Read `issues[]` from verifier structured output
+2. Fix trivial issues silently, ask user about non-trivial ones
+3. Re-verify if fixes applied (max 3 iterations)
+4. Exit when: passes, user proceeds with known issues, or max iterations
 
-3. **If any fixes applied**: Re-invoke `ai-sdlc:implementation-verifier` skill
-   - Track `verification_context.reverify_count` in state
-   - **Max 3 iterations** to prevent infinite loops
-
-4. **Exit when**:
-   - ✅ Verification passes (all issues resolved)
-   - ⚠️ User chooses "Proceed with known issues"
-   - ❌ Max reverify attempts reached (ask user how to proceed)
-
-**State Updates**:
-
-```yaml
-verification_context:
-  last_status: "[from verifier output]"
-  issues_found: [issue summaries]
-  fixes_applied: [what was auto-fixed]
-  decisions_made: [user decisions on non-trivial issues]
-  reverify_count: [0-3]
-```
-
-**AskUserQuestion pattern** (for non-trivial issues):
-
-```
-Use AskUserQuestion tool:
-  Question: "[Issue description] - How would you like to handle this?"
-  Header: "[Issue source]"
-  Options:
-  1. "Try suggested fix" - [If suggestion available]
-  2. "Skip this issue" - Proceed without fixing
-  3. "Let me investigate" - Pause for manual investigation
-```
-
-**Log all actions** to `implementation/work-log.md`:
-- What issues were detected
-- What was auto-fixed (and how)
-- What user decided for each non-trivial issue
-- Re-verification results
+**Log all actions** to `implementation/work-log.md`
 
 ---
 

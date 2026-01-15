@@ -620,6 +620,7 @@ All orchestrators share common patterns documented in `skills/orchestrator-frame
 | Interactive Mode | `interactive-mode.md` | Post-phase prompts and user decisions |
 | Initialization | `initialization-pattern.md` | Startup sequence and directory setup |
 | Delegation Enforcement | `delegation-enforcement.md` | Anti-pattern blocks, invocation blocks, self-checks, **context passing** |
+| Issue Resolution | `issue-resolution-pattern.md` | Fix-then-reverify loop after verification phases |
 
 Each orchestrator references these patterns (via `../orchestrator-framework/references/`) and implements domain-specific behavior. This approach:
 - **Single source of truth**: Patterns documented once, referenced everywhere
