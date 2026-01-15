@@ -48,7 +48,7 @@ Use TodoWrite tool with todos:
   {"content": "Clarify requirements", "status": "pending", "activeForm": "Clarifying requirements"},
   {"content": "Analyze gaps", "status": "pending", "activeForm": "Analyzing gaps"},
   {"content": "Write failing test (TDD Red)", "status": "pending", "activeForm": "Writing failing test"},
-  {"content": "Clarify UI approach", "status": "pending", "activeForm": "Clarifying UI approach"},
+  {"content": "Clarify scope & approach", "status": "pending", "activeForm": "Clarifying scope & approach"},
   {"content": "Generate UI mockups", "status": "pending", "activeForm": "Generating UI mockups"},
   {"content": "Clarify technical approach", "status": "pending", "activeForm": "Clarifying technical approach"},
   {"content": "Create specification", "status": "pending", "activeForm": "Creating specification"},
@@ -72,8 +72,9 @@ At initialization (task type known):
 - **Not bug fix**: Skip "Write failing test (TDD Red)" and "Verify test passes (TDD Green)"
 - **Bug fix**: Skip "Run E2E tests" and "Generate user documentation"
 
-After gap analysis (ui_heavy known):
-- **Not UI-heavy** (ui_heavy=false): Skip "Clarify UI approach", "Generate UI mockups", and "Run E2E tests"
+After gap analysis (clarification needs known):
+- **No clarifications needed** (no decisions_needed, no scope_expansion_recommended, ui_heavy=false): Skip "Clarify scope & approach"
+- **Not UI-heavy** (ui_heavy=false): Skip "Generate UI mockups" and "Run E2E tests"
 - **Simple task** (not complex, single approach): Skip "Clarify technical approach" and "Decide architecture"
 
 After Phase 10 (user can override):
@@ -205,7 +206,7 @@ Use for **all development tasks**:
 | 1.5 | "Clarify requirements" | "Clarifying requirements" | All |
 | 2 | "Analyze gaps" | "Analyzing gaps" | All |
 | 3 | "Write failing test (TDD Red)" | "Writing failing test" | Bug only |
-| 3.5 | "Clarify UI approach" | "Clarifying UI approach" | Enhancement, Feature (if ui_heavy) |
+| 3.5 | "Clarify scope & approach" | "Clarifying scope & approach" | All (if needs_clarification) |
 | 4 | "Generate UI mockups" | "Generating UI mockups" | Enhancement, Feature (if ui_heavy) |
 | 4.5 | "Clarify technical approach" | "Clarifying technical approach" | All (if complex) |
 | 5 | "Create specification" | "Creating specification" | All |
@@ -426,6 +427,11 @@ If NO to any: STOP - go back and invoke the Task tool.
 - Update `task_context.ui_heavy` from output `ui_heavy` field
 - Update `task_context.risk_level` from output `risk_level` (if currently null)
 - For bugs: Update `task_context.reproduction_data` from output `reproduction_data`
+- **Calculate `task_context.needs_clarification`**: true if ANY of:
+  - `decisions_needed.critical` is non-empty
+  - `decisions_needed.important` is non-empty
+  - `scope_expansion_recommended = true`
+  - `ui_heavy = true`
 - Set `options.e2e_enabled`: true if feature/enhancement AND ui_heavy, false for bugs
 - Set `options.user_docs_enabled`: true if feature/enhancement, false for bugs
 
@@ -474,9 +480,15 @@ If NO to any: STOP - go back and invoke the Task tool.
 **DO NOT STOP. DO NOT PROMPT USER. PROCEED IMMEDIATELY.**
 
 **Evaluate condition:**
-1. Read `task_context.ui_heavy` from `orchestrator-state.yml`
-2. **If ui_heavy = true**: Continue to Phase 3.5 (Clarify UI Approach)
-3. **If ui_heavy = false**: Skip to Phase 4.5 (Clarify Technical Approach) or Phase 5 if not complex
+1. Read `task_context.needs_clarification` from `orchestrator-state.yml`
+2. **If needs_clarification = true**: Continue to Phase 3.5 (Clarify Scope & Approach)
+3. **If needs_clarification = false**: Skip to Phase 4.5 (Clarify Technical Approach) or Phase 5 if not complex
+
+**`needs_clarification` is true if ANY of these from gap analysis:**
+- `decisions_needed.critical` is non-empty
+- `decisions_needed.important` is non-empty
+- `scope_expansion_recommended = true`
+- `ui_heavy = true`
 
 Phase 3.5 handles user interaction internally via AskUserQuestion.
 No pause needed before clarifying phases.
@@ -485,37 +497,49 @@ No pause needed before clarifying phases.
 
 ---
 
-### Phase 3.5: Clarify UI Approach (Conditional)
+### Phase 3.5: Clarify Scope & Approach (Conditional)
 
 **Execution**: Main orchestrator (direct with AskUserQuestion)
 
-**When**: task_type = enhancement/feature AND ui_heavy = true (from gap analysis)
+**When**: `needs_clarification = true` (set by gap analysis)
 
-**Skip if**: Bug fix, not UI-heavy, or UI approach already clear
+**`needs_clarification` is true if ANY of:**
+- `decisions_needed.critical` is non-empty
+- `decisions_needed.important` is non-empty
+- `scope_expansion_recommended = true`
+- `ui_heavy = true`
 
-**Purpose**: Resolve UI-specific decisions BEFORE generating mockups
+**Skip if**: All above conditions are false (no decisions needed, no scope expansion, not UI-heavy)
 
-**Question Categories**:
+**Purpose**: Resolve scope and approach decisions BEFORE generating mockups or creating specification
 
-| Category | Example Questions |
-|----------|-------------------|
-| **Component Choice** | "Use existing DatePicker or build custom?" |
-| **Layout** | "Modal dialog or inline expansion?" |
-| **Styling** | "Match existing theme or new design?" |
-| **Interaction** | "Immediate save or explicit submit?" |
+**Question Categories** (in order of priority):
+
+| Category | When to Ask | Example Questions |
+|----------|-------------|-------------------|
+| **Scope Expansion** | `scope_expansion_recommended = true` | "Gap analysis found orphaned display (no input). Expand scope to add input form?" |
+| **Critical Decisions** | `decisions_needed.critical` non-empty | Present critical blocking issues with options from gap analysis |
+| **Important Decisions** | `decisions_needed.important` non-empty | Present important issues with defaults from gap analysis |
+| **Component Choice** | `ui_heavy = true` | "Use existing DatePicker or build custom?" |
+| **Layout** | `ui_heavy = true` | "Modal dialog or inline expansion?" |
+| **Styling** | `ui_heavy = true` | "Match existing theme or new design?" |
+| **Interaction** | `ui_heavy = true` | "Immediate save or explicit submit?" |
 
 **Process**:
-1. Analyze gap-analysis.md for UI-related gaps
-2. Generate max 3-5 UI-specific questions
-3. Present via AskUserQuestion
-4. Document answers in `analysis/ui-clarifications.md`
+1. Read gap-analysis.md structured output
+2. If `scope_expansion_recommended = true`: Present scope expansion question first
+3. If `decisions_needed.critical` non-empty: Present critical decisions (these are blocking)
+4. If `decisions_needed.important` non-empty: Present important decisions with defaults
+5. If `ui_heavy = true`: Present UI-specific questions (max 3-5)
+6. Document all answers in `analysis/scope-clarifications.md`
 
-**YOLO Mode**: Accept all recommended defaults, log acceptance
+**YOLO Mode**: Accept all recommended defaults/recommendations, log acceptance
 
-**State Update**: After UI clarifications complete:
-- Set `task_context.ui_clarified: true` in orchestrator-state.yml
+**State Update**: After clarifications complete:
+- Set `task_context.clarifications_complete: true` in orchestrator-state.yml
+- Set `task_context.scope_expanded: true/false` based on user's scope expansion decision
 
-**Outputs**: `analysis/ui-clarifications.md`
+**Outputs**: `analysis/scope-clarifications.md`
 
 ---
 
@@ -526,8 +550,8 @@ No pause needed before clarifying phases.
 1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
 2. **If mode = interactive**:
    - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 3.5 (Clarify UI Approach) complete. Ready to proceed to Phase 4 (UI Mockup Generation)?"
-     - Options: ["Continue to Phase 4", "Review UI clarifications", "Stop workflow"]
+     - Question: "Phase 3.5 (Clarify Scope & Approach) complete. Ready to proceed to Phase 4 (UI Mockup Generation)?"
+     - Options: ["Continue to Phase 4", "Review scope clarifications", "Stop workflow"]
    - Wait for user response before continuing
 3. **If mode = yolo**:
    - Output: "→ Auto-continuing to Phase 4 (UI Mockup Generation)..."
@@ -568,7 +592,7 @@ Parameters:
     Generate ASCII mockups for: [description]
     Task path: [task-path]
     Gap analysis: analysis/gap-analysis.md
-    UI clarifications: analysis/ui-clarifications.md
+    Scope clarifications: analysis/scope-clarifications.md
 
 ⏳ Wait for subagent completion before continuing.
 
@@ -1302,7 +1326,10 @@ orchestrator:
     type: bug | enhancement | feature
     risk_level: null
     ui_heavy: null
-    clarifications_resolved: null
+    needs_clarification: null          # Set by Phase 2 (true if decisions_needed OR scope_expansion OR ui_heavy)
+    clarifications_resolved: null      # Set by Phase 1.5 (requirements clarifications)
+    clarifications_complete: null      # Set by Phase 3.5 (scope & approach clarifications)
+    scope_expanded: null               # Set by Phase 3.5 (if user agreed to scope expansion)
     architecture_decision: null        # Feature/Enhancement only
     tdd_applicable: true               # Bug only
     reproduction_data: null            # Bug only
@@ -1319,6 +1346,7 @@ orchestrator:
 │   ├── codebase-analysis.md          # Phase 1
 │   ├── clarifications.md             # Phase 1.5
 │   ├── gap-analysis.md               # Phase 2
+│   ├── scope-clarifications.md       # Phase 3.5 (conditional)
 │   └── ui-mockups.md                 # Phase 4 (optional)
 ├── implementation/
 │   ├── spec.md                       # Phase 5

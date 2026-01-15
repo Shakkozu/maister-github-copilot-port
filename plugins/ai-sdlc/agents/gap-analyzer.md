@@ -198,6 +198,7 @@ Layer 3 (User Access):
 - `decisions_needed`: Issues requiring user input
 - `scope_expansion_recommended`: Gaps that suggest expanding scope
 - `critical_issues`: Blocking problems found
+- `needs_clarification`: Convenience flag (true if decisions_needed non-empty OR scope_expansion_recommended OR ui_heavy)
 
 ---
 
@@ -328,6 +329,9 @@ decisions_needed:
 
 scope_expansion_recommended: true | false
 critical_issues: ["issue 1", "issue 2"]
+
+# Convenience flag for orchestrator (Phase 3.5 trigger)
+needs_clarification: true | false  # true if decisions_needed non-empty OR scope_expansion_recommended OR ui_heavy
 ```
 
 ---

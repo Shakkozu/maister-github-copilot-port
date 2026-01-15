@@ -626,7 +626,7 @@ Orchestrators manage complete workflows with state management, auto-recovery, an
 
 | Skill | Purpose | Details |
 |-------|---------|---------|
-| `development-orchestrator` | **Unified workflow** (17 phases: 0-14 + 1.5, 5.5) for bug fixes, enhancements, and new features. Includes clarifying questions (1.5), architecture decision (5.5), TDD gates for bugs (3, 9), gap analysis for all. | `skills/development-orchestrator/SKILL.md` |
+| `development-orchestrator` | **Unified workflow** (19 phases: 0-14 + 1.5, 3.5, 4.5, 5.5) for bug fixes, enhancements, and new features. Includes clarifying questions (1.5), scope & approach clarifications (3.5), architecture decision (5.5), TDD gates for bugs (3, 9), gap analysis for all. | `skills/development-orchestrator/SKILL.md` |
 | `performance-orchestrator` | Profiling, benchmarking, load testing with metrics | `skills/performance-orchestrator/skill.md` |
 | `security-orchestrator` | CVSS-scored vulnerability remediation, compliance audit | `skills/security-orchestrator/skill.md` |
 | `documentation-orchestrator` | User docs with Playwright screenshots, readability validation | `skills/documentation-orchestrator/skill.md` |
