@@ -19,6 +19,7 @@ Unified workflow for bug fixes, enhancements, and new features with task-type-sp
 2. `../orchestrator-framework/references/delegation-enforcement.md` - Delegation patterns and subagent result handling
 3. `../orchestrator-framework/references/interactive-mode.md` - Phase gates and AUTO-CONTINUE
 4. `../orchestrator-framework/references/state-management.md` - State file operations
+5. `../orchestrator-framework/references/issue-resolution-pattern.md` - Fix-then-reverify loop for Phase 11.5
 
 **⚠️ FAILURE TO READ THESE FILES IS A WORKFLOW VIOLATION.**
 
@@ -28,11 +29,13 @@ These patterns define:
 - When to auto-continue vs pause (Phase Gates and ⚡ AUTO)
 - How to consume subagent results and continue workflow
 - How to manage orchestrator-state.yml
+- How to resolve issues after verification (fix/ask/reverify)
 
 **SELF-CHECK:**
-- [ ] Did you use the Read tool to read all 4 files?
+- [ ] Did you use the Read tool to read all 5 files?
 - [ ] Do you understand the AUTO-CONTINUE pattern in interactive-mode.md?
 - [ ] Do you understand Pattern 6 (Consuming Subagent Results) in delegation-enforcement.md?
+- [ ] Do you understand the fix-then-reverify loop in issue-resolution-pattern.md?
 
 If NO to any: STOP and read the files now.
 
@@ -1200,7 +1203,7 @@ If NO to any: STOP - go back and invoke the Skill tool.
 
 **Purpose**: Fix detected issues through agent reasoning, user decisions, and re-verification.
 
-**See**: `../orchestrator-framework/references/issue-resolution-pattern.md` for the complete pattern.
+**Pattern**: You loaded `issue-resolution-pattern.md` in Step 0. Follow that pattern now.
 
 **Development-specific notes**:
 - Verifier: `ai-sdlc:implementation-verifier`

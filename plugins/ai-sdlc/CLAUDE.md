@@ -555,7 +555,7 @@ Before considering an orchestrator complete, verify ALL items:
 
 | Element | Required | Verification |
 |---------|----------|--------------|
-| **Step 0: Load Framework Patterns** | ✓ | Does initialization force reading 4 reference files from orchestrator-framework? |
+| **Step 0: Load Framework Patterns** | ✓ | Does initialization force reading 5 reference files from orchestrator-framework? |
 | State file creation in initialization | ✓ | Does STEP 3 explicitly CREATE orchestrator-state.yml? |
 | Phase Execution Loop pattern | ✓ | Are all 7 STEPs documented? |
 | Post-phase review with AskUserQuestion | ✓ | Is STEP 7 implemented with explicit tool call? |
