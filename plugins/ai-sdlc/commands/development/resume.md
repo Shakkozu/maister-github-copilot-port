@@ -5,9 +5,9 @@ description: Resume an interrupted or failed development workflow from where it 
 
 # Development Workflow: Resume
 
-Resume an interrupted development workflow from where it left off. Reads state from `orchestrator-state.yml` and validates artifacts before continuing.
+MANDATORY: Using Skill tool load development-orchestrator skill in resume mode.
 
-**Invoke**: development-orchestrator skill in resume mode
+Resume an interrupted development workflow from where it left off.
 
 ## Usage
 

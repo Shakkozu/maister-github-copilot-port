@@ -377,3 +377,40 @@ Phase Flow check: Phase [N] → [N+1] is [GATE/AUTO]
 [If AUTO: Proceeding immediately to Phase [N+1]...]
 [If GATE: Checking mode and prompting/continuing...]
 ```
+
+---
+
+## Pattern 7: Context Passing
+
+**Rule**: All subagent prompts must include context from prior phases, not just file paths.
+
+**Template**:
+
+```
+prompt: |
+  [Task instructions]
+  Task path: [path]
+
+  ## CONTEXT FROM PRIOR PHASES
+  [Key state fields from orchestrator-state.yml]
+  [1-2 sentence summaries of completed phases from phase_summaries]
+  [Key decisions made in earlier phases]
+
+  ## ARTIFACTS TO READ
+  [List relevant files for full details]
+```
+
+**Why**: Subagents run in isolated context. Without summaries, they must re-parse entire files and miss prior decisions.
+
+---
+
+## Pattern 8: Context Extraction
+
+**Rule**: After each phase, extract key findings into `[domain]_context.phase_summaries` for downstream phases.
+
+**Process**:
+1. Parse subagent output for key fields
+2. Create 1-2 sentence summary
+3. Update state: `[domain]_context.phase_summaries.[phase_name]`
+
+**What to extract**: Domain-specific key findings + summary. Each orchestrator defines its own phase_summaries schema.

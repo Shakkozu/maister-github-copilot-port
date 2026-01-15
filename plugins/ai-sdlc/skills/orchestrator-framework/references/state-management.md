@@ -82,6 +82,14 @@ orchestrator:
     tdd_applicable: true | false         # Bug only
     reproduction_data: null              # Bug only
     architecture_decision: null          # Feature/Enhancement only
+
+  # Phase 11.5 Issue Resolution tracking
+  verification_context:
+    last_status: passed | passed_with_issues | failed | null
+    issues_found: []                     # Issue summaries from verifier
+    fixes_applied: []                    # What was auto-fixed
+    decisions_made: []                   # User decisions on non-trivial issues
+    reverify_count: 0                    # Current iteration (max 3)
 ```
 
 ### Security Orchestrator
@@ -266,6 +274,8 @@ orchestrator:
 |--------------|-------|----------|---------------------|
 | Development | 1 | codebase-analyzer | `task_context.risk_level` |
 | Development | 2 | gap-analyzer | `task_context.ui_heavy`, `risk_level`, `reproduction_data` |
+| Development | 11 | implementation-verifier | `verification_context.last_status`, `issues_found` |
+| Development | 11.5 | (inline) | `verification_context.fixes_applied`, `decisions_made`, `reverify_count` |
 | Refactoring | 1 | refactoring-planner | `refactoring_context.refactoring_type`, `total_increments` |
 | Refactoring | 2 | behavioral-snapshot-capturer | `refactoring_context.baseline_fingerprint` |
 | Security | 0 | security-analyzer | `security_context.baseline_vulnerabilities`, `critical_vulnerabilities` |
@@ -330,4 +340,32 @@ Use AskUserQuestion tool:
   2. "Specify different phase" - Choose another entry point
   3. "Exit" - Cancel and resolve manually
 ```
+
+---
+
+## Context Accumulation
+
+After each phase, extract key findings into `[domain]_context.phase_summaries`:
+
+```yaml
+[domain]_context:
+  phase_summaries:
+    [phase_name]:
+      summary: "1-2 sentence summary of phase findings"
+      [key_field_1]: [value]
+      [key_field_2]: [value]
+```
+
+Each orchestrator defines its own phase_summaries schema in its SKILL.md.
+
+---
+
+## Resume Context Loading
+
+When resuming, reconstruct context for downstream phases:
+
+1. Read `orchestrator-state.yml` → get `completed_phases[]` and `phase_summaries`
+2. If `phase_summaries` missing for a completed phase, read artifact file and extract
+3. Build context summary from `phase_summaries` for next subagent invocation
+4. Pass context in subagent prompt (see Pattern 7 in delegation-enforcement.md)
 

@@ -563,6 +563,9 @@ Before considering an orchestrator complete, verify ALL items:
 | Explicit AskUserQuestion for all decisions | ✓ | Do ALL user prompts have tool call examples? |
 | Explicit Task tool for subagents | ✓ | Do ALL subagent invocations show Task parameters? |
 | **Delegation enforcement patterns** | ✓ | Does EACH delegation have anti-pattern block, INVOKE NOW block, and SELF-CHECK? |
+| **Context passing (Pattern 7)** | ✓ | Do ALL subagent prompts include ACCUMULATED CONTEXT section? |
+| **Context extraction (Pattern 8)** | ✓ | Does EACH phase State Update extract findings to phase_summaries? |
+| **phase_summaries in state schema** | ✓ | Does Domain Context include phase_summaries structure? |
 | Standards discovery in Phases 5,7,8,11 | ✓ | Is INDEX.md referenced in each? |
 | Reality check (Phase 11) | ✓ | Is reality-assessor invoked via implementation-verifier? |
 | Pragmatic review (Phase 11) | ✓ | Is code-quality-pragmatist invoked via implementation-verifier? |
@@ -579,6 +582,9 @@ Before considering an orchestrator complete, verify ALL items:
 ❌ **Vague subagent calls**: Saying "invoke X" without Task tool parameters
 ❌ **Inline execution in YOLO mode**: Executing delegated work inline instead of invoking skills/subagents (see `delegation-enforcement.md`)
 ❌ **Missing delegation patterns**: Delegation points without anti-pattern block, INVOKE NOW block, and SELF-CHECK
+❌ **Missing context passing**: Subagent prompts without ACCUMULATED CONTEXT section (Pattern 7)
+❌ **Missing context extraction**: Not extracting key findings to phase_summaries after each phase (Pattern 8)
+❌ **File paths only**: Passing just file paths to subagents without state summaries and prior phase summaries
 ❌ **Missing standards**: Not referencing INDEX.md in relevant phases
 ❌ **Incomplete verification**: Running tests without reality check and pragmatic review
 ❌ **No state management**: Not creating/updating orchestrator-state.yml
@@ -610,15 +616,34 @@ All orchestrators share common patterns documented in `skills/orchestrator-frame
 | Pattern | File | Purpose |
 |---------|------|---------|
 | Phase Execution | `phase-execution-pattern.md` | 7-step loop for each phase |
-| State Management | `state-management.md` | orchestrator-state.yml schema and operations |
+| State Management | `state-management.md` | orchestrator-state.yml schema, context accumulation, resume loading |
 | Interactive Mode | `interactive-mode.md` | Post-phase prompts and user decisions |
 | Initialization | `initialization-pattern.md` | Startup sequence and directory setup |
-| Delegation Enforcement | `delegation-enforcement.md` | Anti-pattern blocks, invocation blocks, self-checks |
+| Delegation Enforcement | `delegation-enforcement.md` | Anti-pattern blocks, invocation blocks, self-checks, **context passing** |
 
 Each orchestrator references these patterns (via `../orchestrator-framework/references/`) and implements domain-specific behavior. This approach:
 - **Single source of truth**: Patterns documented once, referenced everywhere
 - **Self-contained orchestrators**: Each has enough context to work independently
 - **No execution overhead**: Reference files are documentation, not invoked skills
+
+### Context Passing Between Phases
+
+**Critical**: When invoking subagents for phase execution, orchestrators must pass accumulated context from prior phases.
+
+**Pattern 7 (Context Passing)** in `delegation-enforcement.md` requires all subagent prompts to include:
+- **State Summary**: risk_level, ui_heavy, scope_expanded, architecture_decision
+- **Key Decisions Made**: List of clarification answers from prior phases
+- **Prior Phase Summaries**: 1-2 sentence summaries of each completed phase
+- **Artifacts to Read**: File paths for full details
+
+**Pattern 8 (Context Extraction)** requires extracting key findings after each phase into `task_context.phase_summaries` in `orchestrator-state.yml`.
+
+**Resume workflows** must reconstruct accumulated context from `phase_summaries` before invoking the resumed phase.
+
+**Benefits**:
+- Subagents work with full context without re-parsing files
+- Resume produces consistent results (same context as fresh execution)
+- Audit trail of phase findings in orchestrator-state.yml
 
 ### Orchestrator Skills
 

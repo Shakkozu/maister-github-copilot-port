@@ -7,7 +7,7 @@ description: Resume an interrupted or failed enhancement workflow (alias for /ai
 
 Alias for `/ai-sdlc:development:resume`. Resumes an interrupted enhancement workflow.
 
-**Invoke**: development-orchestrator skill in resume mode
+MANDATORY: Using Skill tool load development-orchestrator skill in resume mode.
 
 ## Usage
 

@@ -202,54 +202,73 @@ Layer 3 (User Access):
 
 ### Decision Generation Rules
 
-**CRITICAL: You MUST generate decisions based on your findings. Do not just report findings without actionable flags.**
+**CRITICAL: You MUST generate decisions for ANY non-trivial finding. It's ALWAYS better to ask than not to ask. Document-only is for truly minor cosmetic issues.**
 
-#### Orphaned Operations → Scope Expansion
+**NEVER use "Should Document" for:**
+- Orphaned operations (always needs decision)
+- Safety-critical touchpoints (always needs decision)
+- Incomplete CRUD lifecycle (always needs decision)
+- Any issue that affects feature usability
 
-When `data_lifecycle_gaps.orphaned_operations` is non-empty:
+#### Orphaned Operations → ALWAYS Critical Decision
 
-| Orphan Type | Action |
-|-------------|--------|
-| READ without CREATE | Add `decisions_needed.critical` with scope expansion options |
-| CREATE without READ | Add `decisions_needed.critical` with scope expansion options |
-| UPDATE without READ | Add `decisions_needed.critical` with scope expansion options |
-| completeness_score < 50% | Set `scope_expansion_recommended: true` |
+When ANY orphaned operation exists (completeness < 100%):
 
-**Example decision for orphaned operations:**
+| Finding | Action | Why |
+|---------|--------|-----|
+| READ without CREATE UI | `decisions_needed.critical` | Feature unusable without input |
+| CREATE without READ UI | `decisions_needed.critical` | Data disappears for users |
+| Backend exists, no UI | `decisions_needed.critical` | User cannot access functionality |
+| completeness_score < 75% | Set `scope_expansion_recommended: true` | Major gaps |
+
+**You MUST generate this decision - no exceptions:**
 ```yaml
 decisions_needed:
   critical:
     - id: "scope-orphan-[entity]"
-      issue: "[Entity] has [orphan type] - feature will be incomplete"
-      options: ["Expand scope to add [missing operation]", "Keep limited scope (document limitation)"]
+      issue: "[Entity] has orphaned [operation] - users cannot [action]"
+      options: ["Expand scope to add [missing piece]", "Keep limited scope (accept broken UX)"]
       recommendation: "Expand scope"
-      rationale: "[Reason why expansion is recommended]"
+      rationale: "Without [missing piece], feature is incomplete/unusable"
 ```
 
-#### Missing Touchpoints → Decisions
+#### Three-Layer Verification Failures → Decisions
 
-When `data_lifecycle_gaps.missing_touchpoints` is non-empty, evaluate criticality:
+When ANY layer shows incomplete status:
+
+| Layer Status | Action |
+|--------------|--------|
+| "Partial" or "Unknown" | `decisions_needed.important` - clarify what's needed |
+| "MISSING" | `decisions_needed.critical` - blocking issue |
+| User Access = "Unknown" | `decisions_needed.important` - investigate UI path |
+
+#### Missing Touchpoints → ALWAYS Ask
+
+When `missing_touchpoints` is non-empty:
 
 | Touchpoint Criticality | Action |
 |------------------------|--------|
-| Safety-critical (medical, financial, legal) | Add `decisions_needed.critical` |
-| High-value user workflow | Add `decisions_needed.important` |
-| Nice-to-have | Document in report only, no decision needed |
+| Safety-critical (medical, financial, legal) | `decisions_needed.critical` - MUST ask |
+| High-value user workflow | `decisions_needed.important` - SHOULD ask |
+| Nice-to-have | `decisions_needed.important` with default |
 
-#### Calculating needs_clarification
+**DO NOT just "document" high-value touchpoints. Ask if they should be included.**
 
-After generating all decisions, calculate the convenience flag:
+#### Default to Asking
+
+**When in doubt, generate a decision.** The user can always say "proceed with default" but they cannot unsee what wasn't asked.
 
 ```
 needs_clarification = (
   decisions_needed.critical.length > 0 OR
   decisions_needed.important.length > 0 OR
   scope_expansion_recommended == true OR
-  ui_heavy == true
+  ui_heavy == true OR
+  completeness_score < 100
 )
 ```
 
-**DO NOT set `needs_clarification: false` if any of the above conditions are true.**
+**If completeness_score < 100%, needs_clarification MUST be true.**
 
 ---
 
@@ -305,15 +324,18 @@ needs_clarification = (
 
 ## Issues Requiring Decisions
 
-### Critical (Blocking)
+### Critical (Must Decide Before Proceeding)
 1. **[Issue]**: [Description]
    - Options: [A] [B] [C]
    - Recommendation: [X] because [reason]
 
 ### Important (Should Decide)
 1. **[Issue]**: [Description]
+   - Options: [A] [B]
    - Default: [X]
    - Rationale: [reason]
+
+**NOTE: Do NOT create a "Should Document" section. If an issue is worth mentioning, it's worth asking about.**
 
 ## Recommendations
 - [Recommendation 1]

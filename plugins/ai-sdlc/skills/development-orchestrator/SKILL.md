@@ -59,6 +59,7 @@ Use TodoWrite tool with todos:
   {"content": "Verify test passes (TDD Green)", "status": "pending", "activeForm": "Verifying test passes"},
   {"content": "Prompt verification options", "status": "pending", "activeForm": "Prompting verification options"},
   {"content": "Verify implementation", "status": "pending", "activeForm": "Verifying implementation"},
+  {"content": "Resolve verification issues", "status": "pending", "activeForm": "Resolving verification issues"},
   {"content": "Run E2E tests", "status": "pending", "activeForm": "Running E2E tests"},
   {"content": "Generate user documentation", "status": "pending", "activeForm": "Generating user documentation"},
   {"content": "Finalize workflow", "status": "pending", "activeForm": "Finalizing workflow"}
@@ -76,6 +77,9 @@ After gap analysis (clarification needs known):
 - **No clarifications needed** (no decisions_needed, no scope_expansion_recommended, ui_heavy=false): Skip "Clarify scope & approach"
 - **Not UI-heavy** (ui_heavy=false): Skip "Generate UI mockups" and "Run E2E tests"
 - **Simple task** (not complex, single approach): Skip "Clarify technical approach" and "Decide architecture"
+
+After Phase 11 (verification results known):
+- **Verification passed**: Skip "Resolve verification issues" (no issues to resolve)
 
 After Phase 10 (user can override):
 - **User disabled E2E**: Skip "Run E2E tests"
@@ -172,7 +176,8 @@ Use for **all development tasks**:
 | Phase 8 → 9 | 🚦 GATE (conditional) | TDD gate for bugs only |
 | Phase 9 → 10 | 🚦 GATE | Standard pause point |
 | Phase 10 → 11 | 🚦 GATE | Standard pause point |
-| Phase 11 → 12 | 🚦 GATE | Standard pause point |
+| **Phase 11 → 11.5** | ⚡ AUTO | Issue resolution handles interaction |
+| Phase 11.5 → 12 | 🚦 GATE | Standard pause point |
 | Phase 12 → 13 | 🚦 GATE | Standard pause point |
 | Phase 13 → 14 | 🚦 GATE | Standard pause point |
 
@@ -308,8 +313,8 @@ Parameters:
 If NO to any: STOP - go back and invoke the Skill tool.
 
 **State Update**: After codebase-analyzer completes:
-- Read structured output `risk_level` from analysis results
-- Update `task_context.risk_level` in orchestrator-state.yml
+- Update `task_context.risk_level` from output
+- Extract to `phase_summaries.codebase_analysis`: key_files, primary_language, summary
 
 ---
 
@@ -400,9 +405,15 @@ Parameters:
   prompt: |
     Analyze gaps for [task_type]: [description].
     Task path: [task-path]
-    Analysis: analysis/codebase-analysis.md
-    Clarifications: analysis/clarifications.md
     Task type: [task_type]
+
+    ## CONTEXT FROM PRIOR PHASES
+    Risk level: [from task_context.risk_level]
+    Codebase summary: [from phase_summaries.codebase_analysis.summary]
+    Key files: [from phase_summaries.codebase_analysis.key_files]
+    Clarifications: [list from phase_summaries.clarifications]
+
+    Artifacts: analysis/codebase-analysis.md, analysis/clarifications.md
 
 ⏳ Wait for subagent completion before continuing.
 
@@ -423,22 +434,20 @@ Parameters:
 
 If NO to any: STOP - go back and invoke the Task tool.
 
-**State Update**: After gap-analyzer completes, read structured output:
-- Update `task_context.ui_heavy` from output `ui_heavy` field
-- Update `task_context.risk_level` from output `risk_level` (if currently null)
-- For bugs: Update `task_context.reproduction_data` from output `reproduction_data`
-- **Calculate `task_context.needs_clarification`** (DO NOT blindly trust gap-analyzer's flag - verify from components):
-  ```
-  needs_clarification = (
-    decisions_needed.critical.length > 0 OR
-    decisions_needed.important.length > 0 OR
-    scope_expansion_recommended == true OR
-    ui_heavy == true
-  )
-  ```
-  **Even if gap-analyzer says `needs_clarification: false`, recalculate from above.**
-- Set `options.e2e_enabled`: true if feature/enhancement AND ui_heavy, false for bugs
-- Set `options.user_docs_enabled`: true if feature/enhancement, false for bugs
+**State Update**: After gap-analyzer completes:
+- Update `task_context.ui_heavy`, `risk_level` (if null), `reproduction_data` (bugs)
+- **Calculate `needs_clarification`**: true if ANY of:
+  - `decisions_needed.critical` non-empty
+  - `decisions_needed.important` non-empty
+  - `scope_expansion_recommended = true`
+  - `ui_heavy = true`
+  - `completeness_score < 100` (any incomplete CRUD lifecycle)
+  - `orphaned_operations` non-empty
+- Set `options.e2e_enabled`: true if feature/enhancement AND ui_heavy
+- Set `options.user_docs_enabled`: true if feature/enhancement
+- Extract to `phase_summaries.gap_analysis`: integration_points, decisions_needed_count, completeness_score, summary
+
+**NOTE**: If gap-analyzer reports orphaned operations or completeness < 100%, ALWAYS set `needs_clarification = true` even if gap-analyzer didn't generate explicit decisions. Better to ask than skip.
 
 ---
 
@@ -494,6 +503,10 @@ If NO to any: STOP - go back and invoke the Task tool.
 - `decisions_needed.important` is non-empty
 - `scope_expansion_recommended = true`
 - `ui_heavy = true`
+- `completeness_score < 100` (any incomplete CRUD lifecycle)
+- `orphaned_operations` is non-empty
+
+**Default to clarifying** - if there's ANY doubt about completeness, ask the user.
 
 Phase 3.5 handles user interaction internally via AskUserQuestion.
 No pause needed before clarifying phases.
@@ -513,8 +526,10 @@ No pause needed before clarifying phases.
 - `decisions_needed.important` is non-empty
 - `scope_expansion_recommended = true`
 - `ui_heavy = true`
+- `completeness_score < 100`
+- `orphaned_operations` non-empty
 
-**Skip if**: All above conditions are false (no decisions needed, no scope expansion, not UI-heavy)
+**Skip if**: All above conditions are false (no decisions needed, no scope expansion, not UI-heavy, complete lifecycle)
 
 **Purpose**: Resolve scope and approach decisions BEFORE generating mockups or creating specification
 
@@ -522,21 +537,26 @@ No pause needed before clarifying phases.
 
 | Category | When to Ask | Example Questions |
 |----------|-------------|-------------------|
-| **Scope Expansion** | `scope_expansion_recommended = true` | "Gap analysis found orphaned display (no input). Expand scope to add input form?" |
+| **Orphaned Operations** | `orphaned_operations` non-empty | "Backend supports allergies but NO UI to input them. Add input form to scope?" |
+| **Incomplete Lifecycle** | `completeness_score < 100` | "CRUD lifecycle 25% complete. Expand scope to close gaps?" |
+| **Scope Expansion** | `scope_expansion_recommended = true` | "Gap analysis recommends expanding scope. Accept recommendation?" |
 | **Critical Decisions** | `decisions_needed.critical` non-empty | Present critical blocking issues with options from gap analysis |
 | **Important Decisions** | `decisions_needed.important` non-empty | Present important issues with defaults from gap analysis |
+| **Missing Touchpoints** | Safety-critical touchpoints missing | "Allergy info missing from prescription workflow (safety-critical). Include?" |
 | **Component Choice** | `ui_heavy = true` | "Use existing DatePicker or build custom?" |
 | **Layout** | `ui_heavy = true` | "Modal dialog or inline expansion?" |
-| **Styling** | `ui_heavy = true` | "Match existing theme or new design?" |
-| **Interaction** | `ui_heavy = true` | "Immediate save or explicit submit?" |
 
 **Process**:
 1. Read gap-analysis.md structured output
-2. If `scope_expansion_recommended = true`: Present scope expansion question first
-3. If `decisions_needed.critical` non-empty: Present critical decisions (these are blocking)
-4. If `decisions_needed.important` non-empty: Present important decisions with defaults
-5. If `ui_heavy = true`: Present UI-specific questions (max 3-5)
-6. Document all answers in `analysis/scope-clarifications.md`
+2. **If `orphaned_operations` non-empty**: Ask about each orphaned operation (ALWAYS ask, never skip)
+3. **If `completeness_score < 100`**: Ask about completing the lifecycle
+4. If `scope_expansion_recommended = true`: Present scope expansion question
+5. If `decisions_needed.critical` non-empty: Present critical decisions (blocking)
+6. If `decisions_needed.important` non-empty: Present important decisions with defaults
+7. If `ui_heavy = true`: Present UI-specific questions (max 3-5)
+8. Document all answers in `analysis/scope-clarifications.md`
+
+**NEVER skip orphaned operations questions** - these indicate incomplete features that users cannot use properly.
 
 **YOLO Mode**: Accept all recommended defaults/recommendations, log acceptance
 
@@ -596,8 +616,14 @@ Parameters:
   prompt: |
     Generate ASCII mockups for: [description]
     Task path: [task-path]
-    Gap analysis: analysis/gap-analysis.md
-    Scope clarifications: analysis/scope-clarifications.md
+
+    ## CONTEXT FROM PRIOR PHASES
+    Gap analysis: [from phase_summaries.gap_analysis.summary]
+    Integration points: [from phase_summaries.gap_analysis.integration_points]
+    Scope decisions: [from phase_summaries.scope_clarifications.summary]
+    Component choices: [from phase_summaries.scope_clarifications.component_choices]
+
+    Artifacts: analysis/gap-analysis.md, analysis/scope-clarifications.md
 
 ⏳ Wait for subagent completion before continuing.
 
@@ -863,7 +889,14 @@ Parameters:
   prompt: |
     Audit specification for: [description]
     Task path: [task-path]
-    Specification: implementation/spec.md
+    Task type: [task_type]
+
+    ## CONTEXT FROM PRIOR PHASES
+    Risk level: [from task_context.risk_level]
+    Gap analysis: [from phase_summaries.gap_analysis.summary]
+    Architecture decision: [from phase_summaries.architecture_decision.summary, if exists]
+
+    Artifacts: implementation/spec.md, .ai-sdlc/docs/INDEX.md
 
 ⏳ Wait for subagent completion before continuing.
 
@@ -1153,15 +1186,79 @@ If NO to any: STOP - go back and invoke the Skill tool.
 
 ---
 
-## 🚦 GATE: Phase 11 → Phase 12
+## ⚡ AUTO: Phase 11 → Phase 11.5
+
+**Always auto-continue** to Phase 11.5 - issue resolution handles its own interaction.
+
+---
+
+### Phase 11.5: Issue Resolution
+
+**When**: Verification found issues (status != "passed")
+
+**Skip if**: Verification status is "passed" (no issues to resolve)
+
+**Purpose**: Fix detected issues through agent reasoning, user decisions, and re-verification.
+
+**Process**:
+
+1. **Read verification results** from implementation-verifier structured output:
+   - Parse `issues[]` array with severity, description, location, fixable, suggestion
+   - Note `issue_counts` for quick assessment
+
+2. **For each issue, reason about how to handle it**:
+   - **Trivial/auto-fixable** (lint, formatting, missing imports, obvious typos): Fix silently, log to work-log.md
+   - **Non-trivial** (design decisions, unclear requirements, logic errors): Use `AskUserQuestion` to present issue and get user decision
+
+3. **If any fixes applied**: Re-invoke `ai-sdlc:implementation-verifier` skill
+   - Track `verification_context.reverify_count` in state
+   - **Max 3 iterations** to prevent infinite loops
+
+4. **Exit when**:
+   - ✅ Verification passes (all issues resolved)
+   - ⚠️ User chooses "Proceed with known issues"
+   - ❌ Max reverify attempts reached (ask user how to proceed)
+
+**State Updates**:
+
+```yaml
+verification_context:
+  last_status: "[from verifier output]"
+  issues_found: [issue summaries]
+  fixes_applied: [what was auto-fixed]
+  decisions_made: [user decisions on non-trivial issues]
+  reverify_count: [0-3]
+```
+
+**AskUserQuestion pattern** (for non-trivial issues):
+
+```
+Use AskUserQuestion tool:
+  Question: "[Issue description] - How would you like to handle this?"
+  Header: "[Issue source]"
+  Options:
+  1. "Try suggested fix" - [If suggestion available]
+  2. "Skip this issue" - Proceed without fixing
+  3. "Let me investigate" - Pause for manual investigation
+```
+
+**Log all actions** to `implementation/work-log.md`:
+- What issues were detected
+- What was auto-fixed (and how)
+- What user decided for each non-trivial issue
+- Re-verification results
+
+---
+
+## 🚦 GATE: Phase 11.5 → Phase 12
 
 **STOP. You cannot proceed until this gate clears.**
 
 1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
 2. **If mode = interactive**:
    - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 11 (Verification) complete. Ready to proceed to Phase 12 (E2E Testing)?"
-     - Options: ["Continue to Phase 12", "Review verification report", "Stop workflow"]
+     - Question: "Phase 11.5 (Issue Resolution) complete. Ready to proceed to Phase 12 (E2E Testing)?"
+     - Options: ["Continue to Phase 12", "Review what was fixed", "Stop workflow"]
    - Wait for user response before continuing
 3. **If mode = yolo**:
    - Output: "→ Auto-continuing to Phase 12 (E2E Testing)..."
@@ -1201,7 +1298,12 @@ Parameters:
   prompt: |
     Run E2E tests for: [description]
     Task path: [task-path]
-    Specification: implementation/spec.md
+
+    ## CONTEXT FROM PRIOR PHASES
+    Specification: [from phase_summaries.specification.summary]
+    UI mockups: [from phase_summaries.ui_mockups.summary, if exists]
+
+    Artifacts: implementation/spec.md, analysis/ui-mockups.md
 
 ⏳ Wait for subagent completion before continuing.
 
@@ -1266,7 +1368,12 @@ Parameters:
   prompt: |
     Generate user documentation for: [description]
     Task path: [task-path]
-    Specification: implementation/spec.md
+
+    ## CONTEXT FROM PRIOR PHASES
+    Specification: [from phase_summaries.specification.summary]
+    Verification: Implementation verified, tests passing
+
+    Artifacts: implementation/spec.md, analysis/ui-mockups.md
 
 ⏳ Wait for subagent completion before continuing.
 
@@ -1338,6 +1445,16 @@ orchestrator:
     architecture_decision: null        # Feature/Enhancement only
     tdd_applicable: true               # Bug only
     reproduction_data: null            # Bug only
+
+    # Phase summaries for context passing (see Pattern 7-8 in delegation-enforcement.md)
+    phase_summaries:
+      codebase_analysis: {key_files: [], primary_language: null, summary: null}
+      clarifications: []               # [{question, answer}]
+      gap_analysis: {integration_points: [], summary: null}
+      scope_clarifications: {scope_expanded: null, component_choices: [], summary: null}
+      ui_mockups: {components_designed: [], summary: null}
+      specification: {summary: null}
+      architecture_decision: {decision: null, summary: null}
 ```
 
 ---

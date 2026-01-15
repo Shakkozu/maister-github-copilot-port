@@ -259,6 +259,38 @@ Verification Report: verification/implementation-verification.md
 
 ---
 
+## Structured Output for Orchestrator
+
+When invoked by an orchestrator, return structured result alongside the report:
+
+```yaml
+status: "passed" | "passed_with_issues" | "failed"
+report_path: "verification/implementation-verification.md"
+
+# Issue summary for orchestrator to process
+issues:
+  - source: "test_suite" | "standards" | "code_review" | "pragmatic" | "production" | "reality"
+    severity: "critical" | "warning" | "info"
+    description: "[Brief description of the issue]"
+    location: "[File path or area affected]"
+    fixable: true | false  # Your assessment: can this be auto-fixed?
+    suggestion: "[How to fix, if obvious]"
+
+# Counts for quick assessment
+issue_counts:
+  critical: 0
+  warning: 0
+  info: 0
+```
+
+**Guidelines for `fixable` assessment**:
+- `true`: Lint errors, formatting issues, missing imports, obvious typos, simple config fixes
+- `false`: Architecture decisions, design trade-offs, test logic errors, unclear requirements
+
+**The orchestrator decides** what to actually fix based on this data. Your job is to identify and classify issues accurately.
+
+---
+
 ## Guidelines
 
 ### Read-Only Verification

@@ -7,7 +7,7 @@ description: Resume an interrupted or failed feature development workflow (alias
 
 Alias for `/ai-sdlc:development:resume`. Resumes an interrupted feature development workflow.
 
-**Invoke**: development-orchestrator skill in resume mode
+MANDATORY: Using Skill tool load development-orchestrator skill in resume mode.
 
 ## Usage
 
