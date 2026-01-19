@@ -853,6 +853,26 @@ All orchestrators use `TodoWrite` for real-time progress visibility:
 
 See individual orchestrator `skill.md` files for phase-specific todo tables.
 
+## Hooks
+
+The plugin includes hooks that fire at specific Claude Code lifecycle events.
+
+### Post-Compaction State Reminder
+
+**Hook**: `SessionStart` (matcher: `compact`)
+**Location**: `hooks/post-compact-reminder.sh`
+
+This hook fires after context compaction and injects a reminder into Claude's context to check the `orchestrator-state.yml` file for the active workflow.
+
+**Purpose**: Prevents interactive mode from being bypassed when Claude receives "continue without asking" instructions after compaction. The compacted context retains information about which task was being worked on, but may lose the explicit `mode: interactive` setting.
+
+**Logging**: Hook executions are logged to `~/.ai-sdlc-hooks.log` for debugging:
+```
+[2026-01-19 14:30:45] SessionStart(compact) | project=/Users/marek/myproject
+```
+
+**See**: `hooks/hooks.json` for hook configuration.
+
 ## Claude Code Documentation
 
 **IMPORTANT**: Always consult the latest Claude Code documentation when working with plugins and skills. The documentation is regularly updated with new features, best practices, and implementation details.
