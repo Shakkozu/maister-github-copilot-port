@@ -2,33 +2,20 @@
 
 All orchestrators follow this initialization sequence before executing any workflow phases.
 
+---
+
 ## Initialization Steps
 
-### Step 1: Parse Command Arguments
+1. **Parse Command Arguments**: Extract description, mode (`--yolo`), type, entry point (`--from`), optional flags
+2. **Determine Starting Phase**: New task starts Phase 0; resume reads state and finds first incomplete phase
+3. **Create Task Directory**: Standard structure with analysis/, implementation/, verification/, documentation/
+4. **Create State File**: `orchestrator-state.yml` (see state-management.md for schema)
+5. **Create TodoWrite**: All phases as pending todos for progress visibility
+6. **Output Summary**: Show task info, mode, phases, and starting message
 
-Extract from invocation:
-- **Task description**: What the user wants to do
-- **Execution mode**: `--yolo` flag or default interactive
-- **Task type**: From `--type` flag or auto-detect
-- **Entry point**: `--from=phase` for mid-workflow start
-- **Optional flags**: `--e2e`, `--user-docs`, `--code-review`, etc.
-- **Task path**: If resuming existing task
+---
 
-### Step 2: Determine Starting Phase
-
-**If resuming (task path provided)**:
-1. Read `orchestrator-state.yml` if exists
-2. Validate artifacts for completed phases (see `state-management.md`)
-3. Determine first incomplete phase
-4. Validate prerequisites for that phase
-
-**If new task**:
-1. Start from Phase 0 (default) or specified `--from` phase
-2. If starting mid-workflow, validate required files exist
-
-### Step 3: Create Task Directory Structure
-
-For new tasks, create directory structure:
+## Task Directory Structure
 
 ```
 .ai-sdlc/tasks/[type]/YYYY-MM-DD-task-name/
@@ -39,154 +26,18 @@ For new tasks, create directory structure:
 ```
 
 **Task Type Directories**:
-- Bug fixes: `.ai-sdlc/tasks/bug-fixes/`
-- Enhancements: `.ai-sdlc/tasks/enhancements/`
-- New features: `.ai-sdlc/tasks/new-features/`
-- Performance: `.ai-sdlc/tasks/performance/`
-- Security: `.ai-sdlc/tasks/security/`
-- Migrations: `.ai-sdlc/tasks/migrations/`
-- Refactoring: `.ai-sdlc/tasks/refactoring/`
-- Research: `.ai-sdlc/tasks/research/`
-- Documentation: `.ai-sdlc/tasks/documentation/`
 
-### Step 4: Create State File
-
-**Create `orchestrator-state.yml`** (see `state-management.md` for full schema):
-
-```yaml
-orchestrator:
-  mode: [interactive | yolo]
-  started_phase: phase-0
-  current_phase: phase-0
-  completed_phases: []
-  failed_phases: []
-  auto_fix_attempts:
-    # One entry per phase, all 0
-  options:
-    # Set sensible defaults per orchestrator (see Domain Context)
-    # Task-dependent options can remain null until determined
-  created: [current ISO 8601 timestamp]
-  updated: [current ISO 8601 timestamp]
-  task_path: [full path]
-
-  # Domain-specific context (all null initially)
-
-# Task metadata (unified in single file)
-task:
-  title: [task name from description]
-  description: [full task description]
-  type: [task type]
-  status: in_progress
-
-  # Initiative coordination (null for standalone tasks)
-  initiative_id: null
-  dependencies: []
-  blocks: []
-
-  # Optional metadata
-  tags: []
-  priority: null
-  milestone: null
-
-  # Time tracking
-  estimated_hours: null
-  actual_hours: null
-```
-
-### Step 5: Create TodoWrite with All Phases
-
-**CRITICAL: Use TodoWrite tool immediately** to create todos for all phases:
-
-```
-Use TodoWrite tool with todos:
-[
-  {"content": "[Phase 0 name]", "status": "pending", "activeForm": "[Phase 0 active form]"},
-  {"content": "[Phase 1 name]", "status": "pending", "activeForm": "[Phase 1 active form]"},
-  ...
-]
-```
-
-**Rules**:
-- Create ALL phase todos at workflow start (all pending)
-- Mark current phase `in_progress` before execution
-- Mark phase `completed` immediately after success
-- State file remains source of truth for resume logic
-- TodoWrite provides real-time UX visibility
-
-### Step 6: Output Initialization Summary
-
-Output this summary to the user:
-
-```
-🚀 [Orchestrator Name] Started
-
-[Task Type]: [description]
-Mode: [Interactive/YOLO]
-Starting Phase: [phase name]
-Directory: [task-path]
-
-Workflow Phases:
-0.  [ ] [Phase 0 name] → [skill/agent]
-1.  [ ] [Phase 1 name] → [skill/agent]
-2.  [ ] [Phase 2 name] → [skill/agent]
-...
-N.  [ ] [Phase N name] → [skill/agent]
-
-State file: [task-path]/orchestrator-state.yml
-
-[Interactive mode] You'll be prompted for review after each phase.
-[YOLO mode] All phases will run continuously.
-
-Starting Phase 0: [Phase Name]...
-```
-
----
-
-## TodoWrite Phase Table Template
-
-Each orchestrator defines its phases. Example format:
-
-| Phase | content | activeForm |
-|-------|---------|------------|
-| 0 | "Analyze codebase" | "Analyzing codebase" |
-| 1 | "Identify gaps" | "Identifying gaps" |
-| 2 | "Create specification" | "Creating specification" |
-| 3 | "Plan implementation" | "Planning implementation" |
-| 4 | "Execute implementation" | "Executing implementation" |
-| 5 | "Verify implementation" | "Verifying implementation" |
-
-**Note**: Content uses imperative form ("Analyze"), activeForm uses present continuous ("Analyzing").
-
----
-
-## Handling Prerequisites Missing
-
-If starting mid-workflow and prerequisites are missing:
-
-```
-❌ Cannot start from [phase] - missing prerequisites!
-
-Required files:
-- [file1]: ❌ Missing
-- [file2]: ✅ Found
-
-Options:
-1. Start from beginning (Phase 0)
-2. Provide/create missing files manually
-3. Specify different entry point with --from
-```
-
-Then prompt user:
-
-```
-Use AskUserQuestion tool:
-  Question: "Cannot start from [phase] - prerequisites missing. What would you like to do?"
-  Header: "Prerequisites"
-  Options:
-  1. "Start from Phase 0" - Begin workflow from the beginning
-  2. "Specify different phase" - Choose another entry point
-  3. "Exit" - Cancel and resolve manually
-```
+| Task Type | Directory |
+|-----------|-----------|
+| Bug fixes | `.ai-sdlc/tasks/bug-fixes/` |
+| Enhancements | `.ai-sdlc/tasks/enhancements/` |
+| New features | `.ai-sdlc/tasks/new-features/` |
+| Performance | `.ai-sdlc/tasks/performance/` |
+| Security | `.ai-sdlc/tasks/security/` |
+| Migrations | `.ai-sdlc/tasks/migrations/` |
+| Refactoring | `.ai-sdlc/tasks/refactoring/` |
+| Research | `.ai-sdlc/tasks/research/` |
+| Documentation | `.ai-sdlc/tasks/documentation/` |
 
 ---
 
@@ -205,20 +56,39 @@ Generate task directory name from description:
 
 ---
 
-## Common Initialization Mistakes
+## Initialization Summary Output
 
-### ❌ Skipping TodoWrite Creation
+Output this summary before starting Phase 0:
 
-Always create TodoWrite at startup. This provides immediate progress visibility to the user.
+```
+🚀 [Orchestrator Name] Started
 
-### ❌ Not Creating State File
+Task: [description]
+Mode: [Interactive/YOLO]
+Directory: [task-path]
 
-State file is required for resume capability. Create it even if you expect to complete in one session.
+Starting Phase 0: [Phase Name]...
+```
 
-### ❌ Incorrect Directory Structure
+---
 
-Use the correct task type directory. Don't put bug fixes in `new-features/`.
+## Handling Prerequisites Missing
 
-### ❌ Starting Execution Before Summary
+If starting mid-workflow with missing prerequisites:
 
-Always output the initialization summary before starting Phase 0. User should see the full workflow plan.
+1. List required files with status (missing/found)
+2. Use AskUserQuestion with options:
+   - "Start from Phase 0"
+   - "Specify different phase"
+   - "Exit"
+
+---
+
+## Common Mistakes
+
+| Mistake | Why It's Wrong |
+|---------|----------------|
+| Skipping TodoWrite | No progress visibility for user |
+| Not creating state file | Resume capability breaks |
+| Wrong task type directory | Organization confusion (don't put bugs in new-features/) |
+| Starting execution before summary | User doesn't see full workflow plan |

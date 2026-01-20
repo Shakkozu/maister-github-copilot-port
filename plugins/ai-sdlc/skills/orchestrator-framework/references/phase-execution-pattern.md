@@ -1,262 +1,106 @@
 # Phase Execution Pattern
 
-All orchestrators follow this 7-step pattern for each phase in their workflow.
+Orchestrators execute phases using the simple "Phase Blocks" model.
 
-## The 7-Step Phase Loop
+## Phase Block Structure
 
-**FOR each phase in workflow, execute these steps:**
+Each phase in an orchestrator follows this structure:
 
-### STEP 1: Check if Phase Already Completed
+```markdown
+### Phase N: [Name]
 
-Read `orchestrator-state.yml`:
-- If phase in `completed_phases`: **Skip to next phase**
-- If phase in `failed_phases` and max retries exceeded: **Halt with error**
-- Otherwise: **Proceed with execution**
+**Purpose**: [1-2 sentences describing what this phase accomplishes]
+**Execute**: [Skill tool / Task tool with agent / Direct execution]
+**Output**: [Files created by this phase]
+**State**: [orchestrator-state.yml fields updated]
 
-### STEP 1.5: Handle Phase Re-Run (Resume Only)
+→ [Transition instruction]
 
-If resuming and phase was previously in `completed_phases` but removed due to missing artifacts:
-
-1. Log: `🔄 Re-running Phase [N] due to missing artifacts`
-2. Reset any phase-specific context if needed
-3. Clear `auto_fix_attempts` for this phase (reset counter to 0)
-4. Continue with normal phase execution
-
-**Note**: This step only executes during resume when initialization detected missing artifacts.
-
-### STEP 2: Update State to Current Phase
-
-Update `orchestrator-state.yml`:
-
-```yaml
-orchestrator:
-  current_phase: [phase-name]
-  updated: [ISO 8601 timestamp]
+---
 ```
 
-### STEP 3: Pre-Phase Announcement
+## Transition Instructions
 
-**Update TodoWrite**: Mark current phase as `in_progress`:
-```
-Use TodoWrite tool to update current phase status to "in_progress"
-```
+Each phase ends with ONE transition instruction:
 
-Output to user:
+| Instruction | Syntax | Behavior |
+|-------------|--------|----------|
+| **Continue** | `→ Continue to Phase X` | Proceed immediately to next phase |
+| **Pause** | `→ Pause` | Check mode, then continue or prompt |
+| **Conditional** | `→ Conditional: if [condition] then [action] else [action]` | Evaluate condition first |
 
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Phase [N]: [Phase Name]
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+### Continue Transitions
 
-[Phase description]
+Use when the next phase handles user interaction or when phases are tightly coupled:
 
-Invoking: [skill-name or agent-name]
-
-Starting...
+```markdown
+→ Continue to Phase 1.5 (handles user interaction internally)
 ```
 
-### STEP 4: Execute Phase
+The orchestrator proceeds immediately without stopping or prompting.
 
-Execute the phase according to its definition in the orchestrator's Workflow Phases section.
+### Pause Transitions
 
-This is where domain-specific logic runs (e.g., security analysis, performance profiling, codebase analysis).
+Use at phase boundaries where user review is valuable:
 
-**⚠️ CRITICAL: Delegation Enforcement**
+```markdown
+→ Pause
 
-If this phase requires delegation to a skill or subagent:
+**Interactive mode**: MANDATORY - You MUST use AskUserQuestion:
+  Question: "Phase N complete. Continue to Phase N+1?"
+  Options: ["Continue", "Review outputs", "Stop workflow"]
 
-1. **Output pre-delegation announcement**:
-   ```
-   📤 Delegating Phase [N] to: [skill/agent name]
-   Method: [Skill tool / Task tool]
-   Expected outputs: [list]
-   ```
+  DO NOT proceed until user responds.
 
-2. **Invoke the tool** (Skill or Task) - do NOT execute inline
+**YOLO mode**: Output "→ Continuing to Phase N+1..." and proceed
+```
 
-3. **Wait for completion** before proceeding
+**Critical**: In interactive mode, proceeding without AskUserQuestion is a protocol violation.
 
-**See**: `delegation-enforcement.md` for complete enforcement patterns.
+### Conditional Transitions
+
+Use when different paths are needed based on state:
+
+```markdown
+→ Conditional: if task_type=bug AND tdd_enabled then continue to Phase 3, else skip to Phase 4
+
+**Evaluation**:
+1. Read `orchestrator-state.yml` for condition values
+2. Follow the matching path
+```
+
+---
+
+## Phase Execution Steps
+
+For each phase:
+
+1. **Check completion**: Read `orchestrator-state.yml` → if phase in `completed_phases`, skip
+2. **Execute**: Run the phase content (delegate via Skill/Task tool or execute directly)
+3. **Update state**: Add phase to `completed_phases`, update `current_phase`
+4. **Follow transition**: Execute the `→` instruction at phase end
+
+---
+
+## Delegation Enforcement
+
+When a phase requires delegation to a skill or subagent:
+
+1. **Invoke the tool** (Skill or Task) - do NOT execute inline
+2. **Wait for completion** before proceeding
+3. **Process results** and update state
 
 **Anti-patterns to AVOID**:
-- ❌ Reading a SKILL.md file and following its instructions directly
-- ❌ Spawning your own subagents to do delegated work
-- ❌ Executing analysis/planning/implementation inline
-- ❌ Skipping delegation because you "already know" the answer
+- Reading a SKILL.md file and following its instructions directly
+- Spawning your own subagents to do delegated work
+- Executing analysis/planning/implementation inline
+- Skipping delegation because you "already know" the answer
 
-### STEP 5: Handle Errors
-
-If phase fails:
-
-1. Increment `auto_fix_attempts.[phase]` in state
-2. If under max attempts: Try auto-fix strategy (domain-specific)
-3. If max attempts exceeded: Prompt user for decision
-
-**User prompt for failures** (see `interactive-mode.md` for template):
-- "Retry with guidance"
-- "Skip this phase"
-- "Rollback changes"
-- "Stop workflow"
-
-### STEP 6: Update State on Success
-
-Update `orchestrator-state.yml`:
-
-```yaml
-orchestrator:
-  completed_phases:
-    - [phase-name]  # Add to list
-  current_phase: [next-phase]
-  updated: [ISO 8601 timestamp]
-```
-
-**Update TodoWrite**: Mark current phase as `completed`:
-```
-Use TodoWrite tool to update current phase status to "completed"
-```
-
-### STEP 7: Post-Phase Summary & Review
-
-**CRITICAL: You MUST output a phase summary BEFORE prompting the user.**
-
-#### STEP 7a: Output Phase Summary (MANDATORY - Both Modes)
-
-**Always output this summary after phase completes:**
-
-```
-✅ Phase [N] Complete: [Phase Name]
-
-Results:
-- [Key result 1 - what was accomplished]
-- [Key result 2 - what was produced]
-- [Key result 3 - key findings if any]
-
-Outputs:
-- [output-file-1.md]
-- [output-file-2.md]
-
-Status: [Success/Success with warnings]
-
-[If warnings exist]
-⚠️ Warnings:
-- [Warning 1]
-- [Warning 2]
-```
-
-**DO NOT skip this summary.** Users need visibility into what each phase accomplished.
-
-#### STEP 7b: Prompt User (Interactive Mode Only)
-
-**IF interactive mode (not YOLO):**
-
-After outputting the summary, use `AskUserQuestion` for user decision (see `interactive-mode.md`).
-
-**IF YOLO mode:**
-
-After the summary, just continue:
-```
-→ Continuing to next phase...
-```
-
----
-
-## Phase Execution Diagram
-
-```
-┌─────────────────────────────────────────────┐
-│           Phase Execution Loop               │
-├─────────────────────────────────────────────┤
-│                                             │
-│  ┌─────────────────┐                        │
-│  │ STEP 1: Check   │──── Already done? ─────┼──→ Skip
-│  │   completion    │                        │
-│  └────────┬────────┘                        │
-│           │                                 │
-│  ┌────────▼────────┐                        │
-│  │ STEP 2: Update  │                        │
-│  │     state       │                        │
-│  └────────┬────────┘                        │
-│           │                                 │
-│  ┌────────▼────────┐                        │
-│  │ STEP 3: Announce│                        │
-│  │     phase       │                        │
-│  └────────┬────────┘                        │
-│           │                                 │
-│  ┌────────▼────────┐                        │
-│  │ STEP 4: Execute │                        │
-│  │  phase work     │──── Error? ────────────┼──→ STEP 5
-│  └────────┬────────┘                        │
-│           │                                 │
-│  ┌────────▼────────┐                        │
-│  │ STEP 6: Update  │                        │
-│  │  success state  │                        │
-│  └────────┬────────┘                        │
-│           │                                 │
-│  ┌────────▼────────┐                        │
-│  │ STEP 7: Review  │──── Interactive? ──────┼──→ Prompt user
-│  │  (if needed)    │                        │
-│  └────────┬────────┘                        │
-│           │                                 │
-│           ▼                                 │
-│      Next Phase                             │
-│                                             │
-└─────────────────────────────────────────────┘
-```
-
----
-
-## Common Mistakes to Avoid
-
-### ❌ Skipping Step 1 (Completion Check)
-
-Always check if a phase is already done before executing. This enables resume capability.
-
-### ❌ Forgetting Step 7 in Interactive Mode
-
-In interactive mode, you MUST pause after each phase for user review. This is the core orchestrator behavior.
-
-### ❌ Auto-Rolling Back on Failure
-
-Never automatically rollback changes. Always ask the user first (Step 5).
-
-### ❌ Not Updating State
-
-Every phase transition must update `orchestrator-state.yml`. Without this, resume won't work.
-
----
-
-## Standards Discovery Integration
-
-Before certain phases, check `.ai-sdlc/docs/INDEX.md` for applicable standards:
-
-- **Specification phases**: Read INDEX.md before creating specs
-- **Planning phases**: Ensure plan follows project conventions
-- **Implementation phases**: Continuous standards discovery
-- **Verification phases**: Verify against documented standards
-
-Include this reminder before applicable phases:
-
-```
-📋 Standards Discovery
-
-Reading .ai-sdlc/docs/INDEX.md to check applicable standards...
-
-[If INDEX.md exists]
-Found standards:
-- [List relevant standards]
-
-Applying these standards during this phase.
-
-[If INDEX.md doesn't exist]
-No INDEX.md found. Proceeding without explicit standards.
-Consider running /ai-sdlc:init-sdlc to initialize project documentation.
-```
+**See**: `delegation-enforcement.md` for complete enforcement patterns.
 
 ---
 
 ## Invocation Patterns
-
-Orchestrators delegate work to either **Skills** or **Agents**. Use the correct tool for each.
 
 ### Invoking Skills
 
@@ -267,15 +111,9 @@ Use Skill tool:
   skill: "ai-sdlc:[skill-name]"
 ```
 
-**Example** (invoking implementation-planner):
-```
-Use Skill tool:
-  skill: "ai-sdlc:implementation-planner"
-```
+**Skills**: `specification-creator`, `implementation-planner`, `implementer`, `implementation-verifier`, `codebase-analyzer`, `code-reviewer`, `production-readiness-checker`, `docs-manager`
 
-**Skills in AI SDLC**: `specification-creator`, `implementation-planner`, `implementer`, `implementation-verifier`, `codebase-analyzer`, `code-reviewer`, `production-readiness-checker`, `docs-manager`
-
-### Invoking Agents (Subagents)
+### Invoking Agents
 
 Use the `Task` tool with `subagent_type`:
 
@@ -283,27 +121,43 @@ Use the `Task` tool with `subagent_type`:
 Use Task tool:
   subagent_type: "ai-sdlc:[agent-name]"
   description: "[brief description]"
-  prompt: "[detailed prompt for the agent]"
+  prompt: "[detailed prompt]"
 ```
 
-**Example** (invoking gap-analyzer):
-```
-Use Task tool:
-  subagent_type: "ai-sdlc:gap-analyzer"
-  description: "Analyze gaps"
-  prompt: |
-    Analyze gaps for [task_type]: [description].
-    Task path: [task-path]
-    ...
-```
-
-**Agents in AI SDLC**: `gap-analyzer`, `spec-auditor`, `ui-mockup-generator`, `e2e-test-verifier`, `user-docs-generator`, `security-analyzer`, `performance-profiler`, and others.
+**Agents**: `gap-analyzer`, `spec-auditor`, `ui-mockup-generator`, `e2e-test-verifier`, `user-docs-generator`, `security-analyzer`, `performance-profiler`, etc.
 
 ### Key Difference
 
 | Type | Tool | When to Use |
 |------|------|-------------|
-| **Skill** | `Skill` | For structured workflows with multiple phases (planners, creators, verifiers) |
-| **Agent** | `Task` | For specialized analysis tasks that run independently (analyzers, generators) |
+| **Skill** | `Skill` | Structured workflows with phases |
+| **Agent** | `Task` | Specialized analysis tasks |
 
-**Rule of Thumb**: If it has a `skill.md` or `SKILL.md` file → use `Skill` tool. If it has an `agents/*.md` file → use `Task` tool.
+---
+
+## Standards Discovery
+
+Before specification, planning, implementation, and verification phases, check `.ai-sdlc/docs/INDEX.md` for applicable standards:
+
+```
+📋 Standards Discovery
+Reading .ai-sdlc/docs/INDEX.md to check applicable standards...
+
+[If found] Applying: [list relevant standards]
+[If not found] No INDEX.md found. Consider running /ai-sdlc:init-sdlc.
+```
+
+---
+
+## Error Handling
+
+If a phase fails:
+
+1. Increment `auto_fix_attempts.[phase]` in state
+2. If under max attempts (typically 3): Try auto-fix strategy
+3. If max exceeded: Use AskUserQuestion with options:
+   - "Retry with guidance"
+   - "Skip this phase"
+   - "Stop workflow"
+
+**NEVER automatically rollback changes.** Always ask the user first.

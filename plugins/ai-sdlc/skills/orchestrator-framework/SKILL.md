@@ -11,9 +11,9 @@ This skill provides **shared reference documentation** for all orchestrator skil
 
 Reduce duplication across orchestrators by documenting common patterns once:
 
-- **Phase Execution Loop**: 7-step pattern for executing each workflow phase
+- **Phase Blocks**: Simple phase structure with inline transitions (`→ Continue`, `→ Pause`, `→ Conditional`)
 - **State Management**: `orchestrator-state.yml` schema and operations
-- **Interactive Mode**: Post-phase prompts and user decision handling
+- **Interactive Mode**: Mode-aware pause behavior and user prompts
 - **Initialization**: Task directory setup, metadata, TodoWrite patterns
 
 ## How Orchestrators Use This
@@ -35,10 +35,11 @@ This orchestrator follows shared patterns. See:
 
 | File | Purpose |
 |------|---------|
-| `references/phase-execution-pattern.md` | 7-step loop for each phase |
+| `references/phase-execution-pattern.md` | Phase Block structure and transitions |
 | `references/state-management.md` | State file schema and operations |
-| `references/interactive-mode.md` | Post-phase prompts, YOLO vs interactive |
+| `references/interactive-mode.md` | Pause behavior and user prompts |
 | `references/initialization-pattern.md` | Startup sequence and TodoWrite |
+| `references/delegation-enforcement.md` | Skill/agent invocation patterns |
 
 ## Key Principles
 

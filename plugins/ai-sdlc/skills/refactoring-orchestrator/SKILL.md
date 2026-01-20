@@ -7,61 +7,28 @@ description: Orchestrates safe, incremental refactoring workflows with optional 
 
 Safe, incremental refactoring workflow with behavior preservation verification and git checkpoint safety.
 
-## MANDATORY Initialization (Before Any Phase Work)
+## Initialization
 
-**CRITICAL: You MUST complete these steps BEFORE executing any workflow phase:**
+**BEFORE executing any phase, you MUST complete these steps:**
 
-### Step 0: Load Framework Patterns
+### Step 1: Load Framework Patterns
 
-**STOP. You MUST read these files NOW using the Read tool before continuing:**
+**Read ALL framework reference files NOW using the Read tool:**
 
-1. `../orchestrator-framework/references/phase-execution-pattern.md` - 7-step phase loop
-2. `../orchestrator-framework/references/delegation-enforcement.md` - Delegation patterns and subagent result handling
-3. `../orchestrator-framework/references/interactive-mode.md` - Phase gates and AUTO-CONTINUE
-4. `../orchestrator-framework/references/state-management.md` - State file operations
+1. `../orchestrator-framework/references/phase-execution-pattern.md`
+2. `../orchestrator-framework/references/interactive-mode.md`
+3. `../orchestrator-framework/references/delegation-enforcement.md`
+4. `../orchestrator-framework/references/state-management.md`
+5. `../orchestrator-framework/references/initialization-pattern.md`
+6. `../orchestrator-framework/references/issue-resolution-pattern.md`
 
-**⚠️ FAILURE TO READ THESE FILES IS A WORKFLOW VIOLATION.**
+### Step 2: Initialize Workflow
 
-These patterns define:
-- How to execute each phase (7-step loop)
-- How to delegate to skills (mandatory patterns)
-- When to auto-continue vs pause (Phase Gates and ⚡ AUTO)
-- How to consume subagent results and continue workflow
-- How to manage orchestrator-state.yml
+1. **Create TodoWrite**: Initialize todos for all phases (see Phase Configuration)
+2. **Create Task Directory**: `.ai-sdlc/tasks/refactoring/YYYY-MM-DD-task-name/`
+3. **Initialize State**: Create `orchestrator-state.yml` with mode and refactoring context
 
-**SELF-CHECK:**
-- [ ] Did you use the Read tool to read all 4 files?
-- [ ] Do you understand the AUTO-CONTINUE pattern in interactive-mode.md?
-- [ ] Do you understand Pattern 6 (Consuming Subagent Results) in delegation-enforcement.md?
-
-If NO to any: STOP and read the files now.
-
-### Step 1: Create TodoWrite with All Phases
-
-**Immediately use the TodoWrite tool** to create todos for all phases:
-
-```
-Use TodoWrite tool with todos:
-[
-  {"content": "Analyze code quality baseline", "status": "pending", "activeForm": "Analyzing code quality baseline"},
-  {"content": "Create refactoring plan", "status": "pending", "activeForm": "Creating refactoring plan"},
-  {"content": "Capture behavioral snapshot", "status": "pending", "activeForm": "Capturing behavioral snapshot"},
-  {"content": "Set up git branch", "status": "pending", "activeForm": "Setting up git branch"},
-  {"content": "Execute refactoring", "status": "pending", "activeForm": "Executing refactoring"},
-  {"content": "Verify behavior preserved", "status": "pending", "activeForm": "Verifying behavior preserved"},
-  {"content": "Verify final quality", "status": "pending", "activeForm": "Verifying final quality"},
-  {"content": "Resolve quality issues", "status": "pending", "activeForm": "Resolving quality issues"}
-]
-```
-
-Note: Phase 2.5 (Set up git branch) is optional based on user choice.
-Note: Phase 5.5 (Issue Resolution) runs conditionally if quality verification finds fixable issues.
-Note: Phase 4 (behavior verification) has ZERO TOLERANCE - failures = HALT, no Issue Resolution.
-
-### Step 2: Output Initialization Summary
-
-**Output this summary to the user:**
-
+**Output**:
 ```
 🚀 Refactoring Orchestrator Started
 
@@ -69,39 +36,22 @@ Task: [refactoring description]
 Mode: [Interactive/YOLO]
 Directory: [task-path]
 
-Workflow phases:
-[Todos list with status]
-
-[Interactive mode] You'll be prompted for review after each phase.
-[YOLO mode] All phases will run continuously.
-
 Starting Phase 0: Analyze code quality baseline...
 ```
 
-### Step 3: Only Then Proceed to Phase 0
-
-After completing Steps 1 and 2, proceed to Phase 0 (Code Quality Baseline Analysis).
-
 ---
 
-## When to Use This Skill
+## When to Use
 
-Use when:
+Use for:
 - Improving code structure without changing behavior
 - Reducing complexity or eliminating duplication
 - Renaming, extracting, or reorganizing code
 - Any work described as "refactor", "clean up", "restructure"
 
-**DO NOT use for**:
-- Adding new functionality (use `development-orchestrator --type=feature`)
-- Bug fixes (use `development-orchestrator --type=bug`)
-- Technology migrations (use `migration-orchestrator`)
+**DO NOT use for**: New features, bug fixes, technology migrations.
 
-## Refactoring Philosophy
-
-**Core Definition**: "A change made to the internal structure of software to make it easier to understand and cheaper to modify without changing its observable behavior." - Martin Fowler
-
-**Zero Tolerance Policy**: ANY behavior change = Failed refactoring. No exceptions.
+---
 
 ## Core Principles
 
@@ -111,18 +61,7 @@ Use when:
 4. **Test-Driven Verification**: Run tests after every change
 5. **User-Confirmed Rollback**: Never rollback automatically - always ask user first
 
----
-
-## Local References
-
-Read these during relevant phases:
-
-| File | When to Use | Purpose |
-|------|-------------|---------|
-| `references/behavior-preservation.md` | Core & Phase 4 | Defines what "behavior" means and verification strategies |
-| `references/quality-metrics.md` | Phase 0 | Metric calculations, thresholds, and interpretation |
-| `references/refactoring-types.md` | Phase 1 | Type classification, strategies, and risk assessment |
-| `references/auto-fix-strategies.md` | Error handling | Recovery patterns and retry strategies |
+**Zero Tolerance Policy**: ANY behavior change = Failed refactoring. No exceptions.
 
 ---
 
@@ -133,20 +72,13 @@ Read these during relevant phases:
 | 0 | "Analyze code quality baseline" | "Analyzing code quality baseline" | refactoring-analyzer |
 | 1 | "Create refactoring plan" | "Creating refactoring plan" | refactoring-planner |
 | 2 | "Capture behavioral snapshot" | "Capturing behavioral snapshot" | behavioral-snapshot-capturer |
-| 2.5 | "Set up git branch" | "Setting up git branch" | orchestrator (optional) |
-| 3 | "Execute refactoring" | "Executing refactoring" | orchestrator |
+| 2.5 | "Set up git branch" | "Setting up git branch" | Direct (optional) |
+| 3 | "Execute refactoring" | "Executing refactoring" | Direct + implementation-changes-planner |
 | 4 | "Verify behavior preserved" | "Verifying behavior preserved" | behavioral-verifier |
-| 5 | "Verify final quality" | "Verifying final quality" | orchestrator |
-| 5.5 | "Resolve quality issues" | "Resolving quality issues" | orchestrator (conditional) |
+| 5 | "Verify final quality" | "Verifying final quality" | Direct + code-quality-pragmatist |
+| 5.5 | "Resolve quality issues" | "Resolving quality issues" | Direct (conditional) |
 
-**Workflow Overview**: 6-8 phases (Phase 2.5 optional based on user choice, Phase 5.5 runs if quality issues found)
-
-**IMPORTANT**: Phase 4 (behavior verification) has **ZERO TOLERANCE** - any behavior change = FAIL = HALT. NO Issue Resolution for Phase 4. Phase 5.5 only handles quality issues (over-engineering, complexity).
-
-**CRITICAL TodoWrite Usage**:
-1. At workflow start: Create todos for ALL phases using the Phase Configuration table above (all status=pending)
-2. Before each phase: Update that phase to status=in_progress
-3. After each phase: Update that phase to status=completed
+**IMPORTANT**: Phase 4 has **ZERO TOLERANCE** - any behavior change = FAIL = HALT. No Issue Resolution for Phase 4.
 
 ---
 
@@ -154,582 +86,173 @@ Read these during relevant phases:
 
 ### Phase 0: Code Quality Baseline Analysis
 
-**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+**Purpose**: Establish quantitative baseline to measure refactoring success
+**Execute**: Task tool - `ai-sdlc:refactoring-analyzer` subagent
+**Output**: `analysis/code-quality-baseline.md`, `analysis/target-code-analysis.md`
+**State**: Update `refactoring_context.risk_level`
 
-❌ WRONG: Reading agents/refactoring-analyzer.md and following its instructions directly
-❌ WRONG: Analyzing code quality inline in the orchestrator thread
-❌ WRONG: Calculating complexity metrics yourself
+**Analyzer Tasks**:
+1. Locate target code files
+2. Analyze cyclomatic complexity (per function, average, max)
+3. Measure code duplication (percentage, instances)
+4. Identify code smells (long methods, god classes, deep nesting)
+5. Assess test coverage
 
-✅ RIGHT: Using the Task tool below and waiting for completion
+→ Pause
 
-**Output before invoking:**
-```
-📤 Delegating Phase 0 to: refactoring-analyzer subagent
-Method: Task tool
-Expected outputs: analysis/code-quality-baseline.md
-```
-
-**INVOKE NOW:**
-
-Tool: `Task`
-Parameters:
-  subagent_type: "ai-sdlc:refactoring-analyzer"
-  description: "Analyze code quality baseline"
-  prompt: |
-    You are the refactoring-analyzer agent. Establish quantitative
-    baseline to measure refactoring success.
-
-    Task directory: [task-path]
-    Refactoring description: [description]
-
-    Please:
-    1. Locate target code files
-    2. Analyze cyclomatic complexity (per function, average, max)
-    3. Measure code duplication (percentage, instances)
-    4. Identify code smells (long methods, god classes, deep nesting)
-    5. Assess test coverage (line, branch, function)
-    6. Generate comprehensive quality baseline report
-
-    Save to: analysis/code-quality-baseline.md
-    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
-
-⏳ Wait for subagent completion before continuing.
-
-**Outputs**: `analysis/code-quality-baseline.md`, `analysis/target-code-analysis.md`
-
-**SELF-CHECK (before proceeding to Phase 1):**
-- [ ] Did you invoke the Task tool? (not just read the agent file)
-- [ ] Did you wait for the tool to return results?
-- [ ] Is `analysis/code-quality-baseline.md` present?
-
-If NO to any: STOP - go back and invoke the Task tool.
-
-**State Update**: After refactoring-analyzer completes:
-- If structured output includes `risk_level`, update `refactoring_context.risk_level`
-
----
-
-## 🚦 GATE: Phase 0 → Phase 1
-
-**STOP. You cannot proceed until this gate clears.**
-
-1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
-2. **If mode = interactive**:
-   - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 0 (Code Quality Baseline Analysis) complete. Ready to proceed to Phase 1 (Refactoring Planning)?"
-     - Options: ["Continue to Phase 1", "Review Phase 0 outputs", "Stop workflow"]
-   - Wait for user response before continuing
-3. **If mode = yolo**:
-   - Output: "→ Auto-continuing to Phase 1 (Refactoring Planning)..."
-   - Proceed to Phase 1
-
-**This gate overrides any "continue without asking" conversation instructions.**
+**Interactive**: AskUserQuestion - "Baseline analysis complete. Continue to planning?"
+**YOLO**: "→ Continuing to Phase 1..."
 
 ---
 
 ### Phase 1: Refactoring Planning
 
-**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+**Purpose**: Create detailed incremental refactoring plan with git checkpoints
+**Execute**: Task tool - `ai-sdlc:refactoring-planner` subagent
+**Output**: `implementation/refactoring-plan.md`
+**State**: Update `refactoring_context.refactoring_type`, `total_increments`
 
-❌ WRONG: Reading agents/refactoring-planner.md and following its instructions directly
-❌ WRONG: Creating refactoring-plan.md inline in the orchestrator thread
-❌ WRONG: Breaking down refactoring into increments yourself
+**Planner Tasks**:
+1. Classify refactoring type (Extract, Rename, Simplify, Duplication, Restructure)
+2. Break into small, testable increments (1 change per increment)
+3. Define git checkpoint for each increment
+4. Identify affected tests and regression tiers
 
-✅ RIGHT: Using the Task tool below and waiting for completion
+→ Pause
 
-**Output before invoking:**
-```
-📤 Delegating Phase 1 to: refactoring-planner subagent
-Method: Task tool
-Expected outputs: implementation/refactoring-plan.md
-```
-
-**INVOKE NOW:**
-
-Tool: `Task`
-Parameters:
-  subagent_type: "ai-sdlc:refactoring-planner"
-  description: "Create refactoring plan"
-  prompt: |
-    You are the refactoring-planner agent. Create detailed incremental
-    refactoring plan with git checkpoints.
-
-    Task directory: [task-path]
-    Input: analysis/code-quality-baseline.md
-
-    Please:
-    1. Classify refactoring type (Extract, Rename, Simplify, Duplication, Restructure)
-    2. Break into small, testable increments (1 change per increment)
-    3. Define git checkpoint for each increment
-    4. Identify affected tests and regression tiers (Tier 1, 2, 3)
-    5. Assess complexity and risk per increment
-    6. Generate comprehensive refactoring plan with rollback procedures
-
-    Save to: implementation/refactoring-plan.md
-    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
-
-⏳ Wait for subagent completion before continuing.
-
-**Outputs**: `implementation/refactoring-plan.md`
-
-**SELF-CHECK (before proceeding to Phase 2):**
-- [ ] Did you invoke the Task tool? (not just read the agent file)
-- [ ] Did you wait for the tool to return results?
-- [ ] Is `implementation/refactoring-plan.md` present?
-
-If NO to any: STOP - go back and invoke the Task tool.
-
-**State Update**: After refactoring-planner completes:
-- Update `refactoring_context.refactoring_type` from output
-- Update `refactoring_context.total_increments` from output (number of planned increments)
-- Update `refactoring_context.risk_level` from output (if not already set)
-
----
-
-## 🚦 GATE: Phase 1 → Phase 2
-
-**STOP. You cannot proceed until this gate clears.**
-
-1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
-2. **If mode = interactive**:
-   - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 1 (Refactoring Planning) complete. Ready to proceed to Phase 2 (Behavioral Snapshot Capture)?"
-     - Options: ["Continue to Phase 2", "Review Phase 1 outputs", "Stop workflow"]
-   - Wait for user response before continuing
-3. **If mode = yolo**:
-   - Output: "→ Auto-continuing to Phase 2 (Behavioral Snapshot Capture)..."
-   - Proceed to Phase 2
-
-**This gate overrides any "continue without asking" conversation instructions.**
+**Interactive**: AskUserQuestion - "Refactoring plan ready. Continue to behavioral snapshot?"
+**YOLO**: "→ Continuing to Phase 2..."
 
 ---
 
 ### Phase 2: Behavioral Snapshot Capture
 
-**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+**Purpose**: Capture comprehensive behavioral baseline for post-refactoring comparison
+**Execute**: Task tool - `ai-sdlc:behavioral-snapshot-capturer` subagent
+**Output**: `analysis/behavioral-snapshot.md`, `analysis/behavioral-fingerprint.yml`
+**State**: Update `refactoring_context.baseline_fingerprint`
 
-❌ WRONG: Reading agents/behavioral-snapshot-capturer.md and following its instructions directly
-❌ WRONG: Capturing behavioral snapshot inline in the orchestrator thread
-❌ WRONG: Running tests and analyzing signatures yourself
+**Snapshot Captures**:
+1. All function signatures in target files
+2. Test coverage and test results
+3. Observable side effects (DB, API, files, logs)
+4. Behavioral fingerprint hash
 
-✅ RIGHT: Using the Task tool below and waiting for completion
+→ Pause
 
-**Output before invoking:**
-```
-📤 Delegating Phase 2 to: behavioral-snapshot-capturer subagent
-Method: Task tool
-Expected outputs: analysis/behavioral-snapshot.md, analysis/behavioral-fingerprint.yml
-```
-
-**INVOKE NOW:**
-
-Tool: `Task`
-Parameters:
-  subagent_type: "ai-sdlc:behavioral-snapshot-capturer"
-  description: "Capture behavioral snapshot"
-  prompt: |
-    You are the behavioral-snapshot-capturer agent. Capture comprehensive
-    behavioral baseline for comparison after refactoring.
-
-    Task directory: [task-path]
-    Input: implementation/refactoring-plan.md (target files list)
-
-    Please:
-    1. Identify all functions in target files (signatures, parameters, returns)
-    2. Analyze test coverage (direct tests, integration tests)
-    3. Run full test suite, capture baseline results
-    4. Identify observable side effects (DB, API, files, logs, state changes)
-    5. Create behavioral fingerprint (hash of signatures + tests + side effects)
-    6. Generate behavioral snapshot report
-
-    Save to:
-    - analysis/behavioral-snapshot.md
-    - analysis/behavioral-fingerprint.yml
-
-    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
-
-⏳ Wait for subagent completion before continuing.
-
-**Outputs**: `analysis/behavioral-snapshot.md`, `analysis/behavioral-fingerprint.yml`
-
-**SELF-CHECK (before proceeding to Phase 2.5):**
-- [ ] Did you invoke the Task tool? (not just read the agent file)
-- [ ] Did you wait for the tool to return results?
-- [ ] Is `analysis/behavioral-snapshot.md` present?
-
-If NO to any: STOP - go back and invoke the Task tool.
-
-**State Update**: After behavioral-snapshot-capturer completes:
-- Update `refactoring_context.baseline_fingerprint` from output fingerprint hash
-
----
-
-## 🚦 GATE: Phase 2 → Phase 2.5
-
-**STOP. You cannot proceed until this gate clears.**
-
-1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
-2. **If mode = interactive**:
-   - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 2 (Behavioral Snapshot Capture) complete. Ready to proceed to Phase 2.5 (Git Branch Setup)?"
-     - Options: ["Continue to Phase 2.5", "Review Phase 2 outputs", "Stop workflow"]
-   - Wait for user response before continuing
-3. **If mode = yolo**:
-   - Output: "→ Auto-continuing to Phase 2.5 (Git Branch Setup)..."
-   - Proceed to Phase 2.5
-
-**This gate overrides any "continue without asking" conversation instructions.**
+**Interactive**: AskUserQuestion - "Behavioral snapshot captured. Continue to git branch setup?"
+**YOLO**: "→ Continuing to Phase 2.5..."
 
 ---
 
 ### Phase 2.5: Git Branch Setup (Optional)
 
-**Execution**: Main orchestrator (uses AskUserQuestion)
-
 **Purpose**: Ask user if they want a dedicated git branch for refactoring
+**Execute**: Direct - use AskUserQuestion for branch decision
+**Output**: Branch created (if chosen)
+**State**: Update `branch_context.use_dedicated_branch`, `refactoring_branch`
 
-**Process**:
-1. Use AskUserQuestion to ask about branch creation:
-   - "Yes, create branch" → Create `refactor/YYYY-MM-DD-task-name`, checkout
-   - "No, work on current branch" → Continue on current branch with commits
-2. Update state with branch decision
+**Options**:
+- "Yes, create branch" → Create `refactor/YYYY-MM-DD-task-name`, checkout
+- "No, work on current branch" → Continue with commits on current branch
 
-**Benefits of Dedicated Branch**: Isolated work, easy to review/abandon, keeps main clean
-**Benefits of Current Branch**: No branch management, simpler for small refactorings
+→ Pause
 
-**State Update**: After user chooses branch option:
-- Set `branch_context.use_dedicated_branch` to user's choice (true/false)
-- If branch created, set `branch_context.refactoring_branch` to branch name
-
----
-
-## 🚦 GATE: Phase 2.5 → Phase 3
-
-**STOP. You cannot proceed until this gate clears.**
-
-1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
-2. **If mode = interactive**:
-   - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 2.5 (Git Branch Setup) complete. Ready to proceed to Phase 3 (Refactoring Execution)?"
-     - Options: ["Continue to Phase 3", "Review Phase 2.5 outputs", "Stop workflow"]
-   - Wait for user response before continuing
-3. **If mode = yolo**:
-   - Output: "→ Auto-continuing to Phase 3 (Refactoring Execution)..."
-   - Proceed to Phase 3
-
-**This gate overrides any "continue without asking" conversation instructions.**
+**Interactive**: AskUserQuestion - "Git setup complete. Continue to execution?"
+**YOLO**: Auto-select "No" (work on current branch)
 
 ---
 
 ### Phase 3: Refactoring Execution
 
-**Execution**: Main orchestrator (direct for simple, delegates for complex)
+**Purpose**: Execute refactoring increments with test verification and git checkpoints
+**Execute**: Direct for simple (1-3 files), Task tool - `ai-sdlc:implementation-changes-planner` for complex (4+ files)
+**Output**: Refactored code with git commit checkpoints
+**State**: Update `branch_context.increments_completed`, `commit_checkpoints`
 
-**Standards Reminder**: Review `.ai-sdlc/docs/INDEX.md` for coding style before executing.
+**Standards Reminder**: Review `.ai-sdlc/docs/INDEX.md` before executing.
 
 **Process** (for each increment):
+1. Apply refactoring changes
+2. Run regression tests (tier based on risk)
+3. If tests pass: Create git commit checkpoint
+4. If tests fail: **NEVER auto-rollback** - Analyze → Ask User → Execute Choice
 
-1. **Apply Refactoring Changes**
-   - Simple (1-3 files): Apply directly with Edit tool
-   - Complex (4+ files): **MUST delegate** to `implementation-changes-planner`
+**User-Confirmed Rollback Protocol**:
+1. STOP - Don't automatically rollback
+2. ANALYZE - Check for easy fixes (config, test setup, environment)
+3. ASK USER - AskUserQuestion with options: "Try fix" / "Rollback" / "Investigate"
+4. EXECUTE - Only rollback if user explicitly chooses it
 
-**For Complex Increments (4+ files):**
+→ Pause
 
-**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
-
-❌ WRONG: Reading agents/implementation-changes-planner.md and following instructions directly
-❌ WRONG: Planning changes for 4+ files inline in the orchestrator thread
-❌ WRONG: Editing many files without a structured change plan
-
-✅ RIGHT: Using the Task tool below and waiting for completion
-
-**Output before invoking:**
-```
-📤 Delegating increment change planning to: implementation-changes-planner subagent
-Method: Task tool
-Expected outputs: Change plan for current increment
-```
-
-**INVOKE NOW (for complex increments):**
-
-Tool: `Task`
-Parameters:
-  subagent_type: "ai-sdlc:implementation-changes-planner"
-  description: "Plan refactoring changes"
-  prompt: |
-    Plan changes for refactoring increment [N]: [increment description]
-    Task directory: [task-path]
-    Refactoring plan: implementation/refactoring-plan.md
-    Target files: [list of files for this increment]
-
-⏳ Wait for subagent completion, then apply changes.
-
-2. **Run Regression Tests** (appropriate tiers based on risk)
-   - Tier 1: Direct tests (always)
-   - Tier 2: Integration tests (medium+ risk)
-   - Tier 3: Domain tests (high risk)
-
-3. **If Tests Pass**: Create git commit checkpoint
-   - `git add . && git commit -m "Checkpoint N: [description]"`
-   - Continue to next increment
-
-4. **If Tests Fail**: Analyze → Ask User → Execute Choice
-   - **NEVER rollback automatically**
-   - Analyze root cause (config issue? test setup? actual behavior change?)
-   - Use AskUserQuestion with options:
-     - "Try suggested fix" (if easy fix identified)
-     - "Rollback changes" (user confirms rollback)
-     - "Let me investigate" (pause for manual investigation)
-   - Execute user's choice
-
-**Outputs**: Refactored code with git commit checkpoints
-
-**Success**: All increments complete, tests pass, checkpoints created
-
----
-
-## 🚦 GATE: Phase 3 → Phase 4
-
-**STOP. You cannot proceed until this gate clears.**
-
-1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
-2. **If mode = interactive**:
-   - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 3 (Refactoring Execution) complete. Ready to proceed to Phase 4 (Behavior Verification)?"
-     - Options: ["Continue to Phase 4", "Review Phase 3 outputs", "Stop workflow"]
-   - Wait for user response before continuing
-3. **If mode = yolo**:
-   - Output: "→ Auto-continuing to Phase 4 (Behavior Verification)..."
-   - Proceed to Phase 4
-
-**This gate overrides any "continue without asking" conversation instructions.**
+**Interactive**: AskUserQuestion - "Refactoring complete. Continue to behavior verification?"
+**YOLO**: "→ Continuing to Phase 4..."
 
 ---
 
 ### Phase 4: Behavior Verification
 
-**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+**Purpose**: Verify refactored code behavior matches baseline exactly
+**Execute**: Task tool - `ai-sdlc:behavioral-verifier` subagent
+**Output**: `verification/behavior-verification-report.md` with PASS/FAIL verdict
+**State**: Update `refactoring_context.behavior_verification_status`
 
-❌ WRONG: Reading agents/behavioral-verifier.md and following its instructions directly
-❌ WRONG: Verifying behavior preservation inline in the orchestrator thread
-❌ WRONG: Comparing fingerprints yourself
+**Verification Checks**:
+1. Compare function signatures (must match unless explicit rename)
+2. Validate test results (must be identical)
+3. Confirm side effects preserved (must be identical)
+4. Compare behavioral fingerprints
 
-✅ RIGHT: Using the Task tool below and waiting for completion
+**Verdict Criteria**:
+- **PASS**: All signatures match, tests identical, side effects preserved
+- **FAIL**: Any behavioral discrepancy found
 
-**Output before invoking:**
-```
-📤 Delegating Phase 4 to: behavioral-verifier subagent
-Method: Task tool
-Expected outputs: verification/behavior-verification-report.md
-```
+**CRITICAL**: FAIL verdict = HALT workflow. No Issue Resolution for behavior changes.
 
-**INVOKE NOW:**
-
-Tool: `Task`
-Parameters:
-  subagent_type: "ai-sdlc:behavioral-verifier"
-  description: "Verify behavior preserved"
-  prompt: |
-    You are the behavioral-verifier agent. Verify refactored code
-    behavior matches baseline exactly.
-
-    Task directory: [task-path]
-    Input: analysis/behavioral-snapshot.md (baseline)
-
-    Please:
-    1. Capture post-refactoring state (same process as Phase 2)
-    2. Compare function signatures (must match unless explicit rename)
-    3. Validate test results (must be identical)
-    4. Confirm side effects preserved (must be identical)
-    5. Compare behavioral fingerprints
-    6. Generate comparison report with PASS/FAIL verdict
-
-    Save to:
-    - verification/behavior-verification-report.md
-    - verification/post-refactoring-snapshot.md
-    - verification/fingerprint-comparison.yml
-
-    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
-
-    Verdict Criteria:
-    - PASS: All signatures match, tests identical, side effects preserved
-    - FAIL: Any behavioral discrepancy found
-
-⏳ Wait for subagent completion before continuing.
-
-**Outputs**: `verification/behavior-verification-report.md` with verdict
-
-**SELF-CHECK (before proceeding to Phase 5):**
-- [ ] Did you invoke the Task tool? (not just read the agent file)
-- [ ] Did you wait for the tool to return results?
-- [ ] Is `verification/behavior-verification-report.md` present?
-
-If NO to any: STOP - go back and invoke the Task tool.
-
-**Gate**: Cannot proceed to Phase 5 if verdict = FAIL
-
-**Note**: Behavior verification failures are NOT auto-fixed. Report only.
-
-**State Update**: After behavioral-verifier completes:
-- Update `refactoring_context.behavior_verification_status` from output verdict ("PASS" or "FAIL")
-
----
-
-## 🚦 GATE: Phase 4 → Phase 5
-
-**STOP. You cannot proceed until this gate clears.**
-
-1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
-2. **If mode = interactive**:
-   - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 4 (Behavior Verification) complete. Ready to proceed to Phase 5 (Final Quality Verification)?"
-     - Options: ["Continue to Phase 5", "Review Phase 4 outputs", "Stop workflow"]
-   - Wait for user response before continuing
-3. **If mode = yolo**:
-   - Output: "→ Auto-continuing to Phase 5 (Final Quality Verification)..."
-   - Proceed to Phase 5
-
-**This gate overrides any "continue without asking" conversation instructions.**
+→ Conditional: if verdict=PASS continue to Phase 5, otherwise HALT workflow
 
 ---
 
 ### Phase 5: Final Quality Verification
 
-**Execution**: Main orchestrator (re-measures metrics, delegates pragmatic review)
+**Purpose**: Verify quality improvements and check for over-engineering
+**Execute**: Direct for metrics, Task tool - `ai-sdlc:code-quality-pragmatist` for pragmatic review
+**Output**: `verification/quality-improvement-report.md`, `verification/pragmatic-review.md`
+**State**: Update `refactoring_context.quality_verification_status`
 
 **Process**:
-1. **Re-measure Quality Metrics** - Same analysis as Phase 0 (orchestrator direct)
-2. **Calculate Improvements** - Compare baseline vs post-refactoring
-3. **Run Pragmatic Review** - Delegate to `code-quality-pragmatist` (required)
-4. **Generate Quality Improvement Report** - Document improvements and goals met
+1. Re-measure quality metrics (same as Phase 0)
+2. Calculate improvements vs baseline
+3. Run pragmatic review (check for over-engineering)
+4. Generate quality improvement report
 
-**For Step 3 (Pragmatic Review):**
-
-**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
-
-❌ WRONG: Reading agents/code-quality-pragmatist.md and following instructions directly
-❌ WRONG: Checking for over-engineering inline in the orchestrator thread
-❌ WRONG: Generating pragmatic-review.md yourself
-
-✅ RIGHT: Using the Task tool below and waiting for completion
-
-**Output before invoking:**
-```
-📤 Delegating pragmatic review to: code-quality-pragmatist subagent
-Method: Task tool
-Expected outputs: verification/pragmatic-review.md
-```
-
-**INVOKE NOW:**
-
-Tool: `Task`
-Parameters:
-  subagent_type: "ai-sdlc:code-quality-pragmatist"
-  description: "Pragmatic code review"
-  prompt: |
-    Run pragmatic code review for refactored code.
-    Task directory: [task-path]
-    Baseline: analysis/code-quality-baseline.md
-    Check for over-engineering introduced during refactoring.
-    Save to: verification/pragmatic-review.md
-
-⏳ Wait for subagent completion before continuing.
-
-**SELF-CHECK (before completing Phase 5):**
-- [ ] Did you invoke the Task tool for pragmatic review?
-- [ ] Did you wait for the tool to return results?
-- [ ] Is `verification/pragmatic-review.md` present?
-
-If NO to any: STOP - go back and invoke the Task tool.
-
-**Outputs**:
-- `verification/quality-improvement-report.md`
-- `verification/pragmatic-review.md`
-
-**State Update**: After quality verification completes:
-- Update `refactoring_context.quality_verification_status` from pragmatic review verdict
-
----
-
-## 🚦 GATE: Phase 5 → Phase 5.5 or Completion
-
-**STOP. You cannot proceed until this gate clears.**
-
-**Check quality verification result from pragmatic review:**
-
-1. **If verdict = "PASS"**: Skip Phase 5.5, workflow complete
-2. **If verdict = "PASS with Issues"**: Enter Issue Resolution (Phase 5.5)
-3. **If verdict = "FAIL"**: Check for fixable quality issues
-   - If fixable issues exist AND `verification_context.reverify_count` < 3: Enter Phase 5.5
-   - Otherwise: Complete workflow with warnings
-
-**Mode check (if proceeding to completion directly):**
-1. Read `orchestrator-state.yml` → check `mode` value
-2. **If mode = interactive**:
-   - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 5 (Final Quality Verification) complete. All quality checks passed. Workflow complete?"
-     - Options: ["Complete workflow", "Review Phase 5 outputs"]
-   - Wait for user response before continuing
-3. **If mode = yolo**:
-   - Output: "→ Quality verification passed. Workflow complete."
-   - Complete workflow
-
-**This gate overrides any "continue without asking" conversation instructions.**
+→ Conditional: if verdict=PASS complete workflow, if fixable issues continue to Phase 5.5
 
 ---
 
 ### Phase 5.5: Quality Issue Resolution (Conditional)
 
-**When to execute**: Quality verification found fixable issues (over-engineering, complexity)
+**Purpose**: Fix quality issues (over-engineering, unnecessary complexity)
+**Execute**: Direct - apply simplifications, re-verify
+**Output**: Updated code, `verification_context.fixes_applied`
+**State**: Update `reverify_count`, `decisions_made`
 
-**IMPORTANT**: This phase handles QUALITY issues only. Behavior issues are NOT resolved here - Phase 4 failures = HALT.
+**Skip if**: Quality verdict = PASS
 
-**Reference**: See `../orchestrator-framework/references/issue-resolution-pattern.md` for detailed pattern.
+**IMPORTANT**: This phase handles QUALITY issues only. Behavior issues are NOT resolved here.
 
-**Process Overview**:
+**Process**:
+1. Parse issues from pragmatic review
+2. Apply auto-fixes (remove unused code, simplify over-abstractions)
+3. For user decisions: AskUserQuestion with options
+4. Re-verify after fixes (max 3 iterations)
 
-1. **Parse Pragmatic Review Output**:
-   - Extract issues from `verification/pragmatic-review.md`
-   - Categorize by type (over-engineering, complexity, unnecessary abstractions)
+**Exit Conditions**:
+- ✅ New verdict = PASS → Workflow complete
+- ⚠️ Max iterations (3) reached → Complete with warnings
 
-2. **Categorize Issues**:
-   - **Auto-fixable**: Remove unused code, simplify obvious over-abstractions
-   - **User decision needed**: Pattern simplification decisions, trade-off choices
-   - **Not fixable here**: Fundamental design decisions (require new refactoring cycle)
-
-3. **For Each Fixable Issue**:
-   - If auto-fixable: Apply simplification directly
-   - If needs user decision: Use `AskUserQuestion`:
-     ```
-     Question: "Quality issue: [description]. How to proceed?"
-     Options:
-     - "Apply simplification" (if fix is clear)
-     - "Keep as-is" (accept the complexity)
-     - "Stop and discuss" (need more analysis)
-     ```
-
-4. **Track Progress**:
-   ```yaml
-   verification_context:
-     last_status: "passed_with_issues"
-     issues_found: [count]
-     fixes_applied: [list of applied simplifications]
-     decisions_made:
-       - issue: "[description]"
-         decision: "fix" | "skip" | "defer"
-     reverify_count: [0-3]
-   ```
-
-5. **Re-verify**: After applying fixes, re-run pragmatic review (increment `reverify_count`)
-
-6. **Exit Conditions**:
-   - ✅ New verdict = "PASS" → Workflow complete
-   - ⚠️ Max iterations (3) reached → Complete with warnings
-   - Remaining issues are acceptable trade-offs → Complete with documented exceptions
-
-**State Update**: After Issue Resolution:
-- Update `verification_context.reverify_count`
-- Update `verification_context.fixes_applied` with list of simplifications
+→ End of workflow
 
 ---
 
@@ -740,34 +263,24 @@ Refactoring-specific fields in `orchestrator-state.yml`:
 ```yaml
 refactoring_context:
   refactoring_type: "extract" | "rename" | "simplify" | "duplication" | "restructure"
-  total_increments: [number]
-  risk_level: "low" | "medium" | "high"
-  baseline_fingerprint: "[hash]"
-  behavior_verification_status: "PASS" | "FAIL" | null
-  quality_verification_status: "PASS" | "PASS with Issues" | "FAIL" | null
+  total_increments: null
+  risk_level: null
+  baseline_fingerprint: null
+  behavior_verification_status: null
+  quality_verification_status: null
 
 branch_context:
-  use_dedicated_branch: true | false
-  refactoring_branch: "refactor/YYYY-MM-DD-task-name" | null
+  use_dedicated_branch: false
+  refactoring_branch: null
   increments_completed: []
-  commit_checkpoints:
-    - increment: 1
-      description: "[description]"
-      commit_hash: "[hash]"
-      timestamp: "[ISO 8601]"
+  commit_checkpoints: []
 
-# Quality Issue Resolution tracking (Phase 5.5)
-# NOTE: Does NOT apply to Phase 4 behavior verification (zero tolerance)
 verification_context:
-  last_status: "passed" | "passed_with_issues" | "failed"
-  issues_found: [number]
-  fixes_applied:
-    - "[description of simplification 1]"
-    - "[description of simplification 2]"
-  decisions_made:
-    - issue: "[issue description]"
-      decision: "fix" | "skip" | "defer"
-  reverify_count: 0  # max 3
+  last_status: null
+  issues_found: null
+  fixes_applied: []
+  decisions_made: []
+  reverify_count: 0
 ```
 
 ---
@@ -775,8 +288,8 @@ verification_context:
 ## Task Structure
 
 ```
-.ai-sdlc/tasks/refactoring/YYYY-MM-DD-refactoring-name/
-├── orchestrator-state.yml            # Execution state + task metadata
+.ai-sdlc/tasks/refactoring/YYYY-MM-DD-task-name/
+├── orchestrator-state.yml
 ├── analysis/
 │   ├── code-quality-baseline.md       # Phase 0
 │   ├── target-code-analysis.md        # Phase 0
@@ -785,14 +298,12 @@ verification_context:
 ├── implementation/
 │   └── refactoring-plan.md            # Phase 1
 └── verification/
-    ├── behavior-verification-report.md   # Phase 4
-    ├── post-refactoring-snapshot.md      # Phase 4
-    ├── fingerprint-comparison.yml        # Phase 4
-    ├── quality-improvement-report.md     # Phase 5
-    └── pragmatic-review.md               # Phase 5
+    ├── behavior-verification-report.md    # Phase 4
+    ├── post-refactoring-snapshot.md       # Phase 4
+    ├── fingerprint-comparison.yml         # Phase 4
+    ├── quality-improvement-report.md      # Phase 5
+    └── pragmatic-review.md                # Phase 5
 ```
-
-**Git Branch** (optional): `refactor/YYYY-MM-DD-task-name`
 
 ---
 
@@ -800,34 +311,14 @@ verification_context:
 
 | Phase | Max Attempts | Strategy |
 |-------|--------------|----------|
-| 0 | 2 | Expand search patterns, prompt user for target files |
-| 1 | 2 | Clarify refactoring type, use conservative estimates |
-| 2 | 1 | Document limitations if critical functions untested |
+| 0 | 2 | Expand search, prompt user for target files |
+| 1 | 2 | Clarify refactoring type |
+| 2 | 1 | Document limitations |
 | 2.5 | 0 | User decision (no auto-fix) |
-| 3 | 0 | Analyze → Ask user → Execute choice. **NEVER auto-rollback** |
-| 4 | 0 | Read-only, report only. FAIL verdict = HALT |
+| 3 | 0 | Ask user on failure. **NEVER auto-rollback** |
+| 4 | 0 | Read-only. FAIL = HALT |
 | 5 | 1 | Flag issues only |
-
-**Critical Rule**: On test failure in Phase 3, **NEVER rollback automatically**. Always:
-1. Analyze root cause (config? test setup? actual behavior change?)
-2. Ask user with options (try fix / rollback / investigate)
-3. Execute user's choice
-
----
-
-## User-Confirmed Rollback Protocol
-
-When tests fail or behavior verification fails:
-
-1. **STOP** - Don't automatically rollback
-2. **ANALYZE** - Check for easy fixes (config issues, test setup, environment)
-3. **ASK USER** - Use AskUserQuestion with options:
-   - "Try suggested fix" (if easy fix identified)
-   - "Rollback changes" (user confirms)
-   - "Let me investigate" (pause for manual review)
-4. **EXECUTE** - Only rollback if user explicitly chooses it
-
-**Rationale**: Automatic rollback discards work, hides root causes, frustrates users. Many failures are simple config issues with 1-line fixes.
+| 5.5 | 3 | Fix-then-reverify cycles |
 
 ---
 
@@ -838,18 +329,3 @@ Invoked via:
 - `/ai-sdlc:refactoring:resume [task-path] [--from=PHASE]`
 
 Task directory: `.ai-sdlc/tasks/refactoring/YYYY-MM-DD-task-name/`
-
----
-
-## Success Criteria
-
-Workflow successful when:
-
-- Code quality baseline established with all metrics
-- Refactoring plan created with testable increments
-- Behavioral snapshot captured with fingerprint
-- All increments executed with git checkpoint commits
-- Behavior verification PASS (zero functional changes)
-- Quality metrics improved (complexity, duplication reduced)
-- No over-engineering introduced
-- Ready for code review and merge

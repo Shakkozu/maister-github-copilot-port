@@ -7,89 +7,51 @@ description: Orchestrates epic-level initiatives from planning through verificat
 
 Epic-level coordination of 3-15 related tasks with dependency management and sequential execution.
 
-## MANDATORY Initialization (Before Any Phase Work)
+## Initialization
 
-**CRITICAL: You MUST complete these steps BEFORE executing any workflow phase:**
+**BEFORE executing any phase, you MUST complete these steps:**
 
-### Step 0: Load Framework Patterns
+### Step 1: Load Framework Patterns
 
-**STOP. You MUST read these files NOW using the Read tool before continuing:**
+**Read ALL framework reference files NOW using the Read tool:**
 
-1. `../orchestrator-framework/references/phase-execution-pattern.md` - 7-step phase loop
-2. `../orchestrator-framework/references/delegation-enforcement.md` - Delegation patterns and subagent result handling
-3. `../orchestrator-framework/references/interactive-mode.md` - Phase gates and AUTO-CONTINUE
-4. `../orchestrator-framework/references/state-management.md` - State file operations
+1. `../orchestrator-framework/references/phase-execution-pattern.md`
+2. `../orchestrator-framework/references/interactive-mode.md`
+3. `../orchestrator-framework/references/delegation-enforcement.md`
+4. `../orchestrator-framework/references/state-management.md`
+5. `../orchestrator-framework/references/initialization-pattern.md`
+6. `../orchestrator-framework/references/issue-resolution-pattern.md`
 
-**⚠️ FAILURE TO READ THESE FILES IS A WORKFLOW VIOLATION.**
+### Step 2: Initialize Workflow
 
-These patterns define:
-- How to execute each phase (7-step loop)
-- How to delegate to skills (mandatory patterns)
-- When to auto-continue vs pause (Phase Gates and ⚡ AUTO)
-- How to consume subagent results and continue workflow
-- How to manage orchestrator-state.yml
+1. **Create TodoWrite**: Initialize todos for all phases (see Phase Configuration)
+2. **Create Initiative Directory**: `.ai-sdlc/docs/project/initiatives/YYYY-MM-DD-name/`
+3. **Initialize State**: Create `initiative-state.yml` with mode and tracking info
 
-**SELF-CHECK:**
-- [ ] Did you use the Read tool to read all 4 files?
-- [ ] Do you understand the AUTO-CONTINUE pattern in interactive-mode.md?
-- [ ] Do you understand Pattern 6 (Consuming Subagent Results) in delegation-enforcement.md?
-
-If NO to any: STOP and read the files now.
-
-### Step 1: Create TodoWrite with All Phases
-
-**Immediately use the TodoWrite tool** to create todos for all phases:
-
-```
-Use TodoWrite tool with todos:
-[
-  {"content": "Plan initiative tasks", "status": "pending", "activeForm": "Planning initiative tasks"},
-  {"content": "Create task directories", "status": "pending", "activeForm": "Creating task directories"},
-  {"content": "Resolve dependencies", "status": "pending", "activeForm": "Resolving dependencies"},
-  {"content": "Execute tasks", "status": "pending", "activeForm": "Executing tasks"},
-  {"content": "Verify initiative", "status": "pending", "activeForm": "Verifying initiative"},
-  {"content": "Finalize initiative", "status": "pending", "activeForm": "Finalizing initiative"}
-]
-```
-
-### Step 2: Output Initialization Summary
-
-**Output this summary to the user:**
-
+**Output**:
 ```
 🚀 Initiative Orchestrator Started
 
-Task: [initiative description]
+Initiative: [description]
 Mode: [Interactive/YOLO]
 Directory: [initiative-path]
-
-Workflow phases:
-[Todos list with status]
-
-[Interactive mode] You'll be prompted for review after each phase.
-[YOLO mode] All phases will run continuously.
 
 Starting Phase 0: Plan initiative tasks...
 ```
 
-### Step 3: Only Then Proceed to Phase 0
-
-After completing Steps 0, 1, and 2, proceed to Phase 0 (Initiative Planning).
-
 ---
 
-## When to Use This Skill
+## When to Use
 
-Use when:
+Use for:
 - Epic-level work spanning multiple features (multi-week initiatives)
 - Coordinated delivery with related tasks that must work together
 - Complex dependencies with technical or logical ordering requirements
 - Milestone-based delivery with clear checkpoints
 
-**DO NOT use for**:
-- Single standalone tasks (use appropriate task orchestrator)
-- Quick fixes or small changes (use individual task types)
-- Exploratory work without clear scope (define scope first)
+**DO NOT use for**: Single standalone tasks, quick fixes, exploratory work without clear scope.
+
+---
 
 ## Core Principles
 
@@ -101,36 +63,16 @@ Use when:
 
 ---
 
-## Local References
-
-Read these during relevant phases:
-
-| File | When to Use | Purpose |
-|------|-------------|---------|
-| `references/dependency-resolution.md` | Phase 2 | Dependency graph algorithms and resolution strategies |
-| `references/execution-strategies.md` | Phase 3 | Task sequencing and execution patterns |
-| `references/phases.md` | General | Detailed phase substeps and decision points |
-| `references/state-coordination.md` | All phases | Multi-task state handling and coordination |
-
----
-
 ## Phase Configuration
 
 | Phase | content | activeForm | Agent/Skill |
 |-------|---------|------------|-------------|
 | 0 | "Plan initiative tasks" | "Planning initiative tasks" | initiative-planner |
-| 1 | "Create task directories" | "Creating task directories" | orchestrator |
-| 2 | "Resolve dependencies" | "Resolving dependencies" | orchestrator |
-| 3 | "Execute tasks" | "Executing tasks" | orchestrator + task orchestrators |
-| 4 | "Verify initiative" | "Verifying initiative" | orchestrator |
-| 5 | "Finalize initiative" | "Finalizing initiative" | orchestrator |
-
-**Workflow Overview**: 6 phases
-
-**CRITICAL TodoWrite Usage**:
-1. At workflow start: Create todos for ALL phases using the Phase Configuration table above (all status=pending)
-2. Before each phase: Update that phase to status=in_progress
-3. After each phase: Update that phase to status=completed
+| 1 | "Create task directories" | "Creating task directories" | Direct |
+| 2 | "Resolve dependencies" | "Resolving dependencies" | Direct |
+| 3 | "Execute tasks" | "Executing tasks" | Task orchestrators |
+| 4 | "Verify initiative" | "Verifying initiative" | Direct |
+| 5 | "Finalize initiative" | "Finalizing initiative" | Direct |
 
 ---
 
@@ -138,95 +80,34 @@ Read these during relevant phases:
 
 ### Phase 0: Initiative Planning
 
-**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
-
-❌ WRONG: Reading agents/initiative-planner.md and following its instructions directly
-❌ WRONG: Breaking down the initiative inline in the orchestrator thread
-❌ WRONG: Creating initiative.yml and dependency graph yourself
-
-✅ RIGHT: Using the Task tool below and waiting for completion
-
-**Output before invoking:**
-```
-📤 Delegating Phase 0 to: initiative-planner subagent
-Method: Task tool
-Expected outputs: initiative.yml, spec.md, task-plan.md
-```
-
-**INVOKE NOW:**
-
-Tool: `Task`
-Parameters:
-  subagent_type: "ai-sdlc:initiative-planner"
-  description: "Plan initiative tasks"
-  prompt: |
-    You are the initiative-planner agent. Break down epic into
-    concrete tasks with dependency relationships.
-
-    Initiative description: [description]
-    Initiative directory: [.ai-sdlc/docs/project/initiatives/YYYY-MM-DD-name/]
-
-    Please:
-    1. Gather requirements via AskUserQuestion
-    2. Analyze codebase (INDEX.md, existing features)
-    3. Decompose into 3-15 tasks
-    4. Construct dependency graph
-    5. Recommend execution strategy
-    6. Define milestones
-    7. Assess risks
-
-    Create:
-    - initiative.yml (task list, dependencies, metadata)
-    - spec.md (initiative goals, success criteria)
-    - task-plan.md (dependency graph, milestones)
-
-    Use Read, Grep, Glob, Bash, and AskUserQuestion tools. Do NOT modify code.
-
-⏳ Wait for subagent completion before continuing.
-
-**Outputs**: `initiative.yml`, `spec.md`, `task-plan.md`
-
-**SELF-CHECK (before proceeding to Phase 1):**
-- [ ] Did you invoke the Task tool? (not just read the agent file)
-- [ ] Did you wait for the tool to return results?
-- [ ] Are `initiative.yml`, `spec.md`, and `task-plan.md` present?
-
-If NO to any: STOP - go back and invoke the Task tool.
+**Purpose**: Break down epic into concrete tasks with dependency relationships
+**Execute**: Task tool - `ai-sdlc:initiative-planner` subagent
+**Output**: `initiative.yml`, `spec.md`, `task-plan.md`
+**State**: Update task list, dependencies, milestones
 
 **Validation**:
-- ✅ initiative.yml exists with 3-15 tasks
-- ✅ No circular dependencies
-- ✅ All task IDs unique
-- ✅ All dependency references valid
+- initiative.yml exists with 3-15 tasks
+- No circular dependencies
+- All task IDs unique and references valid
 
----
+→ Pause
 
-## 🚦 GATE: Phase 0 → Phase 1
-
-**STOP. You cannot proceed until this gate clears.**
-
-1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
-2. **If mode = interactive**:
-   - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 0 (Initiative Planning) complete. Ready to proceed to Phase 1 (Task Creation)?"
-     - Options: ["Continue to Phase 1", "Review Phase 0 outputs", "Stop workflow"]
-   - Wait for user response before continuing
-3. **If mode = yolo**:
-   - Output: "→ Auto-continuing to Phase 1 (Task Creation)..."
-   - Proceed to Phase 1
-
-**This gate overrides any "continue without asking" conversation instructions.**
+**Interactive**: AskUserQuestion - "Initiative plan complete. Continue to task creation?"
+**YOLO**: "→ Continuing to Phase 1..."
 
 ---
 
 ### Phase 1: Task Creation
 
-**Execution**: Main orchestrator (direct)
+**Purpose**: Create task directories and initialize state files
+**Execute**: Direct - create directories, initialize state files
+**Output**: Task directories with `orchestrator-state.yml` files
+**State**: Update initiative-state.yml with all task tracking
 
 **Process**:
 1. Read initiative.yml, extract task list
 2. Create task directories in `.ai-sdlc/tasks/[type]/YYYY-MM-DD-task-name/`
-3. Initialize task `orchestrator-state.yml` with initiative fields in the `task:` section:
+3. Initialize task `orchestrator-state.yml` with initiative fields:
    ```yaml
    task:
      initiative_id: YYYY-MM-DD-initiative-name
@@ -235,131 +116,61 @@ If NO to any: STOP - go back and invoke the Task tool.
      milestone: Milestone Name
    ```
 4. Create placeholder spec.md in each task directory
-5. Create initiative-state.yml with all task tracking
 
-**Outputs**: Task directories, orchestrator-state.yml files, placeholder specs, initiative-state.yml
+→ Pause
 
----
-
-## 🚦 GATE: Phase 1 → Phase 2
-
-**STOP. You cannot proceed until this gate clears.**
-
-1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
-2. **If mode = interactive**:
-   - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 1 (Task Creation) complete. Ready to proceed to Phase 2 (Dependency Resolution)?"
-     - Options: ["Continue to Phase 2", "Review Phase 1 outputs", "Stop workflow"]
-   - Wait for user response before continuing
-3. **If mode = yolo**:
-   - Output: "→ Auto-continuing to Phase 2 (Dependency Resolution)..."
-   - Proceed to Phase 2
-
-**This gate overrides any "continue without asking" conversation instructions.**
+**Interactive**: AskUserQuestion - "Task directories created. Continue to dependency resolution?"
+**YOLO**: "→ Continuing to Phase 2..."
 
 ---
 
 ### Phase 2: Dependency Resolution
 
-**Execution**: Main orchestrator (direct)
+**Purpose**: Build and validate dependency graph, compute execution order
+**Execute**: Direct - build graph, detect cycles, compute levels
+**Output**: Validated dependency graph, execution queue, critical path
+**State**: Update execution levels and critical path in initiative-state.yml
 
 **Process**:
 1. Build dependency graph from initiative.yml
-2. Validate graph:
-   - **Cycle Detection**: Topological sort, fail if cycle found
-   - **Reference Validation**: All dependencies point to valid task IDs
-   - **Completeness**: All tasks reachable
+2. Validate: cycle detection, reference validation, completeness
 3. Compute dependency levels (BFS from tasks with no dependencies)
 4. Build execution queue ordered by levels
 5. Identify critical path (longest path through graph)
-6. Update initiative-state.yml with execution plan
 
-**Outputs**: Validated dependency graph, execution queue, critical path
+→ Pause
 
----
-
-## 🚦 GATE: Phase 2 → Phase 3
-
-**STOP. You cannot proceed until this gate clears.**
-
-1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
-2. **If mode = interactive**:
-   - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 2 (Dependency Resolution) complete. Ready to proceed to Phase 3 (Task Execution)?"
-     - Options: ["Continue to Phase 3", "Review Phase 2 outputs", "Stop workflow"]
-   - Wait for user response before continuing
-3. **If mode = yolo**:
-   - Output: "→ Auto-continuing to Phase 3 (Task Execution)..."
-   - Proceed to Phase 3
-
-**This gate overrides any "continue without asking" conversation instructions.**
+**Interactive**: AskUserQuestion - "Dependencies resolved. Continue to task execution?"
+**YOLO**: "→ Continuing to Phase 3..."
 
 ---
 
 ### Phase 3: Task Execution
 
-**⚠️ DELEGATION REQUIRED FOR EACH TASK - DO NOT EXECUTE TASKS INLINE**
-
-❌ WRONG: Reading task orchestrator SKILL.md files and following instructions directly
-❌ WRONG: Implementing task work inline in the initiative orchestrator thread
-❌ WRONG: Spawning your own subagents to do task work
-
-✅ RIGHT: Invoking appropriate orchestrator skill for each task and waiting for completion
-
-**IMPORTANT**: Execute tasks ONE AT A TIME (sequential execution)
+**Purpose**: Execute tasks sequentially using appropriate orchestrators
+**Execute**: Skill tool - invoke orchestrator for each task
+**Output**: Completed task artifacts in each task directory
+**State**: Update task status in initiative-state.yml
 
 **Task Type to Orchestrator Mapping**:
 
 | Task Type | Orchestrator Skill |
 |-----------|-------------------|
-| new-feature | ai-sdlc:development-orchestrator |
-| enhancement | ai-sdlc:development-orchestrator |
-| bug-fix | ai-sdlc:development-orchestrator |
+| new-feature, enhancement, bug-fix | ai-sdlc:development-orchestrator |
 | migration | ai-sdlc:migration-orchestrator |
 | refactoring | ai-sdlc:refactoring-orchestrator |
 | performance | ai-sdlc:performance-orchestrator |
 | security | ai-sdlc:security-orchestrator |
 | documentation | ai-sdlc:documentation-orchestrator |
 
-**INVOKE FOR EACH TASK:**
-
-For each task in queue where status != "completed":
-
-1. **Output announcement:**
-   ```
-   📤 Executing task [N]/[total]: [task name]
-   Type: [task type]
-   Orchestrator: [orchestrator skill name]
-   ```
-
-2. **Invoke orchestrator:**
-
-   Tool: `Skill`
-   Parameters:
-     skill: "ai-sdlc:[task-type]-orchestrator"
-
-3. **Wait for orchestrator to complete**
-
-4. **Update state after completion**
-
-⚠️ Do NOT batch execute - invoke one skill, wait for completion, then proceed to next.
-
-**Execution Loop**:
+**Execution Loop** (ONE TASK AT A TIME):
 1. Select next task from queue (respecting dependency order)
-2. Read task's `orchestrator-state.yml` to determine type from `task.type`
-3. **Output pre-delegation announcement** (see above)
-4. **Invoke appropriate orchestrator via Skill tool**
-5. **Wait for orchestrator to complete**
-6. Update initiative-state.yml with completion status
-7. Unblock dependent tasks (check if their dependencies now satisfied)
-8. Repeat until all tasks complete
-
-**SELF-CHECK (after each task):**
-- [ ] Did you invoke the Skill tool for this task? (not execute inline)
-- [ ] Did you wait for the skill to complete?
-- [ ] Is the task's status updated in initiative-state.yml?
-
-If NO to any: STOP - go back and invoke the Skill tool for this task.
+2. Output: `📤 Executing task [N]/[total]: [task name]`
+3. Invoke appropriate orchestrator via Skill tool
+4. Wait for completion
+5. Update initiative-state.yml with completion status
+6. Unblock dependent tasks (check if their dependencies now satisfied)
+7. Repeat until all tasks complete
 
 **Dependency Unblocking**:
 - On task completion, read its `blocks` field
@@ -369,82 +180,50 @@ If NO to any: STOP - go back and invoke the Skill tool for this task.
 **Failure Handling**:
 - Task failure → Pause initiative, prompt user
 - Options: Skip task (marks dependents as blocked), retry, abort
-- Dependent tasks cannot proceed if dependency failed
 
----
+→ Pause
 
-## 🚦 GATE: Phase 3 → Phase 4
-
-**STOP. You cannot proceed until this gate clears.**
-
-1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
-2. **If mode = interactive**:
-   - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 3 (Task Execution) complete. Ready to proceed to Phase 4 (Initiative Verification)?"
-     - Options: ["Continue to Phase 4", "Review Phase 3 outputs", "Stop workflow"]
-   - Wait for user response before continuing
-3. **If mode = yolo**:
-   - Output: "→ Auto-continuing to Phase 4 (Initiative Verification)..."
-   - Proceed to Phase 4
-
-**This gate overrides any "continue without asking" conversation instructions.**
+**Interactive**: AskUserQuestion - "All tasks executed. Continue to verification?"
+**YOLO**: "→ Continuing to Phase 4..."
 
 ---
 
 ### Phase 4: Initiative Verification
 
-**Execution**: Main orchestrator (direct)
+**Purpose**: Validate all tasks completed and aggregate verification results
+**Execute**: Direct - aggregate reports, check acceptance criteria
+**Output**: `verification-report.md`
+**State**: Update verification status
 
 **Process**:
 1. Validate all tasks completed (check initiative-state.yml)
 2. Read each task's verification report
 3. Aggregate issues across all tasks
 4. Check initiative acceptance criteria from spec.md
-5. Create initiative verification report with:
-   - Task completion summary
-   - Aggregated issues (critical, warnings)
-   - Success criteria verification
-   - Deployment readiness recommendation (GO/NO-GO)
+5. Create initiative verification report with GO/NO-GO recommendation
 
-**Outputs**: `verification-report.md`
+**Gate**: Cannot proceed if critical issues found
 
-**Gate**: Cannot proceed to Phase 5 if critical issues found
+→ Pause
 
----
-
-## 🚦 GATE: Phase 4 → Phase 5
-
-**STOP. You cannot proceed until this gate clears.**
-
-1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
-2. **If mode = interactive**:
-   - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 4 (Initiative Verification) complete. Ready to proceed to Phase 5 (Finalization)?"
-     - Options: ["Continue to Phase 5", "Review Phase 4 outputs", "Stop workflow"]
-   - Wait for user response before continuing
-3. **If mode = yolo**:
-   - Output: "→ Auto-continuing to Phase 5 (Finalization)..."
-   - Proceed to Phase 5
-
-**This gate overrides any "continue without asking" conversation instructions.**
+**Interactive**: AskUserQuestion - "Verification complete. Continue to finalization?"
+**YOLO**: "→ Continuing to Phase 5..."
 
 ---
 
 ### Phase 5: Finalization
 
-**Execution**: Main orchestrator (direct)
+**Purpose**: Complete workflow with summary and roadmap update
+**Execute**: Direct - create summary, update roadmap
+**Output**: `summary.md`, updated roadmap.md (if exists)
+**State**: Set status to completed
 
 **Process**:
 1. Update roadmap.md (if exists) with initiative completion
-2. Create initiative summary.md with:
-   - Duration and hours (actual vs estimated)
-   - Tasks completed
-   - Milestones achieved
-   - Metrics (estimation accuracy, success rate)
-   - Lessons learned
+2. Create summary.md with metrics, lessons learned
 3. Mark initiative-state.yml as completed
 
-**Outputs**: Updated roadmap.md, summary.md, completed initiative-state.yml
+→ End of workflow
 
 ---
 
@@ -472,74 +251,22 @@ tasks:
       status: pending | in-progress | completed | blocked | failed
       dependencies: [task-paths]
       blocks: [task-ids]
-      estimated_hours: X
-      actual_hours: Y
+      estimated_hours: null
+      actual_hours: null
 
 execution:
-  current_level: N
-  total_levels: M
+  current_level: null
+  total_levels: null
   levels:
     level-0: [task-ids]
     level-1: [task-ids]
   critical_path: [task-ids]
 
 progress:
-  total_tasks: N
-  completed: X
-  percent: (completed/total * 100)
-  estimated_hours: X
-  actual_hours: Y
+  total_tasks: null
+  completed: 0
+  percent: 0
 ```
-
----
-
-## Integration with Task Orchestrators
-
-Task orchestrators (development, migration, etc.) add **Phase 0.5: Dependency Check** when part of an initiative:
-
-1. Read task `orchestrator-state.yml`
-2. If `task.initiative_id` exists:
-   - Check all dependencies have `task.status: completed`
-   - If any dependency not completed: BLOCK task, exit
-3. If no `initiative_id`: Skip check (standalone task)
-
-**Impact**: ~30 lines per orchestrator, no breaking changes to standalone tasks
-
----
-
-## Auto-Recovery
-
-| Phase | Max Attempts | Strategy |
-|-------|--------------|----------|
-| 0 | 2 | Re-run planner with feedback if circular deps or task count issues |
-| 1 | 3 | Skip existing directories, map invalid types to closest valid |
-| 2 | 2 | Remove invalid dependencies, fail if no Level 0 tasks |
-| 3 | Delegated | Task orchestrators handle their own recovery; initiative pauses on persistent failure |
-| 4 | 2 | Return to Phase 3 if not all tasks complete |
-| 5 | 3 | Skip roadmap update if file not found |
-
-**Task Failure Handling**:
-- Attempts 1-2: Delegate to task orchestrator's auto-fix
-- Attempt 3+: Pause initiative, prompt user (skip/retry/abort)
-
----
-
-## Resume Capability
-
-**Command**: `/ai-sdlc:initiative:resume [initiative-path]`
-
-**Process**:
-1. Load initiative-state.yml
-2. Validate state consistency (tasks exist, states match)
-3. Determine resume point from current_phase
-4. Reconstruct context from initiative.yml and task metadata files
-5. Continue from current_phase
-
-**State Reconstruction** (if initiative-state.yml corrupted):
-1. Read initiative.yml (source of truth for task list)
-2. Poll all task `orchestrator-state.yml` files for current status
-3. Rebuild dependency graph
-4. Prompt user to confirm reconstructed state
 
 ---
 
@@ -547,18 +274,43 @@ Task orchestrators (development, migration, etc.) add **Phase 0.5: Dependency Ch
 
 ```
 .ai-sdlc/docs/project/initiatives/YYYY-MM-DD-initiative-name/
-├── initiative.yml         # Task list, dependencies, metadata
-├── initiative-state.yml   # Execution state and progress
-├── spec.md                # Initiative goals, success criteria
-├── task-plan.md           # Dependency graph, milestones
-├── verification-report.md # Phase 4 output
-└── summary.md             # Phase 5 output
+├── initiative.yml              # Task list, dependencies, metadata
+├── initiative-state.yml        # Execution state and progress
+├── spec.md                     # Initiative goals, success criteria
+├── task-plan.md                # Dependency graph, milestones
+├── verification-report.md      # Phase 4 output
+└── summary.md                  # Phase 5 output
 
 .ai-sdlc/tasks/[type]/YYYY-MM-DD-task-name/
-├── orchestrator-state.yml # Includes initiative_id, dependencies, blocks in task: section
-├── implementation/spec.md # Task specification (placeholder then full)
-└── ...                    # Standard task structure
+├── orchestrator-state.yml      # Includes initiative_id, dependencies
+├── implementation/spec.md      # Task specification
+└── ...                         # Standard task structure
 ```
+
+---
+
+## Integration with Task Orchestrators
+
+Task orchestrators add **Phase 0: Dependency Check** when part of an initiative:
+
+1. Read task `orchestrator-state.yml`
+2. If `task.initiative_id` exists:
+   - Check all dependencies have `task.status: completed`
+   - If any dependency not completed: BLOCK task, exit
+3. If no `initiative_id`: Skip check (standalone task)
+
+---
+
+## Auto-Recovery
+
+| Phase | Max Attempts | Strategy |
+|-------|--------------|----------|
+| 0 | 2 | Re-run planner if circular deps or task count issues |
+| 1 | 3 | Skip existing directories, map invalid types |
+| 2 | 2 | Remove invalid dependencies, fail if no Level 0 tasks |
+| 3 | Delegated | Task orchestrators handle their own recovery |
+| 4 | 2 | Return to Phase 3 if not all tasks complete |
+| 5 | 3 | Skip roadmap update if file not found |
 
 ---
 
@@ -579,17 +331,3 @@ Initiative directory: `.ai-sdlc/docs/project/initiatives/YYYY-MM-DD-name/`
 - **Execution**: Sequential (one task at a time)
 - **Dependency Depth**: Warn if >6 levels (very long critical path)
 - **Phase Boundaries**: Always save state at phase boundaries
-
----
-
-## Success Criteria
-
-Initiative orchestration successful when:
-
-- All tasks completed or accounted for (completed/blocked/skipped)
-- Dependencies enforced throughout execution
-- Verification reports show passed or passed-with-issues
-- Initiative summary created with metrics
-- Roadmap updated (if exists)
-- Full pause/resume capability maintained
-- No data loss on interruption

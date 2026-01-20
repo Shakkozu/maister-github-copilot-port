@@ -7,86 +7,51 @@ description: Orchestrates end-user documentation creation workflows with content
 
 Systematic documentation creation workflow from planning to published, user-ready documentation.
 
-## MANDATORY Initialization (Before Any Phase Work)
+## Initialization
 
-**CRITICAL: You MUST complete these steps BEFORE executing any workflow phase:**
+**BEFORE executing any phase, you MUST complete these steps:**
 
-### Step 0: Load Framework Patterns
+### Step 1: Load Framework Patterns
 
-**STOP. You MUST read these files NOW using the Read tool before continuing:**
+**Read ALL framework reference files NOW using the Read tool:**
 
-1. `../orchestrator-framework/references/phase-execution-pattern.md` - 7-step phase loop
-2. `../orchestrator-framework/references/delegation-enforcement.md` - Delegation patterns and subagent result handling
-3. `../orchestrator-framework/references/interactive-mode.md` - Phase gates and AUTO-CONTINUE
-4. `../orchestrator-framework/references/state-management.md` - State file operations
+1. `../orchestrator-framework/references/phase-execution-pattern.md`
+2. `../orchestrator-framework/references/interactive-mode.md`
+3. `../orchestrator-framework/references/delegation-enforcement.md`
+4. `../orchestrator-framework/references/state-management.md`
+5. `../orchestrator-framework/references/initialization-pattern.md`
+6. `../orchestrator-framework/references/issue-resolution-pattern.md`
 
-**⚠️ FAILURE TO READ THESE FILES IS A WORKFLOW VIOLATION.**
+### Step 2: Initialize Workflow
 
-These patterns define:
-- How to execute each phase (7-step loop)
-- How to delegate to skills (mandatory patterns)
-- When to auto-continue vs pause (Phase Gates and ⚡ AUTO)
-- How to consume subagent results and continue workflow
-- How to manage orchestrator-state.yml
+1. **Create TodoWrite**: Initialize todos for all phases (see Phase Configuration)
+2. **Create Task Directory**: `.ai-sdlc/tasks/documentation/YYYY-MM-DD-task-name/`
+3. **Initialize State**: Create `orchestrator-state.yml` with mode and documentation context
 
-**SELF-CHECK:**
-- [ ] Did you use the Read tool to read all 4 files?
-- [ ] Do you understand the AUTO-CONTINUE pattern in interactive-mode.md?
-- [ ] Do you understand Pattern 6 (Consuming Subagent Results) in delegation-enforcement.md?
-
-If NO to any: STOP and read the files now.
-
-### Step 1: Create TodoWrite with All Phases
-
-**Immediately use the TodoWrite tool** to create todos for all phases:
-
-```
-Use TodoWrite tool with todos:
-[
-  {"content": "Plan documentation structure", "status": "pending", "activeForm": "Planning documentation structure"},
-  {"content": "Create content with screenshots", "status": "pending", "activeForm": "Creating content with screenshots"},
-  {"content": "Review and validate", "status": "pending", "activeForm": "Reviewing and validating"},
-  {"content": "Resolve documentation issues", "status": "pending", "activeForm": "Resolving documentation issues"},
-  {"content": "Publish and integrate", "status": "pending", "activeForm": "Publishing and integrating"}
-]
-```
-
-Note: Phase 2.5 (Issue Resolution) runs conditionally if review finds fixable issues.
-
-### Step 2: Output Initialization Summary
-
-**Output this summary to the user:**
-
+**Output**:
 ```
 🚀 Documentation Orchestrator Started
 
-Task: [documentation request description]
+Task: [documentation description]
 Mode: [Interactive/YOLO]
 Directory: [task-path]
-
-Workflow phases:
-[Todos list with status]
-
-[Interactive mode] You'll be prompted for review after each phase.
-[YOLO mode] All phases will run continuously.
 
 Starting Phase 0: Plan documentation structure...
 ```
 
-### Step 3: Only Then Proceed to Phase 0
-
-After completing Steps 0-2, proceed to Phase 0 (Documentation Planning & Audience Analysis).
-
 ---
 
-## When to Use This Skill
+## When to Use
 
-Use when:
-- Need to document new features for users
+Use for:
+- Documenting new features for users
 - Creating user guides, tutorials, or FAQ sections
-- Updating existing documentation with screenshots
-- Want systematic documentation workflow with quality validation
+- Updating documentation with screenshots
 - Building API documentation or reference guides
+
+**DO NOT use for**: README files, code comments, technical specs, or changelog entries.
+
+---
 
 ## Core Principles
 
@@ -98,18 +63,6 @@ Use when:
 
 ---
 
-## Local References
-
-Read these during relevant phases:
-
-| File | When to Use | Purpose |
-|------|-------------|---------|
-| `references/documentation-types.md` | Phase 0 | Structure patterns by doc type (user guide, tutorial, reference, FAQ, API) |
-| `references/writing-guidelines.md` | Phase 1 | Tone, voice, clarity guidelines with examples |
-| `references/screenshot-strategies.md` | Phase 1 | Browser automation patterns and image optimization |
-
----
-
 ## Phase Configuration
 
 | Phase | content | activeForm | Agent/Skill |
@@ -117,15 +70,8 @@ Read these during relevant phases:
 | 0 | "Plan documentation structure" | "Planning documentation structure" | documentation-planner |
 | 1 | "Create content with screenshots" | "Creating content with screenshots" | user-docs-generator |
 | 2 | "Review and validate" | "Reviewing and validating" | documentation-reviewer |
-| 2.5 | "Resolve documentation issues" | "Resolving documentation issues" | orchestrator (conditional) |
-| 3 | "Publish and integrate" | "Publishing and integrating" | orchestrator |
-
-**Workflow Overview**: 4-5 phases (Phase 2.5 runs if review finds fixable issues)
-
-**CRITICAL TodoWrite Usage**:
-1. At workflow start: Create todos for ALL phases using the Phase Configuration table above (all status=pending)
-2. Before each phase: Update that phase to status=in_progress
-3. After each phase: Update that phase to status=completed
+| 2.5 | "Resolve documentation issues" | "Resolving documentation issues" | Direct (conditional) |
+| 3 | "Publish and integrate" | "Publishing and integrating" | Direct |
 
 ---
 
@@ -133,345 +79,91 @@ Read these during relevant phases:
 
 ### Phase 0: Documentation Planning & Audience Analysis
 
-**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+**Purpose**: Classify doc type, identify audience, create structured outline
+**Execute**: Task tool - `ai-sdlc:documentation-planner` subagent
+**Output**: `planning/documentation-outline.md`
+**State**: Update `documentation_context.doc_type`, `target_audience`, `tone`
 
-❌ WRONG: Reading agents/documentation-planner.md and following its instructions directly
-❌ WRONG: Planning documentation structure inline in the orchestrator thread
-❌ WRONG: Creating the documentation outline yourself
+→ Pause
 
-✅ RIGHT: Using the Task tool below and waiting for completion
-
-**Output before invoking:**
-```
-📤 Delegating Phase 0 to: documentation-planner subagent
-Method: Task tool
-Expected outputs: planning/documentation-outline.md
-```
-
-**INVOKE NOW:**
-
-Tool: `Task`
-Parameters:
-  subagent_type: "ai-sdlc:documentation-planner"
-  description: "Plan documentation structure"
-  prompt: |
-    You are the documentation-planner agent. Analyze documentation requirements
-    and create structured content outline.
-
-    Documentation Request: [user description]
-    Task directory: [task-path]
-
-    Please:
-    1. Classify documentation type (user guide, tutorial, reference, FAQ, API docs)
-    2. Identify target audience (end users, developers, admins, power users)
-    3. Determine appropriate tone and complexity level
-    4. Create detailed content outline with sections
-    5. Identify required screenshots and visual examples
-    6. Estimate documentation scope (pages, screenshots, time)
-    7. Generate comprehensive documentation plan
-
-    Save to: planning/documentation-outline.md
-    Use only Read, Grep, Glob, and Bash tools. Do NOT modify code.
-
-⏳ Wait for subagent completion before continuing.
-
-**Outputs**: `planning/documentation-outline.md`
-
-**SELF-CHECK (before proceeding to Phase 1):**
-- [ ] Did you invoke the Task tool? (not just read the agent file)
-- [ ] Did you wait for the tool to return results?
-- [ ] Is `planning/documentation-outline.md` present?
-
-If NO to any: STOP - go back and invoke the Task tool.
-
-**Success**: Doc type classified, audience identified, outline complete with screenshot requirements
-
----
-
-## 🚦 GATE: Phase 0 → Phase 1
-
-**STOP. You cannot proceed until this gate clears.**
-
-1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
-2. **If mode = interactive**:
-   - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 0 (Plan documentation structure) complete. Ready to proceed to Phase 1 (Create content with screenshots)?"
-     - Options: ["Continue to Phase 1", "Review Phase 0 outputs", "Stop workflow"]
-   - Wait for user response before continuing
-3. **If mode = yolo**:
-   - Output: "→ Auto-continuing to Phase 1 (Create content with screenshots)..."
-   - Proceed to Phase 1
-
-**This gate overrides any "continue without asking" conversation instructions.**
+**Interactive**: AskUserQuestion - "Documentation outline complete. Continue to content creation?"
+**YOLO**: "→ Continuing to Phase 1..."
 
 ---
 
 ### Phase 1: Content Creation with Screenshots
 
-**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+**Purpose**: Generate documentation content with Playwright screenshots
+**Execute**: Task tool - `ai-sdlc:user-docs-generator` subagent
+**Output**: `documentation/user-guide.md`, `documentation/screenshots/*.png`
+**State**: Update `documentation_context.content_created`, `screenshot_count`
 
-❌ WRONG: Reading agents/user-docs-generator.md and following its instructions directly
-❌ WRONG: Writing documentation content inline in the orchestrator thread
-❌ WRONG: Capturing screenshots yourself
+→ Pause
 
-✅ RIGHT: Using the Task tool below and waiting for completion
-
-**Output before invoking:**
-```
-📤 Delegating Phase 1 to: user-docs-generator subagent
-Method: Task tool
-Expected outputs: documentation/user-guide.md, documentation/screenshots/
-```
-
-**INVOKE NOW:**
-
-Tool: `Task`
-Parameters:
-  subagent_type: "ai-sdlc:user-docs-generator"
-  description: "Create content with screenshots"
-  prompt: |
-    You are the user-docs-generator agent. Generate documentation content
-    with screenshots using the structured outline.
-
-    Task directory: [task-path]
-    Input: planning/documentation-outline.md
-
-    Please:
-    1. Read documentation outline and requirements
-    2. Identify user-facing workflows from outline
-    3. Generate content following outline structure
-    4. Capture clear screenshots using Playwright for each step
-    5. Write step-by-step instructions in appropriate tone
-    6. Include realistic examples with proper data
-    7. Add tips, warnings, and best practices
-    8. Create comprehensive user documentation
-
-    Save to: documentation/[doc-filename].md
-    Screenshots: documentation/screenshots/
-    Use Read, Write, Bash, and Playwright tools for screenshot capture.
-
-⏳ Wait for subagent completion before continuing.
-
-**Outputs**:
-- `documentation/user-guide.md` (or appropriate filename)
-- `documentation/screenshots/*.png`
-
-**SELF-CHECK (before proceeding to Phase 2):**
-- [ ] Did you invoke the Task tool? (not just read the agent file)
-- [ ] Did you wait for the tool to return results?
-- [ ] Is `documentation/user-guide.md` (or equivalent) present?
-
-If NO to any: STOP - go back and invoke the Task tool.
-
-**Success**: All sections written, screenshots captured, examples included
-
----
-
-## 🚦 GATE: Phase 1 → Phase 2
-
-**STOP. You cannot proceed until this gate clears.**
-
-1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
-2. **If mode = interactive**:
-   - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 1 (Create content with screenshots) complete. Ready to proceed to Phase 2 (Review and validate)?"
-     - Options: ["Continue to Phase 2", "Review Phase 1 outputs", "Stop workflow"]
-   - Wait for user response before continuing
-3. **If mode = yolo**:
-   - Output: "→ Auto-continuing to Phase 2 (Review and validate)..."
-   - Proceed to Phase 2
-
-**This gate overrides any "continue without asking" conversation instructions.**
+**Interactive**: AskUserQuestion - "Content created. Continue to review?"
+**YOLO**: "→ Continuing to Phase 2..."
 
 ---
 
 ### Phase 2: Review & Validation
 
-**⚠️ DELEGATION REQUIRED - DO NOT EXECUTE INLINE**
+**Purpose**: Validate completeness and readability with metrics
+**Execute**: Task tool - `ai-sdlc:documentation-reviewer` subagent
+**Output**: `verification/documentation-review.md` with PASS/FAIL verdict
+**State**: Update `documentation_context.verdict`, `readability_score`
 
-❌ WRONG: Reading agents/documentation-reviewer.md and following its instructions directly
-❌ WRONG: Reviewing documentation inline in the orchestrator thread
-❌ WRONG: Creating review report yourself
+**Verdict Criteria**:
+- **PASS**: All sections present, readability targets met, screenshots valid
+- **PASS with Issues**: Minor issues but usable
+- **FAIL**: Missing sections, poor readability (<50 ease), broken links
 
-✅ RIGHT: Using the Task tool below and waiting for completion
-
-**Output before invoking:**
-```
-📤 Delegating Phase 2 to: documentation-reviewer subagent
-Method: Task tool
-Expected outputs: verification/documentation-review.md
-```
-
-**INVOKE NOW:**
-
-Tool: `Task`
-Parameters:
-  subagent_type: "ai-sdlc:documentation-reviewer"
-  description: "Review and validate"
-  prompt: |
-    You are the documentation-reviewer agent. Validate documentation
-    completeness and readability.
-
-    Task directory: [task-path]
-    Inputs:
-    - planning/documentation-outline.md
-    - documentation/[doc-filename].md
-
-    Please:
-    1. Check completeness (all sections from outline present)
-    2. Calculate readability metrics (Flesch Reading Ease, Grade Level)
-    3. Validate screenshots exist and are clear
-    4. Check for broken links and references
-    5. Flag technical jargon (recommend simplification)
-    6. Verify examples are clear and realistic
-    7. Assess overall clarity and usefulness
-    8. Generate review report with PASS/FAIL verdict
-
-    Save to: verification/documentation-review.md
-    Use only Read, Grep, Glob, and Bash tools. Do NOT modify content.
-
-    Verdict Criteria:
-    - PASS: All sections present, readability targets met, screenshots valid
-    - PASS with Issues: Minor issues but usable
-    - FAIL: Missing sections, poor readability (<50 ease), broken links
-
-⏳ Wait for subagent completion before continuing.
-
-**Outputs**: `verification/documentation-review.md` with verdict
-
-**SELF-CHECK (before proceeding to Phase 3):**
-- [ ] Did you invoke the Task tool? (not just read the agent file)
-- [ ] Did you wait for the tool to return results?
-- [ ] Is `verification/documentation-review.md` present?
-
-If NO to any: STOP - go back and invoke the Task tool.
-
-**Gate**: Cannot proceed to Phase 3 if verdict = FAIL
-
----
-
-## 🚦 GATE: Phase 2 → Phase 2.5 or Phase 3
-
-**STOP. You cannot proceed until this gate clears.**
-
-**Check review result from `documentation_context.verdict`:**
-
-1. **If verdict = "PASS"**: Skip Phase 2.5, go directly to Phase 3
-2. **If verdict = "PASS with Issues"**: Enter Issue Resolution (Phase 2.5)
-3. **If verdict = "FAIL"**: Check for fixable issues
-   - If fixable issues exist AND `verification_context.reverify_count` < 3: Enter Phase 2.5
-   - Otherwise: STOP workflow, report failures to user
-
-**Mode check (if proceeding to Phase 3 directly):**
-1. Read `orchestrator-state.yml` → check `mode` value
-2. **If mode = interactive**:
-   - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 2 (Review and validate) passed. Ready to proceed to Phase 3 (Publish and integrate)?"
-     - Options: ["Continue to Phase 3", "Review Phase 2 outputs", "Stop workflow"]
-   - Wait for user response before continuing
-3. **If mode = yolo**:
-   - Output: "→ Auto-continuing to Phase 3 (Publish and integrate)..."
-   - Proceed to Phase 3
-
-**This gate overrides any "continue without asking" conversation instructions.**
+→ Conditional: if verdict=PASS skip to Phase 3, if verdict="PASS with Issues" or fixable FAIL continue to Phase 2.5, otherwise stop workflow
 
 ---
 
 ### Phase 2.5: Documentation Issue Resolution (Conditional)
 
-**When to execute**: Review returned "PASS with Issues" or "FAIL" with fixable issues
+**Purpose**: Fix issues identified in review through direct editing
+**Execute**: Direct - apply fixes, re-verify with documentation-reviewer
+**Output**: Updated documentation, `verification_context.fixes_applied`
+**State**: Update `verification_context.reverify_count`, `decisions_made`
 
-**Reference**: See `../orchestrator-framework/references/issue-resolution-pattern.md` for detailed pattern.
+**Skip if**: verdict = PASS
 
-**Process Overview**:
+**Process**:
+1. Parse issues from review (categorize: auto-fixable, needs decision, not fixable)
+2. Apply auto-fixes (typos, formatting, broken links, missing alt text)
+3. For user decisions: AskUserQuestion with options
+4. Re-verify after fixes (max 3 iterations)
 
-1. **Parse Structured Output** from documentation-reviewer:
-   - Extract `issues[]` array with severity, source, fixable status
-   - Note `issue_counts` (critical, warning, info)
-   - Check `metrics` (completeness, readability, screenshots, broken_links)
+**Exit Conditions**:
+- ✅ New verdict = PASS → Proceed to Phase 3
+- ⚠️ Max iterations (3) reached → Ask user: publish with warnings or stop
+- ❌ Critical issues remain → Report to user, recommend revision
 
-2. **Categorize Issues**:
-   - **Auto-fixable**: Typos, formatting issues, broken internal links, simple rewording, missing alt text
-   - **User decision needed**: Screenshot retakes, content restructuring, tone adjustments
-   - **Not fixable here**: Missing sections (need content creation), structural reorganization
+→ Pause
 
-3. **For Each Fixable Issue**:
-   - If auto-fixable: Apply fix directly
-   - If needs user decision: Use `AskUserQuestion`:
-     ```
-     Question: "Documentation issue: [description]. How to proceed?"
-     Options:
-     - "Apply suggested fix" (if fix is clear)
-     - "Skip this issue" (accept as-is)
-     - "Stop and revise" (need manual content work)
-     ```
-
-4. **Track Progress**:
-   ```yaml
-   verification_context:
-     last_status: "passed_with_issues"
-     issues_found: [count]
-     fixes_applied: [list of applied fixes]
-     decisions_made:
-       - issue: "[description]"
-         decision: "fix" | "skip" | "defer"
-     reverify_count: [0-3]
-   ```
-
-5. **Re-verify**: After applying fixes, invoke documentation-reviewer again (increment `reverify_count`)
-
-6. **Exit Conditions**:
-   - ✅ New verdict = "PASS" → Proceed to Phase 3
-   - ⚠️ Max iterations (3) reached → Ask user: publish with warnings or stop
-   - ❌ Critical issues remain → Report to user, recommend revision
-
-**State Update**: After Issue Resolution:
-- Update `verification_context.reverify_count`
-- Update `verification_context.fixes_applied` with list of fixes
-- Update `documentation_context.verdict` with new verdict
-
----
-
-## 🚦 GATE: Phase 2.5 → Phase 3
-
-**STOP. You cannot proceed until this gate clears.**
-
-1. **Mode check**: Read `orchestrator-state.yml` → check `mode` value
-2. **If mode = interactive**:
-   - Use `AskUserQuestion` tool NOW:
-     - Question: "Phase 2.5 (Issue Resolution) complete. [N] issues fixed. Ready to proceed to Phase 3 (Publish and integrate)?"
-     - Options: ["Continue to Phase 3", "Review resolution results", "Stop workflow"]
-   - Wait for user response before continuing
-3. **If mode = yolo**:
-   - Output: "→ Auto-continuing to Phase 3 (Publish and integrate)..."
-   - Proceed to Phase 3
-
-**This gate overrides any "continue without asking" conversation instructions.**
+**Interactive**: AskUserQuestion - "Issues resolved. Continue to publication?"
+**YOLO**: "→ Continuing to Phase 3..."
 
 ---
 
 ### Phase 3: Publication & Integration
 
-**Execution**: Main orchestrator (direct)
-
-**Prerequisites**: Phase 2 verdict = PASS or PASS with Issues
+**Purpose**: Format, integrate, and publish documentation
+**Execute**: Direct - format, generate TOC, copy to target location
+**Output**: Published docs, `verification/publication-summary.md`
+**State**: Set `publication.integrated: true`, `publication.validated: true`
 
 **Process**:
+1. Format for target platform (markdown standards, image paths)
+2. Generate table of contents with anchor links
+3. Add navigation links (previous/next)
+4. Copy to publication location
+5. Validate publication (files, links, images work)
+6. Generate publication summary
 
-1. **Format for Target Platform** - Apply markdown standards, validate image paths
-2. **Generate Table of Contents** - Create TOC with anchor links
-3. **Add Navigation Links** - Previous/next page navigation
-4. **Integrate with Docs Structure** - Update documentation index
-5. **Copy to Publication Location** - Move to target directory, update paths
-6. **Validate Publication** - Verify files, links, and images work
-7. **Generate Summary** - Create `verification/publication-summary.md`
-
-**Outputs**:
-- Published documentation in target location
-- Updated documentation index
-- `verification/publication-summary.md`
-
-**Success**: Documentation published, integrated, validated
+→ End of workflow
 
 ---
 
@@ -487,30 +179,44 @@ documentation_context:
   readability_target:
     ease: [60-80 for users, 50-60 for devs]
     grade: [6-8 for users, 9-10 for devs]
-  screenshot_count: [number]
+  screenshot_count: null
   content_created: false
   review_passed: false
   readability_score:
-    ease: [actual score]
-    grade: [actual grade]
-  verdict: "PASS" | "PASS with Issues" | "FAIL"
+    ease: null
+    grade: null
+  verdict: null
 
 verification_context:
-  last_status: "passed" | "passed_with_issues" | "failed"
-  issues_found: [count]
-  fixes_applied: []          # List of applied fixes
-  decisions_made: []         # User decisions on issues
-  reverify_count: 0          # 0-3, max iterations
-
-options:
-  skip_screenshots: false
-  custom_publication_path: null
+  last_status: null
+  issues_found: null
+  fixes_applied: []
+  decisions_made: []
+  reverify_count: 0
 
 publication:
-  location: [path]
+  location: null
   format: "markdown"
   integrated: false
   validated: false
+```
+
+---
+
+## Task Structure
+
+```
+.ai-sdlc/tasks/documentation/YYYY-MM-DD-task-name/
+├── orchestrator-state.yml
+├── planning/
+│   └── documentation-outline.md     # Phase 0
+├── documentation/
+│   ├── user-guide.md                # Phase 1
+│   └── screenshots/                 # Phase 1
+├── verification/
+│   ├── documentation-review.md      # Phase 2
+│   └── publication-summary.md       # Phase 3
+└── [published location]             # Phase 3
 ```
 
 ---
@@ -519,10 +225,11 @@ publication:
 
 | Phase | Max Attempts | Strategy |
 |-------|--------------|----------|
-| 0 | 2 | Prompt user if doc type unclear, use conservative estimates |
-| 1 | 3 | Retry failed screenshots, fix formatting, adjust tone |
-| 2 | 0 | Read-only, report only (no auto-fix) |
-| 3 | 1 | Fix formatting issues, regenerate TOC, retry copy |
+| 0 | 2 | Prompt user if doc type unclear |
+| 1 | 3 | Retry failed screenshots, fix formatting |
+| 2 | 0 | Read-only, report only |
+| 2.5 | 3 | Fix-then-reverify cycles |
+| 3 | 1 | Fix formatting, regenerate TOC |
 
 ---
 
@@ -555,18 +262,3 @@ Invoked via:
 - `/ai-sdlc:documentation:resume [task-path]`
 
 Task directory: `.ai-sdlc/tasks/documentation/YYYY-MM-DD-task-name/`
-
----
-
-## Success Criteria
-
-Workflow successful when:
-
-- Documentation type classified and audience identified
-- Complete content outline with all sections planned
-- Content written in appropriate tone for audience
-- All screenshots captured and properly referenced
-- Readability metrics met (Flesch Ease, Grade Level targets)
-- No broken links or references
-- Technical jargon explained or simplified
-- Documentation published and integrated
