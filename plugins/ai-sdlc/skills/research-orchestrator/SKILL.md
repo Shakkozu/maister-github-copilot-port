@@ -79,7 +79,6 @@ Use when:
 | 0 | "Initialize research" | "Initializing research" | Direct |
 | 1 | "Plan research methodology" | "Planning research methodology" | research-planner |
 | 2 | "Gather information (parallel)" | "Gathering information in parallel" | information-gatherer (x4) |
-| 2.5 | "Merge findings" | "Merging findings" | Direct |
 | 3 | "Analyze and synthesize" | "Analyzing and synthesizing" | research-synthesizer |
 | 4 | "Generate outputs" | "Generating outputs" | Direct |
 | 5 | "Verify findings" | "Verifying findings" | Direct (optional) |
@@ -136,12 +135,15 @@ Use when:
 
 ---
 
-### Phase 2: Information Gathering (Parallel)
+### Phase 2: Information Gathering & Merge
 
-**Purpose**: Gather information from all identified sources in parallel
-**Execute**: Task tool - 4 parallel `ai-sdlc:information-gatherer` subagents
-**Output**: `analysis/findings/codebase-*.md`, `docs-*.md`, `config-*.md`, `external-*.md`
-**State**: Track gathering progress
+**Purpose**: Gather information from all sources in parallel, then consolidate into summary
+**Execute**:
+1. Task tool - 4 parallel `ai-sdlc:information-gatherer` subagents
+2. Wait for ALL agents to complete
+3. Direct - read all findings, create unified summary and verification
+**Output**: `analysis/findings/codebase-*.md`, `docs-*.md`, `config-*.md`, `external-*.md`, `analysis/findings/00-summary.md`, `analysis/findings/99-verification.md`
+**State**: Track gathering progress, update findings summary
 
 **CRITICAL: Launch all 4 agents in ONE message for parallel execution.**
 
@@ -160,18 +162,7 @@ Use Task tool 4 times in ONE message:
 - Task 4: source_category=external → analysis/findings/external-*.md
 ```
 
-Wait for ALL agents to complete before continuing.
-
-→ Continue to Phase 2.5 (merge must happen immediately)
-
----
-
-### Phase 2.5: Merge Findings
-
-**Purpose**: Consolidate parallel gathering results into summary and verification
-**Execute**: Direct - read all findings, create unified summary
-**Output**: `analysis/findings/00-summary.md`, `analysis/findings/99-verification.md`
-**State**: Update findings summary
+**After all agents complete, merge findings:**
 
 **Summary Structure** (`00-summary.md`):
 - Research question (from brief)
@@ -188,7 +179,7 @@ Wait for ALL agents to complete before continuing.
 
 → Pause
 
-**Interactive**: AskUserQuestion - "Findings merged. Continue to synthesis?"
+**Interactive**: AskUserQuestion - "Findings gathered and merged. Continue to synthesis?"
 **YOLO**: "→ Continuing to Phase 3..."
 
 ---
@@ -330,8 +321,8 @@ options:
 │   └── sources.md                  # Phase 1
 ├── analysis/
 │   ├── findings/
-│   │   ├── 00-summary.md           # Phase 2.5
-│   │   ├── 99-verification.md      # Phase 2.5
+│   │   ├── 00-summary.md           # Phase 2 (merge step)
+│   │   ├── 99-verification.md      # Phase 2 (merge step)
 │   │   ├── codebase-*.md           # Phase 2
 │   │   ├── docs-*.md               # Phase 2
 │   │   ├── config-*.md             # Phase 2
@@ -355,7 +346,7 @@ options:
 | 0 | 1 | Prompt user for clarification if question unclear |
 | 1 | 2 | Expand search patterns, use fallback mixed methodology |
 | 2 | 3 | Retry failed agents only, continue with successful categories |
-| 2.5 | 2 | Merge available findings, note missing categories |
+| 2 | 2 | Merge available findings, note missing categories |
 | 3 | 2 | Request targeted re-gathering for gaps |
 | 4 | 2 | Generate standard outputs, ask user in interactive |
 | 5 | 0 | Read-only, report only |

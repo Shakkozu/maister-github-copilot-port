@@ -82,22 +82,18 @@ Use for **all development tasks**:
 | Phase | content | activeForm | Task Types |
 |-------|---------|------------|------------|
 | 0 | "Check dependencies" | "Checking dependencies" | All (if initiative) |
-| 1 | "Analyze codebase" | "Analyzing codebase" | All |
-| 1.5 | "Clarify requirements" | "Clarifying requirements" | All |
-| 2 | "Analyze gaps" | "Analyzing gaps" | All |
+| 1 | "Analyze codebase & clarify requirements" | "Analyzing codebase & clarifying" | All |
+| 2 | "Analyze gaps & clarify scope" | "Analyzing gaps & clarifying scope" | All |
 | 3 | "Write failing test (TDD Red)" | "Writing failing test" | Bug only |
-| 3.5 | "Clarify scope & approach" | "Clarifying scope & approach" | All (if needs_clarification) |
 | 4 | "Generate UI mockups" | "Generating UI mockups" | Enhancement, Feature (if ui_heavy) |
-| 4.5 | "Clarify technical approach" | "Clarifying technical approach" | All (if complex) |
-| 5 | "Create specification" | "Creating specification" | All |
+| 5 | "Clarify technical approach & create specification" | "Creating specification" | All |
 | 5.5 | "Decide architecture" | "Deciding architecture" | Feature, Enhancement (conditional) |
 | 6 | "Audit specification" | "Auditing specification" | All (conditional) |
 | 7 | "Plan implementation" | "Planning implementation" | All |
 | 8 | "Execute implementation" | "Executing implementation" | All |
 | 9 | "Verify test passes (TDD Green)" | "Verifying test passes" | Bug only |
 | 10 | "Prompt verification options" | "Prompting verification options" | All |
-| 11 | "Verify implementation" | "Verifying implementation" | All |
-| 11.5 | "Resolve verification issues" | "Resolving verification issues" | All (if issues found) |
+| 11 | "Verify implementation & resolve issues" | "Verifying implementation" | All |
 | 12 | "Run E2E tests" | "Running E2E tests" | Optional |
 | 13 | "Generate user documentation" | "Generating user documentation" | Optional |
 | 14 | "Finalize workflow" | "Finalizing workflow" | All |
@@ -122,43 +118,42 @@ Use for **all development tasks**:
 
 ---
 
-### Phase 1: Codebase Analysis
+### Phase 1: Codebase Analysis & Clarifications
 
-**Purpose**: Comprehensive codebase exploration using parallel subagents
-**Execute**: Skill tool - `ai-sdlc:codebase-analyzer`
-**Output**: `analysis/codebase-analysis.md`
-**State**: Update `task_context.risk_level`, `phase_summaries.codebase_analysis`
+**Purpose**: Comprehensive codebase exploration followed by scope/requirements clarification
+**Execute**:
+1. Skill tool - `ai-sdlc:codebase-analyzer`
+2. Update state with analysis results
+3. Direct - use AskUserQuestion for max 5 critical clarifying questions
+4. Save clarifications to `analysis/clarifications.md`
+**Output**: `analysis/codebase-analysis.md`, `analysis/clarifications.md`
+**State**: Update `task_context.risk_level`, `phase_summaries.codebase_analysis`, `task_context.clarifications_resolved`
 
-→ Continue to Phase 1.5 (clarifying questions handles user interaction)
-
----
-
-### Phase 1.5: Clarifying Questions
-
-**Purpose**: Resolve scope and requirements ambiguities BEFORE gap analysis
-**Execute**: Direct - use AskUserQuestion for max 5 critical questions
-**Output**: `analysis/clarifications.md`
-**State**: Set `task_context.clarifications_resolved: true`
-
-**YOLO Mode**: Accept all recommended defaults
+**YOLO Mode**: Accept all recommended defaults for clarifications
 
 → Pause
 
-**Interactive**: AskUserQuestion - "Clarifications complete. Continue to Phase 2?"
+**Interactive**: AskUserQuestion - "Analysis and clarifications complete. Continue to Phase 2?"
 **YOLO**: "→ Continuing to Phase 2..."
 
 ---
 
-### Phase 2: Gap Analysis
+### Phase 2: Gap Analysis & Scope Clarification
 
-**Purpose**: Compare current vs desired state systematically
-**Execute**: Task tool - `ai-sdlc:gap-analyzer` subagent
-**Output**: `analysis/gap-analysis.md`
-**State**: Update `task_context.ui_heavy`, `task_context.needs_clarification`, `options.e2e_enabled`
+**Purpose**: Compare current vs desired state, then resolve scope/approach decisions
+**Execute**:
+1. Task tool - `ai-sdlc:gap-analyzer` subagent
+2. Update state with gap analysis results
+3. If `needs_clarification = true`: Direct - use AskUserQuestion for scope/approach decisions
+4. Save scope clarifications to `analysis/scope-clarifications.md`
+**Output**: `analysis/gap-analysis.md`, `analysis/scope-clarifications.md` (conditional)
+**State**: Update `task_context.ui_heavy`, `task_context.needs_clarification`, `task_context.scope_expanded`, `options.e2e_enabled`
 
 **Context to pass**: Risk level, codebase summary, key files, clarifications
 
-→ Conditional: if task_type=bug then continue to Phase 3, else skip to Phase 3.5 evaluation
+**YOLO Mode**: Accept all recommended defaults for scope decisions
+
+→ Conditional: if task_type=bug then continue to Phase 3, else skip to Phase 4
 
 ---
 
@@ -173,24 +168,9 @@ Use for **all development tasks**:
 
 **Critical**: Test MUST fail before implementation (proves bug exists)
 
-→ Continue to Phase 3.5 evaluation
-
----
-
-### Phase 3.5: Clarify Scope & Approach (Conditional)
-
-**Purpose**: Resolve scope and approach decisions before specification
-**Execute**: Direct - use AskUserQuestion for critical decisions
-**Output**: `analysis/scope-clarifications.md`
-**State**: Set `task_context.clarifications_complete: true`, `task_context.scope_expanded`
-
-**Skip if**: `needs_clarification = false` (no decisions needed, no scope expansion, not UI-heavy)
-
-**YOLO Mode**: Accept all recommended defaults/recommendations
-
 → Pause
 
-**Interactive**: AskUserQuestion - "Scope clarified. Continue to Phase 4?"
+**Interactive**: AskUserQuestion - "TDD red gate complete. Continue to Phase 4?"
 **YOLO**: "→ Continuing to Phase 4..."
 
 ---
@@ -206,34 +186,26 @@ Use for **all development tasks**:
 
 **Context to pass**: Gap analysis, scope decisions, component choices
 
-→ Continue to Phase 4.5 evaluation
-
----
-
-### Phase 4.5: Clarify Technical Approach (Conditional)
-
-**Purpose**: Resolve technical decisions before specification
-**Execute**: Direct - use AskUserQuestion for max 3-5 technical questions
-**Output**: `analysis/technical-clarifications.md`
-**State**: Set `task_context.tech_clarified: true`
-
-**Skip if**: Simple task, risk_level = low, no multiple approaches detected
-
-**YOLO Mode**: Accept all recommended defaults
-
 → Pause
 
-**Interactive**: AskUserQuestion - "Technical approach clarified. Continue to Phase 5?"
+**Interactive**: AskUserQuestion - "UI mockups complete. Continue to Phase 5?"
 **YOLO**: "→ Continuing to Phase 5..."
 
 ---
 
-### Phase 5: Specification
+### Phase 5: Technical Approach & Specification
 
-**Purpose**: Create comprehensive specification document
-**Execute**: Skill tool - `ai-sdlc:specification-creator`
-**Output**: `implementation/spec.md`, `implementation/requirements.md`
-**State**: Update `phase_summaries.specification`
+**Purpose**: Resolve technical decisions, then create comprehensive specification
+**Execute**:
+1. If complex task with multiple approaches: Direct - use AskUserQuestion for 3-5 technical questions
+2. Save to `analysis/technical-clarifications.md` (conditional)
+3. Skill tool - `ai-sdlc:specification-creator`
+**Output**: `analysis/technical-clarifications.md` (conditional), `implementation/spec.md`, `implementation/requirements.md`
+**State**: Update `task_context.tech_clarified`, `phase_summaries.specification`
+
+**Skip technical clarification if**: Simple task, risk_level = low, no multiple approaches detected
+
+**YOLO Mode**: Accept recommended technical defaults
 
 → Pause
 
@@ -338,31 +310,19 @@ Use for **all development tasks**:
 
 ---
 
-### Phase 11: Verification
+### Phase 11: Verification & Issue Resolution
 
-**Purpose**: Comprehensive implementation verification
-**Execute**: Skill tool - `ai-sdlc:implementation-verifier`
-**Output**: `verification/implementation-verification.md`, optional code-review/pragmatic/reality reports
-**State**: Update verification results
-
-→ Continue to Phase 11.5 (issue resolution handles interaction)
-
----
-
-### Phase 11.5: Issue Resolution
-
-**Purpose**: Fix detected issues through agent reasoning and re-verification
-**Execute**: Direct - fix trivial issues, AskUserQuestion for non-trivial, re-verify
-**Output**: Updated `implementation/work-log.md`
-**State**: Update `verification_context`
-
-**Skip if**: Verification status is "passed"
-
-**Max iterations**: 3 fix-then-reverify cycles
+**Purpose**: Comprehensive implementation verification with fix-then-reverify cycles
+**Execute**:
+1. Skill tool - `ai-sdlc:implementation-verifier`
+2. If issues found: Fix trivial issues directly, AskUserQuestion for non-trivial
+3. Re-verify after fixes (max 3 fix-then-reverify cycles)
+**Output**: `verification/implementation-verification.md`, optional code-review/pragmatic/reality reports, updated `implementation/work-log.md`
+**State**: Update verification results, `verification_context`
 
 → Pause
 
-**Interactive**: AskUserQuestion - "Issues resolved. Continue to Phase 12?"
+**Interactive**: AskUserQuestion - "Verification complete. Continue to Phase 12?"
 **YOLO**: "→ Continuing to Phase 12..."
 
 ---
@@ -436,7 +396,6 @@ orchestrator:
     ui_heavy: null
     needs_clarification: null
     clarifications_resolved: null
-    clarifications_complete: null
     scope_expanded: null
     architecture_decision: null
     tdd_applicable: true  # Bug only
@@ -467,9 +426,10 @@ orchestrator:
 ├── analysis/
 │   ├── research-context/          # If --research provided
 │   ├── codebase-analysis.md       # Phase 1
-│   ├── clarifications.md          # Phase 1.5
+│   ├── clarifications.md          # Phase 1
 │   ├── gap-analysis.md            # Phase 2
-│   ├── scope-clarifications.md    # Phase 3.5 (conditional)
+│   ├── scope-clarifications.md    # Phase 2 (conditional)
+│   ├── technical-clarifications.md # Phase 5 (conditional)
 │   └── ui-mockups.md              # Phase 4 (optional)
 ├── implementation/
 │   ├── spec.md                    # Phase 5
@@ -481,7 +441,7 @@ orchestrator:
 ├── verification/
 │   ├── spec-audit.md              # Phase 6 (conditional)
 │   ├── implementation-verification.md  # Phase 11
-│   └── e2e-verification-report.md # Phase 12 (optional)
+│   └── e2e-verification-report.md      # Phase 12 (optional)
 └── documentation/
     └── user-guide.md              # Phase 13 (optional)
 ```

@@ -34,10 +34,10 @@ Each phase ends with ONE transition instruction:
 Use when the next phase handles user interaction or when phases are tightly coupled:
 
 ```markdown
-→ Continue to Phase 1.5 (handles user interaction internally)
+→ Continue to Phase 3 (evaluation handles conditional logic)
 ```
 
-The orchestrator proceeds immediately without stopping or prompting.
+The orchestrator proceeds immediately without stopping or prompting. Do not output a phase completion summary or end the turn. If the next phase handles user interaction, it will prompt the user itself.
 
 ### Pause Transitions
 

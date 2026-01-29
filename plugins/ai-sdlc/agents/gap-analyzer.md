@@ -403,7 +403,7 @@ decisions_needed:
 scope_expansion_recommended: true | false
 critical_issues: ["issue 1", "issue 2"]
 
-# Convenience flag for orchestrator (Phase 3.5 trigger)
+# Convenience flag for orchestrator (scope clarification trigger)
 needs_clarification: true | false  # true if decisions_needed non-empty OR scope_expansion_recommended OR ui_heavy
 ```
 
