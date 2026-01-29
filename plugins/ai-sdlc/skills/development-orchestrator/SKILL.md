@@ -296,7 +296,7 @@ Use for **all development tasks**:
 ### Phase 8: Implementation
 
 **Purpose**: Execute the implementation plan
-**Execute**: Skill tool - `ai-sdlc:implementer`
+**Execute**: Skill tool - `ai-sdlc:implementation-plan-executor`
 **Output**: Implemented code, `implementation/work-log.md`
 **State**: Update implementation progress
 
