@@ -606,7 +606,6 @@ Skills are automatically invoked by Claude when appropriate. Details live in eac
 | Skill | Purpose | Details |
 |-------|---------|---------|
 | `codebase-analyzer` | Phase 1 analysis using 3 parallel Explore subagents (file discovery, code analysis, context discovery) | `skills/codebase-analyzer/SKILL.md` |
-| `specification-creator` | Creates specs through 4 phases: initialize → research → write → verify | `skills/specification-creator/skill.md` |
 | `implementation-planner` | Breaks specs into task groups with test-driven steps | `skills/implementation-planner/skill.md` |
 | `implementer` | Executes plans with **mandatory** standards reading (INDEX.md + implementation-plan.md Standards Compliance section + keyword-triggered) and **test step enforcement** (requires user approval to skip N.1 tests) | `skills/implementer/SKILL.md` |
 | `implementation-verifier` | Read-only QA: runs tests, actively reasons about applicable standards from INDEX.md, verifies compliance | `skills/implementation-verifier/skill.md` |
@@ -772,6 +771,7 @@ Subagents are specialized AI agents invoked by skills and orchestrators. All age
 | `project-analyzer` | Deep codebase analysis for tech stack, architecture, conventions | `/init-sdlc` | `agents/project-analyzer.md` |
 | `task-classifier` | Classifies task descriptions into 9 types with confidence scoring | `/work` command | `agents/task-classifier.md` |
 | `gap-analyzer` | Compares current vs desired state with task-type support (bug/enhancement/feature) | development-orchestrator | `agents/gap-analyzer.md` |
+| `specification-creator` | Creates specs from gathered requirements with reusability search and self-verification | development-orchestrator, migration-orchestrator | `agents/specification-creator.md` |
 
 **Deprecated Agent**:
 - `existing-feature-analyzer` → Replaced by `codebase-analyzer` skill (uses 3 parallel Explore subagents)

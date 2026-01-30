@@ -18,7 +18,7 @@ When a phase requires a skill or subagent:
 | Anti-Pattern | Why It's Wrong | Correct Approach |
 |--------------|----------------|------------------|
 | "I'll analyze the codebase..." | Bypasses codebase-analyzer skill | Use `Skill` tool with `ai-sdlc:codebase-analyzer` |
-| "Let me create the specification..." | Bypasses specification-creator | Use `Skill` tool with `ai-sdlc:specification-creator` |
+| "Let me create the specification..." | Bypasses specification-creator | Use `Task` tool with `ai-sdlc:specification-creator` subagent |
 | "Looking at the gaps between..." | Bypasses gap-analyzer subagent | Use `Task` tool with `ai-sdlc:gap-analyzer` |
 | "I'll implement this by..." | Bypasses implementer skill | Use `Skill` tool with `ai-sdlc:implementer` |
 | Reading a SKILL.md then doing the work | Skill files are instructions FOR skills | Use Skill tool to invoke |

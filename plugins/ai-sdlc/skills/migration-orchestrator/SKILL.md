@@ -24,7 +24,7 @@ Systematic migration workflow from current state analysis to verified migration 
 
 ### Step 2: Initialize Workflow
 
-1. **Create TodoWrite**: Initialize todos for all phases (see Phase Configuration)
+1. **Create Task Items**: Use `TaskCreate` for all phases (see Phase Configuration), then set dependencies with `TaskUpdate addBlockedBy`
 2. **Create Task Directory**: `.ai-sdlc/tasks/migrations/YYYY-MM-DD-task-name/`
 3. **Initialize State**: Create `orchestrator-state.yml` with mode and migration context
 
@@ -80,7 +80,7 @@ Use for:
 | 0 | "Analyze current state" | "Analyzing current state" | codebase-analyzer |
 | 0.5 | "Check dependencies" | "Checking dependencies" | Direct (initiative only) |
 | 1 | "Plan target state and gaps" | "Planning target state and gaps" | gap-analyzer |
-| 2 | "Create migration strategy" | "Creating migration strategy" | specification-creator |
+| 2 | "Gather requirements & create migration strategy" | "Gathering requirements & creating migration strategy" | Direct + specification-creator (subagent) |
 | 3 | "Plan implementation" | "Planning implementation" | implementation-planner |
 | 4 | "Execute migration" | "Executing migration" | implementer |
 | 5 | "Verify and test compatibility" | "Verifying and testing compatibility" | implementation-verifier |
@@ -139,12 +139,30 @@ Use for:
 
 ---
 
-### Phase 2: Migration Strategy Specification
+### Phase 2: Migration Requirements & Strategy Specification
 
-**Purpose**: Create detailed migration specification with rollback procedures
-**Execute**: Skill tool - `ai-sdlc:specification-creator`
-**Output**: `implementation/spec.md`, `analysis/rollback-plan.md`, optionally `analysis/dual-run-plan.md`
+**Purpose**: Gather migration requirements, then create detailed migration specification with rollback procedures
+**Execute**:
+
+**Part A — Migration Requirements Gathering (inline)**:
+1. Direct - use AskUserQuestion for migration-specific requirements (3-5 questions):
+   - Migration scope and boundaries (what's in/out of migration)
+   - Rollback expectations and downtime tolerance
+   - Data migration specifics (if data migration type)
+   - Dual-run requirements (if applicable)
+   - Existing code/config to preserve
+   - Frame as confirmable assumptions: "I assume X, is that correct?"
+2. Save gathered requirements to `analysis/requirements.md`
+
+**Part B — Specification Creation (subagent)**:
+3. Task tool - `ai-sdlc:specification-creator` subagent
+
+**Context to pass to subagent**: task_path, task_type (migration), task_description, requirements_path (analysis/requirements.md), project_context_paths, migration_type, current_system, target_system, risk_level, breaking_changes, phase_summaries (current_state_analysis, gap_analysis)
+
+**Output**: `analysis/requirements.md`, `implementation/spec.md`, `analysis/rollback-plan.md`, optionally `analysis/dual-run-plan.md`
 **State**: Update `rollback_plan_created`, `dual_run_configured`
+
+**YOLO Mode**: Accept recommended defaults for all migration questions
 
 → Pause
 
@@ -297,6 +315,7 @@ options:
 ├── analysis/
 │   ├── current-state-analysis.md     # Phase 0
 │   ├── target-state-plan.md          # Phase 1
+│   ├── requirements.md               # Phase 2
 │   ├── rollback-plan.md              # Phase 2
 │   └── dual-run-plan.md              # Phase 2 (if dual-run)
 ├── implementation/
@@ -318,7 +337,7 @@ options:
 |-------|--------------|----------|
 | 0 | 2 | Expand search patterns, prompt user for file paths |
 | 1 | 2 | Re-prompt for target details |
-| 2 | 2 | Re-invoke spec-creator, regenerate rollback plan |
+| 2 | 2 | Re-gather requirements, re-invoke spec-creator subagent, regenerate rollback plan |
 | 3 | 2 | Regenerate with migration constraints |
 | 4 | 5 | Fix syntax errors, prompt user on repeated failure |
 | 5 | 3 | Fix-then-reverify. **HALT on data integrity issues** |

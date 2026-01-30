@@ -36,7 +36,7 @@ Unified workflow for bug fixes, enhancements, and new features with task-type-sp
 
 ### Step 3: Initialize Workflow
 
-1. **Create TodoWrite**: Initialize todos for all phases (see Phase Configuration)
+1. **Create Task Items**: Use `TaskCreate` for all phases (see Phase Configuration), then set dependencies with `TaskUpdate addBlockedBy`
 2. **Create Task Directory**: `.ai-sdlc/tasks/[type]/YYYY-MM-DD-task-name/`
 3. **Initialize State**: Create `orchestrator-state.yml` with mode, task info, and research reference
 
@@ -86,7 +86,7 @@ Use for **all development tasks**:
 | 2 | "Analyze gaps & clarify scope" | "Analyzing gaps & clarifying scope" | All |
 | 3 | "Write failing test (TDD Red)" | "Writing failing test" | Bug only |
 | 4 | "Generate UI mockups" | "Generating UI mockups" | Enhancement, Feature (if ui_heavy) |
-| 5 | "Clarify technical approach & create specification" | "Creating specification" | All |
+| 5 | "Gather requirements & create specification" | "Gathering requirements & creating specification" | All |
 | 5.5 | "Decide architecture" | "Deciding architecture" | Feature, Enhancement (conditional) |
 | 6 | "Audit specification" | "Auditing specification" | All (conditional) |
 | 7 | "Plan implementation" | "Planning implementation" | All |
@@ -193,19 +193,42 @@ Use for **all development tasks**:
 
 ---
 
-### Phase 5: Technical Approach & Specification
+### Phase 5: Technical Approach, Requirements & Specification
 
-**Purpose**: Resolve technical decisions, then create comprehensive specification
+**Purpose**: Resolve technical decisions, gather specification requirements, then create comprehensive specification
 **Execute**:
+
+**Part A — Technical Clarification (inline, conditional)**:
 1. If complex task with multiple approaches: Direct - use AskUserQuestion for 3-5 technical questions
 2. Save to `analysis/technical-clarifications.md` (conditional)
-3. Skill tool - `ai-sdlc:specification-creator`
-**Output**: `analysis/technical-clarifications.md` (conditional), `implementation/spec.md`, `implementation/requirements.md`
-**State**: Update `task_context.tech_clarified`, `phase_summaries.specification`
 
 **Skip technical clarification if**: Simple task, risk_level = low, no multiple approaches detected
 
-**YOLO Mode**: Accept recommended technical defaults
+**Part B — Requirements Gathering (inline)**:
+3. Direct - use AskUserQuestion for specification requirements:
+   - Adaptive question count based on description length:
+     - Brief (<30 words): 6-8 questions
+     - Standard (30-100 words): 4-6 questions
+     - Detailed (>100 words): 2-3 focused questions
+   - Frame as confirmable assumptions: "I assume X, is that correct?"
+   - REQUIRED questions (always include):
+     1. **User Journey**: How will users discover/access this? Which personas? How fits existing workflows?
+     2. **Existing Code Reuse**: Similar features, UI components, backend patterns to reference?
+     3. **Visual Assets**: Any mockups, wireframes, screenshots? Place in `analysis/visuals/`
+4. Check for visual assets in `analysis/visuals/` (even if user says none)
+   - If found: note for subagent context
+   - If not found and non-UI task: skip visual asset processing
+5. Save gathered requirements to `analysis/requirements.md` with: initial description, Q&A from all rounds, similar features identified, visual assets and insights, functional requirements summary, reusability opportunities, scope boundaries, technical considerations
+
+**Part C — Specification Creation (subagent)**:
+6. Task tool - `ai-sdlc:specification-creator` subagent
+
+**Context to pass to subagent**: task_path, task_type, task_description, requirements_path (analysis/requirements.md), project_context_paths (INDEX.md, vision.md, roadmap.md, tech-stack.md), risk_level, ui_heavy, scope_expanded, phase_summaries (codebase_analysis, gap_analysis, clarifications, scope_clarifications, ui_mockups), research_context (if any)
+
+**Output**: `analysis/technical-clarifications.md` (conditional), `analysis/requirements.md`, `implementation/spec.md`
+**State**: Update `task_context.tech_clarified`, `phase_summaries.specification`
+
+**YOLO Mode**: Accept recommended defaults for all questions, then invoke subagent
 
 → Pause
 
@@ -517,7 +540,7 @@ When research context is detected, read these files from the research folder:
 |-------|------------------------------|
 | Phase 1 | Codebase analyzer receives research findings as search guidance |
 | Phase 2 | Gap analyzer uses research recommendations for comparison |
-| Phase 5 | Specification creator uses research specs as INPUT (still creates full spec) |
+| Phase 5 | Specification creator subagent uses research specs as INPUT (still creates full spec) |
 | Phase 5.5 | Architecture decision uses research recommendations as INPUT (still presents options) |
 | Phase 7 | Implementation planner references research approach for task grouping |
 
