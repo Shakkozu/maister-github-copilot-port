@@ -3,7 +3,7 @@ name: ai-sdlc:performance:new
 description: Start a performance optimization workflow with profiling, benchmarking, and load testing
 ---
 
-**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:performance-orchestrator" NOW. Pass all arguments. Do not read files, explore code, or enter plan mode first.
+**ACTION REQUIRED**: This command delegates to a different skill. The `<command-name>` tag refers to THIS command, not the target. Call the Skill tool with skill="ai-sdlc:performance-orchestrator" NOW. Pass all arguments. Do not read files, explore code, or execute workflow steps yourself.
 
 # Performance Optimization Workflow: New
 

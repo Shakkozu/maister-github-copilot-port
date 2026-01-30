@@ -3,7 +3,7 @@ name: ai-sdlc:refactoring:new
 description: Start a new refactoring workflow with guided orchestration through all phases
 ---
 
-**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:refactoring-orchestrator" NOW. Pass all arguments. Do not read files, explore code, or enter plan mode first.
+**ACTION REQUIRED**: This command delegates to a different skill. The `<command-name>` tag refers to THIS command, not the target. Call the Skill tool with skill="ai-sdlc:refactoring-orchestrator" NOW. Pass all arguments. Do not read files, explore code, or execute workflow steps yourself.
 
 # Refactoring Workflow: New
 

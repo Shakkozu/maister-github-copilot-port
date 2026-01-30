@@ -3,7 +3,7 @@ name: ai-sdlc:work
 description: Unified entry point - auto-classifies tasks and routes to appropriate workflow
 ---
 
-**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:task-classifier" NOW to classify the task, then invoke the appropriate orchestrator skill based on classification. Do not read files, explore code, or enter plan mode first.
+**ACTION REQUIRED**: This command delegates to a different skill. The `<command-name>` tag refers to THIS command, not the target. Call the Skill tool with skill="ai-sdlc:task-classifier" NOW to classify the task, then invoke the appropriate orchestrator skill based on classification. Do not read files, explore code, or execute workflow steps yourself.
 
 # Unified Work Entry Point
 

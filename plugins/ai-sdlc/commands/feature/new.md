@@ -3,7 +3,7 @@ name: ai-sdlc:feature:new
 description: Start a new feature development workflow (alias for /ai-sdlc:development:new --type=feature)
 ---
 
-**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:development-orchestrator" and args="--type=feature" NOW. Pass all arguments. Do not read files, explore code, or enter plan mode first.
+**ACTION REQUIRED**: This command delegates to a different skill. The `<command-name>` tag refers to THIS command, not the target. Call the Skill tool with skill="ai-sdlc:development-orchestrator" and args="--type=feature" NOW. Pass all arguments. Do not read files, explore code, or execute workflow steps yourself.
 
 # New Feature Workflow
 

@@ -3,7 +3,7 @@ name: ai-sdlc:reviews:pragmatic
 description: Run pragmatic code review to detect over-engineering and ensure code matches project scale
 ---
 
-**ACTION REQUIRED**: Call the Task tool with subagent_type="ai-sdlc:code-quality-pragmatist" NOW. Pass the path to analyze in the prompt. Do not read files, explore code, or enter plan mode first.
+**ACTION REQUIRED**: This command delegates to a different skill. The `<command-name>` tag refers to THIS command, not the target. Call the Task tool with subagent_type="ai-sdlc:code-quality-pragmatist" NOW. Pass the path to analyze in the prompt. Do not read files, explore code, or execute workflow steps yourself.
 
 You are running a pragmatic code review using the `code-quality-pragmatist` agent.
 

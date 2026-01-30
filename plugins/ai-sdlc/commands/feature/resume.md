@@ -3,7 +3,7 @@ name: ai-sdlc:feature:resume
 description: Resume an interrupted or failed feature development workflow (alias for /ai-sdlc:development:resume)
 ---
 
-**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:development-orchestrator" NOW. Pass the task path and all arguments. Do not read files, explore code, or enter plan mode first.
+**ACTION REQUIRED**: This command delegates to a different skill. The `<command-name>` tag refers to THIS command, not the target. Call the Skill tool with skill="ai-sdlc:development-orchestrator" NOW. Pass the task path and all arguments. Do not read files, explore code, or execute workflow steps yourself.
 
 # Resume Feature Workflow
 

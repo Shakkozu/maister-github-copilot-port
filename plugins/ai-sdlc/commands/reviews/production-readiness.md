@@ -3,7 +3,7 @@ name: ai-sdlc:reviews:production-readiness
 description: Verify production deployment readiness with comprehensive checks
 ---
 
-**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:production-readiness-checker" NOW. Pass path and target arguments. Do not read files, explore code, or enter plan mode first.
+**ACTION REQUIRED**: This command delegates to a different skill. The `<command-name>` tag refers to THIS command, not the target. Call the Skill tool with skill="ai-sdlc:production-readiness-checker" NOW. Pass path and target arguments. Do not read files, explore code, or execute workflow steps yourself.
 
 You are verifying production deployment readiness using the `production-readiness-checker` skill.
 

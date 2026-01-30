@@ -3,7 +3,7 @@ name: ai-sdlc:reviews:code
 description: Run automated code quality, security, and performance analysis on your code
 ---
 
-**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:code-reviewer" NOW. Pass path and scope arguments. Do not read files, explore code, or enter plan mode first.
+**ACTION REQUIRED**: This command delegates to a different skill. The `<command-name>` tag refers to THIS command, not the target. Call the Skill tool with skill="ai-sdlc:code-reviewer" NOW. Pass path and scope arguments. Do not read files, explore code, or execute workflow steps yourself.
 
 You are running a comprehensive code review using the `code-reviewer` skill.
 

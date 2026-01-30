@@ -3,7 +3,7 @@ name: ai-sdlc:enhancement:new
 description: Start a new enhancement workflow (alias for /ai-sdlc:development:new --type=enhancement)
 ---
 
-**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:development-orchestrator" and args="--type=enhancement" NOW. Pass all arguments. Do not read files, explore code, or enter plan mode first.
+**ACTION REQUIRED**: This command delegates to a different skill. The `<command-name>` tag refers to THIS command, not the target. Call the Skill tool with skill="ai-sdlc:development-orchestrator" and args="--type=enhancement" NOW. Pass all arguments. Do not read files, explore code, or execute workflow steps yourself.
 
 # Enhancement Workflow
 

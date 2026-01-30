@@ -3,7 +3,7 @@ name: ai-sdlc:research:resume
 description: Resume an interrupted or failed research workflow from where it left off
 ---
 
-**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:research-orchestrator" NOW. Pass the task path and all arguments. Do not read files, explore code, or enter plan mode first.
+**ACTION REQUIRED**: This command delegates to a different skill. The `<command-name>` tag refers to THIS command, not the target. Call the Skill tool with skill="ai-sdlc:research-orchestrator" NOW. Pass the task path and all arguments. Do not read files, explore code, or execute workflow steps yourself.
 
 # Research Workflow: Resume
 
