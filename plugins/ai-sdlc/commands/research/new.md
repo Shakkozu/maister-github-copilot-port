@@ -3,8 +3,7 @@ name: ai-sdlc:research:new
 description: Start a new research workflow with guided orchestration through all phases
 ---
 
-> **CRITICAL**: Invoke the `ai-sdlc:research-orchestrator` skill using the **Skill tool** IMMEDIATELY.
-> Do NOT execute this workflow manually. Pass all arguments to the skill.
+**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:research-orchestrator" NOW. Pass all arguments. Do not read files, explore code, or enter plan mode first.
 
 # Research Workflow: New
 

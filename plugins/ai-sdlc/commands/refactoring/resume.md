@@ -3,8 +3,7 @@ name: ai-sdlc:refactoring:resume
 description: Resume an interrupted or failed refactoring workflow from where it left off
 ---
 
-> **CRITICAL**: Invoke the `ai-sdlc:refactoring-orchestrator` skill using the **Skill tool** IMMEDIATELY.
-> Do NOT execute this workflow manually. Pass the task path to the skill.
+**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:refactoring-orchestrator" NOW. Pass the task path and all arguments. Do not read files, explore code, or enter plan mode first.
 
 # Refactoring Workflow: Resume
 

@@ -3,8 +3,7 @@ name: ai-sdlc:development:resume
 description: Resume an interrupted or failed development workflow from where it left off
 ---
 
-> **CRITICAL**: Invoke the `ai-sdlc:development-orchestrator` skill using the **Skill tool** IMMEDIATELY.
-> Do NOT execute this workflow manually. Pass the task path to the skill.
+**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:development-orchestrator" NOW. Pass the task path and all arguments. Do not read files, explore code, or enter plan mode first.
 
 # Development Workflow: Resume
 

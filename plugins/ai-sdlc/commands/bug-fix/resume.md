@@ -3,8 +3,7 @@ name: ai-sdlc:bug-fix:resume
 description: Resume an interrupted or failed bug fix workflow (alias for /ai-sdlc:development:resume)
 ---
 
-> **CRITICAL**: Invoke the `ai-sdlc:development-orchestrator` skill using the **Skill tool** IMMEDIATELY.
-> Do NOT execute this workflow manually. Pass the task path to the skill.
+**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:development-orchestrator" NOW. Pass the task path and all arguments. Do not read files, explore code, or enter plan mode first.
 
 # Resume Bug Fix Workflow
 

@@ -3,8 +3,7 @@ name: ai-sdlc:initiative:new
 description: Start a new epic-level initiative with guided orchestration through all phases
 ---
 
-> **CRITICAL**: Invoke the `ai-sdlc:initiative-orchestrator` skill using the **Skill tool** IMMEDIATELY.
-> Do NOT execute this workflow manually. Pass all arguments to the skill.
+**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:initiative-orchestrator" NOW. Pass all arguments. Do not read files, explore code, or enter plan mode first.
 
 # Initiative Workflow: New
 

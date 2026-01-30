@@ -3,8 +3,7 @@ name: ai-sdlc:standards:update
 description: Update or create project standards from conversation context or explicit input
 ---
 
-> **CRITICAL**: Invoke the `ai-sdlc:docs-manager` skill using the **Skill tool** IMMEDIATELY.
-> Do NOT execute this workflow manually. Pass the standard path (if provided) to the skill.
+**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:docs-manager" NOW. Pass the standard path (if provided). Do not read files, explore code, or enter plan mode first.
 
 # Update Project Standards
 

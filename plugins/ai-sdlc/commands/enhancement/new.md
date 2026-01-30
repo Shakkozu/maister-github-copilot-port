@@ -3,8 +3,7 @@ name: ai-sdlc:enhancement:new
 description: Start a new enhancement workflow (alias for /ai-sdlc:development:new --type=enhancement)
 ---
 
-> **CRITICAL**: Invoke the `ai-sdlc:development-orchestrator` skill using the **Skill tool** IMMEDIATELY with `task_type=enhancement`.
-> Do NOT execute this workflow manually. Pass all arguments to the skill.
+**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:development-orchestrator" and args="--type=enhancement" NOW. Pass all arguments. Do not read files, explore code, or enter plan mode first.
 
 # Enhancement Workflow
 

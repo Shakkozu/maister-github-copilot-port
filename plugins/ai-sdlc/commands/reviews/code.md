@@ -3,8 +3,7 @@ name: ai-sdlc:reviews:code
 description: Run automated code quality, security, and performance analysis on your code
 ---
 
-> **CRITICAL**: Invoke the `ai-sdlc:code-reviewer` skill using the **Skill tool** IMMEDIATELY.
-> Do NOT execute this workflow manually. Pass path and scope arguments to the skill.
+**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:code-reviewer" NOW. Pass path and scope arguments. Do not read files, explore code, or enter plan mode first.
 
 You are running a comprehensive code review using the `code-reviewer` skill.
 

@@ -3,8 +3,7 @@ name: ai-sdlc:documentation:new
 description: Start a documentation creation workflow with content planning, screenshot generation, and publication
 ---
 
-> **CRITICAL**: Invoke the `ai-sdlc:documentation-orchestrator` skill using the **Skill tool** IMMEDIATELY.
-> Do NOT execute this workflow manually. Pass all arguments to the skill.
+**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:documentation-orchestrator" NOW. Pass all arguments. Do not read files, explore code, or enter plan mode first.
 
 # Documentation Workflow: New
 

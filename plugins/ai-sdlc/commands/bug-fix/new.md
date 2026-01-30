@@ -3,8 +3,7 @@ name: ai-sdlc:bug-fix:new
 description: Start a comprehensive bug fixing workflow (alias for /ai-sdlc:development:new --type=bug)
 ---
 
-> **CRITICAL**: Invoke the `ai-sdlc:development-orchestrator` skill using the **Skill tool** IMMEDIATELY with `task_type=bug`.
-> Do NOT execute this workflow manually. Pass all arguments to the skill.
+**ACTION REQUIRED**: Call the Skill tool with skill="ai-sdlc:development-orchestrator" and args="--type=bug" NOW. Pass all arguments. Do not read files, explore code, or enter plan mode first.
 
 # Bug Fix Workflow
 
