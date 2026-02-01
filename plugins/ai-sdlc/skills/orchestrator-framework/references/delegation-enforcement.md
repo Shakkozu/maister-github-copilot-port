@@ -38,6 +38,17 @@ These do NOT require delegation:
 
 For all analysis, planning, implementation, and verification phases: **ALWAYS DELEGATE**.
 
+**Never acceptable inline** (regardless of perceived task simplicity):
+- Specification creation → always delegate to `ai-sdlc:specification-creator` subagent
+- Implementation planning → always delegate to `ai-sdlc:implementation-planner` subagent
+- Gap analysis → always delegate to `ai-sdlc:gap-analyzer` subagent
+- Codebase analysis → always delegate to `ai-sdlc:codebase-analyzer` skill
+- Code review → always delegate to `ai-sdlc:code-reviewer` subagent
+- Test execution → always delegate to `ai-sdlc:test-suite-runner` subagent
+- Implementation completeness → always delegate to `ai-sdlc:implementation-completeness-checker` subagent
+
+"The task is simple" is NOT a valid reason to skip delegation. Subagents provide context isolation regardless of complexity.
+
 ---
 
 ## Skill Invocation

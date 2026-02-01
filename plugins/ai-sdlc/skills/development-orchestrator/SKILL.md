@@ -221,9 +221,19 @@ Use for **all development tasks**:
 5. Save gathered requirements to `analysis/requirements.md` with: initial description, Q&A from all rounds, similar features identified, visual assets and insights, functional requirements summary, reusability opportunities, scope boundaries, technical considerations
 
 **Part C — Specification Creation (subagent)**:
+
+**ANTI-PATTERN — DO NOT DO THIS:**
+- ❌ "Let me create the specification..." — STOP. Delegate to specification-creator.
+- ❌ "I'll write the spec based on requirements..." — STOP. Delegate to specification-creator.
+- ❌ "The task is simple enough to spec inline..." — STOP. Simplicity is NOT a reason to skip delegation.
+
+**INVOKE NOW** — Task tool call:
+
 6. Task tool - `ai-sdlc:specification-creator` subagent
 
 **Context to pass to subagent**: task_path, task_type, task_description, requirements_path (analysis/requirements.md), project_context_paths (INDEX.md, vision.md, roadmap.md, tech-stack.md), risk_level, ui_heavy, scope_expanded, phase_summaries (codebase_analysis, gap_analysis, clarifications, scope_clarifications, ui_mockups), research_context (if any)
+
+**SELF-CHECK**: Did you just invoke the Task tool with `ai-sdlc:specification-creator`? Or did you start writing spec.md yourself? If the latter, STOP immediately and invoke the Task tool instead.
 
 **Output**: `analysis/technical-clarifications.md` (conditional), `analysis/requirements.md`, `implementation/spec.md`
 **State**: Update `task_context.tech_clarified`, `phase_summaries.specification`
@@ -277,11 +287,21 @@ Use for **all development tasks**:
 ### Phase 7: Implementation Planning
 
 **Purpose**: Break specification into implementation steps
+
+**ANTI-PATTERN — DO NOT DO THIS:**
+- ❌ "Let me create the implementation plan..." — STOP. Delegate to implementation-planner.
+- ❌ "I'll break this into steps..." — STOP. Delegate to implementation-planner.
+- ❌ "This is simple enough to plan inline..." — STOP. Simplicity is NOT a reason to skip delegation.
+
+**INVOKE NOW** — Task tool call:
+
 **Execute**: Task tool - `ai-sdlc:implementation-planner` subagent
 **Output**: `implementation/implementation-plan.md`
 **State**: Update task groups and dependencies
 
 **Context to pass to subagent**: task_path, task_type, task_description, phase_summaries (specification, gap_analysis, codebase_analysis), research_context (if any)
+
+**SELF-CHECK**: Did you just invoke the Task tool with `ai-sdlc:implementation-planner`? Or did you start writing implementation-plan.md yourself? If the latter, STOP immediately and invoke the Task tool instead.
 
 → Pause
 
