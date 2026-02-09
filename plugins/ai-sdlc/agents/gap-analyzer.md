@@ -198,7 +198,6 @@ Layer 3 (User Access):
 - `decisions_needed`: Issues requiring user input
 - `scope_expansion_recommended`: Gaps that suggest expanding scope
 - `critical_issues`: Blocking problems found
-- `needs_clarification`: Convenience flag (true if decisions_needed non-empty OR scope_expansion_recommended OR ui_heavy)
 
 ### Decision Generation Rules
 
@@ -258,17 +257,9 @@ When `missing_touchpoints` is non-empty:
 
 **When in doubt, generate a decision.** The user can always say "proceed with default" but they cannot unsee what wasn't asked.
 
-```
-needs_clarification = (
-  decisions_needed.critical.length > 0 OR
-  decisions_needed.important.length > 0 OR
-  scope_expansion_recommended == true OR
-  ui_heavy == true OR
-  completeness_score < 100
-)
-```
+The orchestrator will present ALL items in `decisions_needed.critical` and `decisions_needed.important` to the user. If an issue matters, put it in one of those arrays.
 
-**If completeness_score < 100%, needs_clarification MUST be true.**
+**If completeness_score < 100%, there MUST be items in decisions_needed.**
 
 ---
 
@@ -402,9 +393,6 @@ decisions_needed:
 
 scope_expansion_recommended: true | false
 critical_issues: ["issue 1", "issue 2"]
-
-# Convenience flag for orchestrator (scope clarification trigger)
-needs_clarification: true | false  # true if decisions_needed non-empty OR scope_expansion_recommended OR ui_heavy
 ```
 
 ---
