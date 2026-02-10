@@ -88,10 +88,10 @@ The Task prompt MUST include:
 3. **Read `outputs/research-report.md`** - comprehensive findings, recommendations
 4. **Parse accumulated context** - phase summaries, selected approach, design preferences
 5. **Identify design scope** - what the chosen approach requires architecturally
-6. **Synthesize Design Overview** - from the loaded context, draft the 2-3 paragraph overview covering:
-   - **Business context**: What problem or opportunity this addresses, why now, who benefits (from research question + motivation)
-   - **Chosen approach**: What solution direction was selected, key architectural style, why this over alternatives (from selected approach + key trade-offs)
-   - **Key decisions**: The most impactful architectural choices, stated plainly (from solution-exploration.md)
+6. **Synthesize Design Overview** - draft a concise, scannable executive summary (aim for ~150 words total). Use bold terms and bullet lists — avoid dense prose. Structure:
+   - **Business context** (2-3 sentences): What problem, why now, who benefits
+   - **Chosen approach** (3-5 sentences): Solution direction, architectural style, key pattern. Bold the most important terms
+   - **Key decisions** (bulleted list): 3-6 bullets, each one sentence stating the decision and its rationale
 
 ### Phase 2: C4 Architecture Diagrams
 
@@ -237,9 +237,14 @@ Chosen option: [Option N], because [justification, 1-2 sentences]
 # High-Level Design: [Solution Name]
 
 ## Design Overview
-[Para 1: Business context - what problem/opportunity, why now, who benefits]
-[Para 2: Chosen approach - what solution direction, key architectural style, why this over alternatives]
-[Para 3: Key decisions and trade-offs - most impactful choices made, what was traded off]
+[2-3 sentences: Business context - what problem, why now, who benefits]
+
+[3-5 sentences: Chosen approach - solution direction, architectural style, key pattern. **Bold** important terms]
+
+**Key decisions:**
+- [Decision 1: what was chosen and why, one sentence]
+- [Decision 2: ...]
+- [...]
 
 ## Architecture
 
