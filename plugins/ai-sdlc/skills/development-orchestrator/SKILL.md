@@ -279,17 +279,17 @@ Use for **all development tasks**:
 
 ---
 
-### Phase 6: Specification Audit (Conditional)
+### Phase 6: Specification Audit (Recommended)
 
 **Purpose**: Independent review of specification before implementation
 **Execute**: Task tool - `ai-sdlc:spec-auditor` subagent
 **Output**: `verification/spec-audit.md`
 **State**: Update `options.spec_audit_enabled`
 
-**Run if**: Feature, enhancement with >5 files, spec >50 lines, security-sensitive, or user requests
+**Recommended**: Always. Present spec audit as the recommended default. User can skip if they choose.
 
-**Interactive**: AskUserQuestion to decide - "Run specification audit?"
-**YOLO**: Auto-decide based on complexity
+**Interactive**: AskUserQuestion - "Run specification audit? (Recommended)" with "Yes, run audit (Recommended)" as first option
+**YOLO**: Always run
 
 → Pause
 
@@ -445,7 +445,7 @@ Development-specific fields in `orchestrator-state.yml`:
 orchestrator:
   task_type: bug | enhancement | feature
   options:
-    spec_audit_enabled: null
+    spec_audit_enabled: true
     skip_test_suite: true
     e2e_enabled: null
     user_docs_enabled: null
@@ -500,7 +500,7 @@ orchestrator:
 │   ├── tdd-red-gate.md            # Phase 3 (bug only)
 │   └── tdd-green-gate.md          # Phase 9 (bug only)
 ├── verification/
-│   ├── spec-audit.md              # Phase 6 (conditional)
+│   ├── spec-audit.md              # Phase 6 (recommended)
 │   ├── implementation-verification.md  # Phase 11
 │   └── e2e-verification-report.md      # Phase 12 (optional)
 └── documentation/
