@@ -798,7 +798,7 @@ Subagents are specialized AI agents invoked by skills and orchestrators. All age
 6. **Incremental Verification**: Run only new tests after each group, not entire suite
 7. **Comprehensive Verification Before Commit**: Run full test suite and create verification report before code review
 
-**For detailed workflow documentation, see**: `docs/guides/workflow-overview.md`
+**For detailed workflow documentation, see**: individual skill `SKILL.md` files
 
 ## Progress Tracking with Task System
 

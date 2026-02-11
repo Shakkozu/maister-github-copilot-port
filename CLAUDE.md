@@ -24,7 +24,6 @@ docs/                              # User-facing documentation and guides
 ## Key Files
 
 - **`@plugins/ai-sdlc/CLAUDE.md`**: Comprehensive plugin documentation with all skills, commands, agents, and workflow principles. Read this when working on plugin internals.
-- **`docs/Contributing.md`**: Guide for creating new skills, commands, and agents.
 - **`README.md`**: User-facing documentation for plugin consumers.
 
 ## Plugin Development

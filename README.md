@@ -121,8 +121,6 @@ Build completely new capabilities with a comprehensive 6-7 phase workflow:
 
 **Best for**: New features, adding capabilities that don't exist yet
 
-[**📖 Detailed Guide**](docs/guides/feature-development.md)
-
 ---
 
 ### Enhancements
@@ -136,8 +134,6 @@ Improve existing features with backward compatibility verification:
 **Phases**: Existing Feature Analysis → Gap Analysis → Specification → Planning → Implementation → Compatibility Verification
 
 **Best for**: Improving, extending, or enhancing existing features
-
-[**📖 Detailed Guide**](docs/guides/enhancement-workflow.md)
 
 ---
 
@@ -153,8 +149,6 @@ Fix defects with mandatory TDD Red→Green discipline:
 
 **Best for**: Fixing bugs, errors, crashes with root cause analysis
 
-[**📖 Detailed Guide**](docs/guides/bug-fixing.md)
-
 ---
 
 ### Performance Optimization
@@ -168,8 +162,6 @@ Optimize speed and efficiency with profiling and benchmarking:
 **Phases**: Baseline Profiling → Bottleneck Analysis → Implementation with Benchmarking → Performance Verification → Load Testing
 
 **Best for**: Slow responses, high CPU/memory usage, scaling issues
-
-[**📖 Detailed Guide**](docs/guides/performance-optimization.md)
 
 ---
 
@@ -185,8 +177,6 @@ Move technologies or patterns with rollback planning:
 
 **Best for**: Technology upgrades, platform changes, architecture transitions
 
-[**📖 Detailed Guide**](docs/guides/migrations.md)
-
 ---
 
 ### Research
@@ -200,43 +190,6 @@ Investigate technical questions or gather requirements:
 **Phases**: Planning → Information Gathering → Analysis & Synthesis → Documentation
 
 **Best for**: Understanding codebase, exploring best practices, requirements gathering
-
-[**📖 Detailed Guide**](docs/guides/research.md)
-
-## Documentation
-
-### Getting Started
-
-- [**Quick Start Guide**](docs/Quick-Start.md) - Get up and running in 5 minutes
-- [**Architecture Overview**](docs/Architecture.md) - Understand how components work together
-- [**Troubleshooting**](docs/Troubleshooting.md) - Common issues and solutions
-
-### Workflow Guides
-
-- [Feature Development](docs/guides/feature-development.md)
-- [Enhancement Workflow](docs/guides/enhancement-workflow.md)
-- [Bug Fixing](docs/guides/bug-fixing.md)
-- [Performance Optimization](docs/guides/performance-optimization.md)
-- [Migrations](docs/guides/migrations.md)
-- [Research](docs/guides/research.md)
-
-### Reference
-
-- [Commands Reference](docs/reference/commands.md) - All available slash commands
-- [Skills Reference](docs/reference/skills.md) - Detailed skill documentation
-- [Agents Reference](docs/reference/agents.md) - Specialized agent capabilities
-- [Terminology](docs/reference/terminology.md) - Key concepts and definitions
-
-### Advanced Topics
-
-- [Standards Discovery](docs/concepts/standards-discovery.md) - How continuous standards checking works
-- [State Management](docs/concepts/state-management.md) - Pause/resume and failure recovery
-- [User-Centric Development](docs/concepts/user-centric-development.md) - User journey analysis and gap detection
-- [Auto-Recovery Strategies](docs/concepts/auto-recovery.md) - Intelligent failure handling
-
-### Contributing
-
-- [**Contributing Guide**](docs/Contributing.md) - How to extend the plugin and create new skills
 
 ## Commands Quick Reference
 
@@ -300,20 +253,6 @@ Complex changes are broken into small, testable increments with git checkpoints 
 ### Evidence-Based Verification
 
 All findings must reference actual code. Read-only verification reports issues but doesn't fix them—developers should review and apply fixes intentionally.
-
-## Getting Help
-
-- **Troubleshooting**: See [docs/Troubleshooting.md](docs/Troubleshooting.md) for common issues
-- **Documentation**: Browse the [docs/](docs/) directory for comprehensive guides
-- **Issues**: Report bugs or request features at the plugin repository
-- **Questions**: Check the FAQ in [docs/Troubleshooting.md](docs/Troubleshooting.md)
-
-## What's Next?
-
-1. **[Start with Quick Start Guide](docs/Quick-Start.md)** - 5-minute hands-on tutorial
-2. **[Understand the Architecture](docs/Architecture.md)** - Learn how components work together
-3. **[Try your first workflow](docs/guides/feature-development.md)** - Build a feature end-to-end
-4. **[Explore advanced features](docs/concepts/)** - Deep dive into capabilities
 
 ---
 

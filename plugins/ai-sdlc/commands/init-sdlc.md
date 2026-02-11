@@ -197,8 +197,7 @@ The docs-manager skill will:
 1. Create `.ai-sdlc/docs/` directory structure
 2. Copy baseline standards from plugin (ONLY selected categories from Phase 3.5)
 3. Create initial INDEX.md (with placeholders for skipped standards)
-4. Create `.ai-sdlc/docs/project/initiatives/` directory for future initiatives
-5. Update CLAUDE.md integration
+4. Update CLAUDE.md integration
 
 **Wait for docs-manager to complete before proceeding.**
 
