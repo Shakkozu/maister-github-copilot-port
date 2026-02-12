@@ -108,7 +108,7 @@ Use this when a project doesn't have `.ai-sdlc/docs/` or needs documentation for
 
      *Not initialized for this project. If you need frontend standards, you can:*
      - *Add them manually using the docs-manager skill*
-     - *Run `/ai-sdlc:standards:discover --scope=frontend` to auto-discover*
+     - *Run `/ai-sdlc:standards-discover --scope=frontend` to auto-discover*
      ```
 6. **MANDATORY - Update CLAUDE.md:**
    - Check if `CLAUDE.md` exists in the project root; if not, ask the user if they want to create it
@@ -136,7 +136,7 @@ Use this when a project doesn't have `.ai-sdlc/docs/` or needs documentation for
 
 **Note on Skipped Standards**: If standard categories are skipped during initialization, teams can add them later using:
 - "Add Documentation File" operation to add specific standards
-- `/ai-sdlc:standards:discover` command to auto-discover standards from codebase
+- `/ai-sdlc:standards-discover` command to auto-discover standards from codebase
 
 ---
 

@@ -218,7 +218,7 @@ Example: `/ai-sdlc:development:resume .ai-sdlc/tasks/new-features/2025-11-17-use
 | Command | Description |
 |---------|-------------|
 | `/init-sdlc` | Initialize AI SDLC framework |
-| `/ai-sdlc:standards:discover` | Auto-discover coding standards |
+| `/ai-sdlc:standards-discover` | Auto-discover coding standards |
 | `/ai-sdlc:standards:update [path]` | Update project standards |
 | `/ai-sdlc:reviews:code [path]` | Automated code quality analysis |
 | `/ai-sdlc:reviews:pragmatic [path]` | Check for over-engineering |

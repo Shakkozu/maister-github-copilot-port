@@ -595,6 +595,7 @@ Skills are automatically invoked by Claude when appropriate. Details live in eac
 | `codebase-analyzer` | Thin dispatcher: selects agent roles adaptively, launches parallel Explore subagents, delegates report synthesis to `codebase-analysis-reporter` subagent | `skills/codebase-analyzer/SKILL.md` |
 | `implementer` | Executes plans with **mandatory** standards reading (INDEX.md + implementation-plan.md Standards Compliance section + keyword-triggered) and **test step enforcement** (requires user approval to skip N.1 tests) | `skills/implementer/SKILL.md` |
 | `implementation-verifier` | Read-only QA orchestrator: delegates completeness checks, test execution, code review, and production readiness to specialized subagents; compiles results into verification report | `skills/implementation-verifier/SKILL.md` |
+| `standards-discover` | Parallel multi-source standards discovery (config, code, docs, PRs/CI) with confidence scoring | `skills/standards-discover/SKILL.md` |
 | `docs-manager` | Manages standards in `.ai-sdlc/docs/`, handles discovery and updates | `skills/docs-manager/skill.md` |
 
 ### Orchestrator Framework
@@ -655,7 +656,7 @@ Commands invoke orchestrators and utilities. All orchestrators support `--yolo` 
 |---------|-------|---------|
 | `/init-sdlc` | `/init-sdlc` | Initialize framework with smart defaults for docs/standards |
 | `/ai-sdlc:standards:update` | `/ai-sdlc:standards:update [path]` | Update/create standards from conversation context |
-| `/ai-sdlc:standards:discover` | `/ai-sdlc:standards:discover [--scope=SCOPE]` | Discover standards from config files and code patterns |
+| `/ai-sdlc:standards-discover` | `/ai-sdlc:standards-discover [--scope=SCOPE]` | Discover standards from config files and code patterns (invokes `standards-discover` skill) |
 
 ### Workflow Commands
 

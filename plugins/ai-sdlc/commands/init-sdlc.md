@@ -9,6 +9,22 @@ description: Initialize AI SDLC framework with intelligent project analysis and 
 
 Initialize `.ai-sdlc/docs/` with intelligent project analysis and meaningful documentation generation based on actual codebase inspection.
 
+## Phase Configuration
+
+| Phase | Subject | activeForm |
+|-------|---------|------------|
+| 1 | Pre-flight checks | Running pre-flight checks |
+| 2 | Analyze project codebase | Analyzing project codebase |
+| 3 | Present findings & gather context | Gathering project context |
+| 3.5 | Select standards to initialize | Selecting standards |
+| 4 | Initialize documentation structure | Initializing documentation |
+| 5 | Generate project documentation | Generating project documentation |
+| 6 | Update INDEX.md | Updating INDEX.md |
+| 7 | Verify CLAUDE.md integration | Verifying CLAUDE.md integration |
+| 8 | Validate & summarize | Validating initialization |
+
+**Task Tracking**: Before Phase 1, use `TaskCreate` for all phases above (pending), then set sequential dependencies with `TaskUpdate addBlockedBy` (each phase blocked by its predecessor). At each phase start: `TaskUpdate` to `in_progress`. At each phase end: `TaskUpdate` to `completed`. If a phase is skipped (e.g., user selects "Update existing" and skips to Phase 5), mark skipped phases as `completed` with `metadata: {skipped: true}`.
+
 ## PHASE 1: Pre-flight Checks
 
 Check for existing structure:
@@ -671,7 +687,7 @@ cat .ai-sdlc/docs/project/roadmap.md
 **Auto-discover coding standards from your codebase:**
 
 ```bash
-/ai-sdlc:standards:discover
+/ai-sdlc:standards-discover
 ```
 
 This will analyze:
