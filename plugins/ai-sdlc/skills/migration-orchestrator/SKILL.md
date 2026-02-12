@@ -78,7 +78,6 @@ Use for:
 | Phase | content | activeForm | Agent/Skill |
 |-------|---------|------------|-------------|
 | 0 | "Analyze current state" | "Analyzing current state" | codebase-analyzer |
-| 0.5 | "Check dependencies" | "Checking dependencies" | Direct (initiative only) |
 | 1 | "Plan target state and gaps" | "Planning target state and gaps" | gap-analyzer |
 | 2 | "Gather requirements & create migration strategy" | "Gathering requirements & creating migration strategy" | Direct + specification-creator (subagent) |
 | 3 | "Plan implementation" | "Planning implementation" | implementation-planner (subagent) |
@@ -91,30 +90,20 @@ Use for:
 
 ## Workflow Phases
 
-### Phase 0: Current State Analysis
+### Phase 0: Current State Analysis & Clarifications
 
-**Purpose**: Comprehensive analysis of current system before migration
-**Execute**: Skill tool - `ai-sdlc:codebase-analyzer`
-**Output**: `analysis/current-state-analysis.md`
-**State**: Update task_context with current system info
+**Purpose**: Comprehensive analysis of current system before migration, followed by scope/requirements clarification
+**Execute**:
+1. Skill tool - `ai-sdlc:codebase-analyzer`
+2. Update state with analysis results
+3. Direct - use AskUserQuestion for max 5 critical clarifying questions about migration scope, target system, and constraints
+4. Save clarifications to `analysis/clarifications.md`
+**Output**: `analysis/current-state-analysis.md`, `analysis/clarifications.md`
+**State**: Update task_context with current system info, `task_context.clarifications_resolved`
 
-→ Conditional: if initiative_id exists continue to Phase 0.5, else skip to Phase 1
+**YOLO Mode**: Accept all recommended defaults for clarifications
 
----
-
-### Phase 0.5: Dependency Check (Initiative Only)
-
-**Purpose**: Verify all blocking dependencies are completed
-**Execute**: Direct - read initiative state, check dependencies
-**Output**: Dependency status check
-**State**: Update `dependencies_satisfied`
-
-**Skip if**: No `initiative_id` in state
-
-→ Pause
-
-**Interactive**: AskUserQuestion - "Dependencies satisfied. Continue to target state planning?"
-**YOLO**: "→ Continuing to Phase 1..."
+→ Continue
 
 ---
 

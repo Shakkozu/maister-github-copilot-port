@@ -84,19 +84,22 @@ Use for:
 
 ## Workflow Phases
 
-### Phase 0: Codebase Analysis
+### Phase 0: Codebase Analysis & Clarifications
 
-**Purpose**: Comprehensive codebase exploration for performance context
-**Execute**: Skill tool - `ai-sdlc:codebase-analyzer`
-**Output**: `analysis/codebase-analysis.md`
-**State**: Update `performance_context.phase_summaries.codebase_analysis`
+**Purpose**: Comprehensive codebase exploration for performance context, followed by scope/requirements clarification
+**Execute**:
+1. Skill tool - `ai-sdlc:codebase-analyzer`
+2. Update state with analysis results
+3. Direct - use AskUserQuestion for max 5 critical clarifying questions about performance concerns, hotspots, and optimization goals
+4. Save clarifications to `analysis/clarifications.md`
+**Output**: `analysis/codebase-analysis.md`, `analysis/clarifications.md`
+**State**: Update `performance_context.phase_summaries.codebase_analysis`, `task_context.clarifications_resolved`
 
 Pass `task_type="enhancement"` and the performance-focused description. The codebase-analyzer adaptively selects parallel Explore agents based on task complexity. For performance tasks, the description should guide agents toward: database query patterns, hot code paths, I/O operations, caching layers, connection management, schema/migration files.
 
-→ Pause
+**YOLO Mode**: Accept all recommended defaults for clarifications
 
-**Interactive**: AskUserQuestion - "Codebase analysis complete. Continue to performance analysis?"
-**YOLO**: "→ Continuing to Phase 1..."
+→ Continue
 
 ---
 

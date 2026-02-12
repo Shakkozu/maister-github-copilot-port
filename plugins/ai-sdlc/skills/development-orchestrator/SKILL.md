@@ -81,7 +81,6 @@ Use for **all development tasks**:
 
 | Phase | content | activeForm | Task Types |
 |-------|---------|------------|------------|
-| 0 | "Check dependencies" | "Checking dependencies" | All (if initiative) |
 | 1 | "Analyze codebase & clarify requirements" | "Analyzing codebase & clarifying" | All |
 | 2 | "Analyze gaps & clarify scope" | "Analyzing gaps & clarifying scope" | All |
 | 3 | "Write failing test (TDD Red)" | "Writing failing test" | Bug only |
@@ -102,22 +101,6 @@ Use for **all development tasks**:
 
 ## Workflow Phases
 
-### Phase 0: Dependency Check (If Part of Initiative)
-
-**Purpose**: Verify all blocking dependencies are completed
-**Execute**: Direct - read initiative state
-**Output**: Dependency status check
-**State**: Update `dependencies_satisfied`
-
-**Skip if**: No `initiative_id` in state
-
-→ Pause
-
-**Interactive**: AskUserQuestion - "Dependencies satisfied. Continue to Phase 1?"
-**YOLO**: "→ Continuing to Phase 1..."
-
----
-
 ### Phase 1: Codebase Analysis & Clarifications
 
 **Purpose**: Comprehensive codebase exploration followed by scope/requirements clarification
@@ -131,10 +114,7 @@ Use for **all development tasks**:
 
 **YOLO Mode**: Accept all recommended defaults for clarifications
 
-→ Pause
-
-**Interactive**: AskUserQuestion - "Analysis and clarifications complete. Continue to Phase 2?"
-**YOLO**: "→ Continuing to Phase 2..."
+→ Continue
 
 ---
 
