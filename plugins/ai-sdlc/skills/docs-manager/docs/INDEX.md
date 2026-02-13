@@ -39,22 +39,22 @@ Located in `.ai-sdlc/docs/standards/global/`
 These standards apply across the entire codebase, regardless of frontend/backend context.
 
 #### Error Handling (`standards/global/error-handling.md`)
-Standards for error handling, exception management, error messages, and error propagation. Follow these patterns when implementing error handling logic.
+Structured error types, error propagation patterns, user-facing vs internal error messages, try-catch placement guidelines, error logging conventions.
 
 #### Validation (`standards/global/validation.md`)
-Standards for input validation, data sanitization, and validation error messages. Apply these rules when validating user input or external data.
+Input validation at system boundaries, sanitization patterns, validation error message formatting, schema validation approach.
 
 #### Conventions (`standards/global/conventions.md`)
-General coding conventions including naming, file organization, and code structure. Follow these conventions for consistency across the codebase.
+Naming conventions (files, variables, functions, classes), file organization patterns, import ordering, code structure guidelines.
 
 #### Coding Style (`standards/global/coding-style.md`)
-Code formatting, indentation, spacing, and style guidelines. Follow these rules for consistent, readable code.
+Indentation and formatting rules, spacing conventions, line length limits, bracket style, consistent code readability patterns.
 
 #### Commenting (`standards/global/commenting.md`)
-Standards for code comments, documentation comments, and inline explanations. Apply these guidelines when documenting code.
+When to comment (non-obvious logic only), documentation comment format, inline explanation guidelines, TODO/FIXME conventions.
 
 #### Minimal Implementation (`standards/global/minimal-implementation.md`)
-Standards for avoiding speculative code, unused methods, and "just in case" abstractions. Follow these principles to keep code lean and maintainable.
+No speculative code, no unused methods, no "just in case" abstractions, YAGNI principle enforcement, lean code guidelines.
 
 ---
 
@@ -65,16 +65,16 @@ Located in `.ai-sdlc/docs/standards/frontend/`
 These standards apply to frontend code (UI components, client-side logic, styling).
 
 #### CSS (`standards/frontend/css.md`)
-CSS/styling standards including naming conventions, organization, and best practices. Follow these rules when writing styles.
+CSS naming conventions, stylesheet organization, utility-first vs component styles, CSS variable usage, responsive styling patterns.
 
 #### Components (`standards/frontend/components.md`)
-Standards for UI component structure, composition, props, and lifecycle. Apply these patterns when building components.
+Component structure and composition patterns, props design, lifecycle management, smart vs presentational separation.
 
 #### Accessibility (`standards/frontend/accessibility.md`)
-Accessibility standards for keyboard navigation, screen readers, ARIA, and WCAG compliance. Follow these guidelines for inclusive interfaces.
+Keyboard navigation requirements, screen reader support, ARIA attribute usage, WCAG compliance level, focus management patterns.
 
 #### Responsive Design (`standards/frontend/responsive.md`)
-Standards for responsive layouts, breakpoints, and mobile-first design. Apply these principles when building responsive UIs.
+Breakpoint definitions, mobile-first approach, responsive layout patterns, touch target sizing, viewport considerations.
 
 ---
 
@@ -85,16 +85,16 @@ Located in `.ai-sdlc/docs/standards/backend/`
 These standards apply to backend code (APIs, services, data layer).
 
 #### API Design (`standards/backend/api.md`)
-Standards for REST/GraphQL API design, endpoints, request/response formats, and versioning. Follow these patterns when building APIs.
+REST endpoint naming, request/response format conventions, versioning strategy, error response structure, pagination patterns.
 
 #### Models (`standards/backend/models.md`)
-Standards for data models, schemas, and business logic. Apply these patterns when defining domain models.
+Data model structure, schema conventions, business logic placement, relationship patterns, model validation rules.
 
 #### Queries (`standards/backend/queries.md`)
-Standards for database queries, optimization, and query patterns. Follow these guidelines when writing database queries.
+Query optimization patterns, N+1 prevention, index usage guidelines, query builder conventions, raw query policies.
 
 #### Migrations (`standards/backend/migrations.md`)
-Standards for database migrations, schema changes, and data migrations. Apply these practices when modifying database schema.
+Migration naming conventions, schema change patterns, data migration approach, rollback requirements, migration testing.
 
 ---
 
@@ -105,7 +105,7 @@ Located in `.ai-sdlc/docs/standards/testing/`
 These standards apply to all testing code (unit, integration, E2E).
 
 #### Test Writing (`standards/testing/test-writing.md`)
-Standards for writing tests, test organization, naming, and best practices. Follow these guidelines when creating tests.
+Test naming conventions, test file organization, arrange-act-assert structure, mocking guidelines, coverage expectations, test data management.
 
 ---
 

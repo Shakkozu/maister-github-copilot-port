@@ -341,7 +341,7 @@ Please:
 2. Maintain markdown formatting (bullet points, code blocks)
 3. Organize practices logically (group related items)
 4. Preserve existing practices unless conflicts exist
-5. Update INDEX.md to reflect changes
+5. Update INDEX.md entry for this standard — the description MUST enumerate the specific practices/conventions now documented in the file (not just a generic category description). Read the updated standard file and list key practices in the INDEX.md description.
 6. Verify CLAUDE.md integration"
 ```
 
@@ -359,7 +359,7 @@ Please:
 1. Create the standard file with proper markdown formatting
 2. Organize practices with clear sections
 3. Include code examples where provided
-4. Add to INDEX.md with appropriate description
+4. Add to INDEX.md with a description that enumerates the specific practices documented in the file (not a generic category description)
 5. Verify CLAUDE.md integration"
 ```
 
@@ -376,8 +376,12 @@ test -f .ai-sdlc/docs/[standard-path].md && echo "✓ Standard file verified"
 # Check file has content
 [ -s .ai-sdlc/docs/[standard-path].md ] && echo "✓ Standard has content"
 
-# Verify INDEX.md includes this standard
-grep -q "[standard-name]" .ai-sdlc/docs/INDEX.md && echo "✓ INDEX.md updated"
+# Verify INDEX.md includes this standard with practice-specific description
+grep -q "[standard-name]" .ai-sdlc/docs/INDEX.md && echo "✓ INDEX.md references standard"
+# Check that the INDEX.md description lists specific practices, not just a generic description
+# Read the entry and verify newly added practices appear in the description
+grep -A 3 "[standard-name]" .ai-sdlc/docs/INDEX.md
+# If description is still generic (e.g. "Standards for..."), re-invoke docs-manager to update it
 
 # Check CLAUDE.md references standards
 grep -q "ai-sdlc/docs/standards" CLAUDE.md && echo "✓ CLAUDE.md integrated"

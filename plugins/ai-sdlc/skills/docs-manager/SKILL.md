@@ -147,8 +147,9 @@ Use this to create or update the INDEX.md file that serves as the master documen
 **What to do:**
 1. Scan the `.ai-sdlc/docs/` directory structure
 2. For each documentation file found:
-   - Read the first few lines to extract description (look for frontmatter or first paragraph)
+   - Read the file content to extract description
    - Determine the file's purpose and category
+   - **For technical standards**: The description MUST enumerate the specific practices/conventions documented in the file, not just a generic category description. Example: "Observable cleanup with takeUntilDestroyed, reactive form typed access patterns, smart vs presentational component separation" — not just "Standards for UI component structure."
 3. Generate or update INDEX.md with this structure:
 
 ```markdown
