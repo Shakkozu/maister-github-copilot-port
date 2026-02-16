@@ -31,7 +31,7 @@ Task Tool:
     You are the reality-assessor agent. Assess the reality of completion for: [task-path]
 
     Your task:
-    1. Load all available verification reports (implementation-verifier, pragmatic-review-report.md, code-review-report.md, spec-audit-report.md)
+    1. Load all available verification reports (implementation-verifier, pragmatic-review.md, code-review-report.md, spec-audit.md)
     2. Assess claimed completion (check implementation-plan.md markers, test results, verification status)
     3. Validate functional completeness:
        - Run tests yourself (don't trust reports)
@@ -43,7 +43,7 @@ Task Tool:
     5. Check integration points (data flow, API contracts, auth, external systems)
     6. Generate reality assessment report with clear deployment decision
 
-    Save report to: verification/reality-assessment-report.md
+    Save report to: verification/reality-check.md
 
     Focus on: Does this ACTUALLY work for intended purpose? Functional reality over technical perfection.
 

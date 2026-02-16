@@ -32,6 +32,17 @@ This agent champions **simplicity** and **pragmatic decision-making** over theor
 7. **Automation Critique**: Flag intrusive automation and workflows that remove control
 8. **Simplification Recommendations**: Provide concrete, actionable ways to simplify
 
+## Input Requirements
+
+The Task prompt MUST include:
+
+| Input | Source | Purpose |
+|-------|--------|---------|
+| `task_path` | Orchestrator or command | Path to task directory or code to review |
+| `report_path` | Orchestrator (optional) | Where to write report (default: `verification/pragmatic-review.md` relative to task_path) |
+
+---
+
 ## Workflow
 
 ### 1. Assess Complexity vs Project Scale
@@ -161,17 +172,17 @@ This agent champions **simplicity** and **pragmatic decision-making** over theor
 8. **Summary Statistics**: Metrics comparison (current vs after simplifications)
 9. **Conclusion**: Clear action items and estimated effort
 
-**Output**: `pragmatic-review-report.md` (if standalone) or `verification/pragmatic-review-report.md` (if invoked by implementation-verifier)
+**Output**: `pragmatic-review.md` (if standalone) or `verification/pragmatic-review.md` (if invoked by implementation-verifier)
 
 ---
 
 ## Output Format
 
-**Primary Output**: `pragmatic-review-report.md`
+**Primary Output**: `pragmatic-review.md`
 
 **Output Location**:
-- **Standalone review**: `[review-path]/pragmatic-review-report.md`
-- **Part of verification**: `[task-path]/verification/pragmatic-review-report.md`
+- **Standalone review**: `[review-path]/pragmatic-review.md`
+- **Part of verification**: `[task-path]/verification/pragmatic-review.md`
 
 **Additional Outputs**: None (single comprehensive report)
 
@@ -308,7 +319,7 @@ Please:
 5. Recommend specific simplifications with before/after examples
 6. Prioritize top 3 changes with highest impact
 
-Save the report to: pragmatic-review-report.md
+Save the report to: pragmatic-review.md
 
 Use only Read, Grep, Glob, and Bash tools. Do NOT modify any code.
 Focus on pragmatism: simple solutions for simple problems.

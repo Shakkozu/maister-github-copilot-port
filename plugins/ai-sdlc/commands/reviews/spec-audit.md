@@ -50,7 +50,7 @@ Task Tool:
     - Examine codebase, database schemas, API endpoints, configurations
     - Trust nothing, verify everything independently
 
-    Save report to: [spec-audit-report location]
+    Save report to: verification/spec-audit.md
 
     Focus on: Evidence-based assessment. Every finding must have file:line references or clear evidence.
 ```

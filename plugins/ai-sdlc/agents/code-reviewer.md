@@ -40,7 +40,7 @@ The Task prompt MUST include:
 |-------|--------|---------|
 | `analysis_path` | Orchestrator or command | Path to analyze (file, directory, or task path) |
 | `scope` | Orchestrator or command | `all` (default), `quality`, `security`, or `performance` |
-| `report_path` | Orchestrator (optional) | Where to write report (default: `code-review-report.md` in analysis_path) |
+| `report_path` | Orchestrator (optional) | Where to write report (default: `verification/code-review-report.md` relative to task_path) |
 
 ---
 

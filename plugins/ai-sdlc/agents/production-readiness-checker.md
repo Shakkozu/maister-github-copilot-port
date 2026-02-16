@@ -40,7 +40,7 @@ The Task prompt MUST include:
 |-------|--------|---------|
 | `analysis_path` | Orchestrator or command | Path to analyze (task directory, feature directory, or project) |
 | `target` | Orchestrator or command | `production` (default, full rigor) or `staging` (relaxed) |
-| `report_path` | Orchestrator (optional) | Where to write report (default: `production-readiness-report.md`) |
+| `report_path` | Orchestrator (optional) | Where to write report (default: `verification/production-readiness-report.md` relative to task_path) |
 
 ---
 

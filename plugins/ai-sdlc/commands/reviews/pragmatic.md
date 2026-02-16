@@ -39,7 +39,7 @@ Task Tool:
     6. Prioritize top 3 changes with highest impact
 
     Generate comprehensive pragmatic review report.
-    Save to: pragmatic-review-report.md
+    Save to: verification/pragmatic-review.md
 
     Focus on: Simple solutions for simple problems. Code should match project needs, not theoretical best practices.
 ```

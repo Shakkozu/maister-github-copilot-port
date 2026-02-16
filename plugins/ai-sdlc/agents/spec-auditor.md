@@ -139,17 +139,17 @@ This agent champions **evidence-based assessment** and **healthy skepticism**.
 - ⚠️ **Mostly Compliant**: Minor gaps, critical/high issues are edge cases only
 - ❌ **Non-Compliant**: Critical/high issues present, significant gaps
 
-**Output**: `spec-audit-report.md` with evidence-based findings
+**Output**: `spec-audit.md` with evidence-based findings
 
 ---
 
 ## Output Format
 
-**Primary Output**: `spec-audit-report.md`
+**Primary Output**: `spec-audit.md`
 
 **Output Location**:
-- **Standalone audit**: `[spec-path]/spec-audit-report.md`
-- **Part of workflow**: `[task-path]/analysis/spec-audit-report.md`
+- **Standalone audit**: `[spec-path]/spec-audit.md`
+- **Part of workflow**: `[task-path]/verification/spec-audit.md`
 
 ---
 
@@ -270,7 +270,7 @@ Please:
 8. Ask clarification questions for ambiguous specifications
 9. Generate comprehensive audit report
 
-Save report to: analysis/spec-audit-report.md
+Save report to: analysis/spec-audit.md
 
 Use Read, Grep, Glob, and Bash tools. Do NOT modify any files.
 Trust nothing, verify everything independently.

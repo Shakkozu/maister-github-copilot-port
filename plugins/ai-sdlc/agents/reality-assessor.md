@@ -31,6 +31,19 @@ This agent champions **functional reality over technical perfection** and **work
 6. **Pragmatic Planning**: Create actionable plans to finish work properly
 7. **Completion Criteria**: Ensure "complete" means "actually works for intended purpose"
 
+## Input Requirements
+
+The Task prompt MUST include:
+
+| Input | Source | Purpose |
+|-------|--------|---------|
+| `task_path` | Orchestrator or command | Absolute path to task directory |
+| `report_path` | Orchestrator (optional) | Where to write report (default: `verification/reality-check.md` relative to task_path) |
+| `skip_test_execution` | Orchestrator (optional) | When `true`, read test results from file instead of running tests |
+| `test_results_path` | Orchestrator (optional) | Path to test results file (when `skip_test_execution: true`) |
+
+---
+
 ## Workflow
 
 ### 1. Load Available Verification Reports
@@ -39,9 +52,9 @@ This agent champions **functional reality over technical perfection** and **work
 
 **Reports to Check**:
 - `verification/implementation-verification.md` (if exists from implementation-verifier)
-- `verification/pragmatic-review-report.md` (if exists from code-quality-pragmatist)
+- `verification/pragmatic-review.md` (if exists from code-quality-pragmatist)
 - `verification/code-review-report.md` (if exists from code-reviewer)
-- `analysis/spec-audit-report.md` (if exists from spec-auditor)
+- `verification/spec-audit.md` (if exists from spec-auditor)
 - `implementation/implementation-plan.md` (check completion markers)
 
 **What to Extract**:
@@ -180,17 +193,17 @@ When `skip_test_execution` is `false` or not set (standalone invocation, or when
 - ⚠️ **Issues Found**: Works but has concerns, acceptable with monitoring
 - ❌ **Not Ready**: Critical gaps, do not deploy
 
-**Output**: `reality-assessment-report.md` with clear status and action plan
+**Output**: `reality-check.md` with clear status and action plan
 
 ---
 
 ## Output Format
 
-**Primary Output**: `reality-assessment-report.md`
+**Primary Output**: `reality-check.md`
 
 **Output Location**:
-- **Standalone check**: `[task-path]/reality-assessment-report.md`
-- **Part of verification**: `[task-path]/verification/reality-assessment-report.md`
+- **Standalone check**: `[task-path]/reality-check.md`
+- **Part of verification**: `[task-path]/verification/reality-check.md`
 
 ---
 
@@ -316,7 +329,7 @@ Please:
 8. Identify any gaps between claimed completion and functional reality
 9. Provide clear GO/NO-GO deployment decision with justification
 
-Save report to: verification/reality-assessment-report.md
+Save report to: verification/reality-check.md
 
 Use Read, Grep, Glob, and Bash tools. Do NOT modify any code.
 Focus: Does this ACTUALLY work and solve the business problem?
