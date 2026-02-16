@@ -10,8 +10,14 @@
   "plugins": [
     {
       "name": "ai-sdlc",
-      "description": "AI SDLC workflows with standards management",
+      "description": "AI SDLC workflows with standards management (Claude Code)",
       "source": "./plugins/ai-sdlc",
+      "category": "development"
+    },
+    {
+      "name": "ai-sdlc-copilot",
+      "description": "AI SDLC workflows with standards management (GitHub Copilot CLI)",
+      "source": "./plugins/ai-sdlc-copilot",
       "category": "development"
     }
   ]
