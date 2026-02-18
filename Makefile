@@ -20,4 +20,4 @@ clean:
 	rm -rf plugins/maister-copilot/
 
 watch:
-	fswatch -o plugins/ai-sdlc/ | xargs -n1 -I{} make build
+	fswatch -o plugins/maister/ | xargs -n1 -I{} make build

@@ -11,7 +11,7 @@
     {
       "name": "maister",
       "description": "AI SDLC workflows with standards management (Claude Code)",
-      "source": "./plugins/ai-sdlc",
+      "source": "./plugins/maister",
       "category": "development"
     },
     {

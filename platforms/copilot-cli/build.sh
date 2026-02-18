@@ -3,7 +3,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-CORE="$ROOT/plugins/ai-sdlc"
+CORE="$ROOT/plugins/maister"
 OUT="$ROOT/plugins/maister-copilot"
 
 # Cross-platform sed in-place (macOS needs '' arg, Linux doesn't)

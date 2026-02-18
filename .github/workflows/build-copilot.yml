@@ -2,7 +2,7 @@ name: Build Copilot CLI Variant
 on:
   push:
     branches: [master, v2]
-    paths: ['plugins/ai-sdlc/**', 'platforms/**']
+    paths: ['plugins/maister/**', 'platforms/**']
 
 jobs:
   build:
