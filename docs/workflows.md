@@ -7,10 +7,12 @@ Maister provides six workflow types, each with phases tailored to its needs. All
 The unified development workflow handles features, enhancements, and bug fixes through a 14-phase adaptive pipeline. Phases activate or skip based on task type.
 
 ```
-/maister:development-new "Add two-factor authentication" --type=feature
+/maister:development-new
+/maister:development-new "Add two-factor authentication"
 /maister:development-new "Fix login timeout" --type=bug
-/maister:development-new "Add CSV export to reports" --type=enhancement
 ```
+
+When run without arguments, the plugin extracts the task description from your conversation and auto-detects the type (feature, bug, or enhancement). Use `--type=` only when you want to override the auto-detection.
 
 **Flags**: `--type=bug|enhancement|feature`, `--yolo`, `--e2e`, `--user-docs`, `--code-review`, `--research=PATH`, `--from=PHASE`
 
@@ -58,7 +60,8 @@ Resume phases: `analysis`, `gap`, `spec`, `plan`, `implement`, `verify`
 Static code analysis to detect bottlenecks, followed by standard spec/plan/implement/verify pipeline.
 
 ```
-/maister:performance-new "Optimize dashboard loading time" [--yolo]
+/maister:performance-new
+/maister:performance-new "Optimize dashboard loading time" --yolo
 ```
 
 ### Phases
@@ -92,7 +95,8 @@ Resume phases: `analysis`, `specification`, `planning`, `implementation`, `verif
 Technology, data, and architecture migrations with rollback planning and risk assessment.
 
 ```
-/maister:migration-new "Migrate from REST to GraphQL" [--yolo] [--type=TYPE]
+/maister:migration-new
+/maister:migration-new "Migrate from REST to GraphQL" --type=code
 ```
 
 **Migration types**: `code`, `data`, `architecture`, `general`
@@ -131,7 +135,8 @@ Resume phases: `analysis`, `target`, `spec`, `plan`, `execute`, `verify`, `docs`
 Multi-source research with synthesis, optional solution brainstorming, and high-level design.
 
 ```
-/maister:research-new "What authentication approach fits our architecture?" [--yolo] [--type=TYPE]
+/maister:research-new
+/maister:research-new "What authentication approach fits our architecture?" --type=technical
 ```
 
 **Research types**: `technical`, `requirements`, `literature`, `mixed`

@@ -6,6 +6,7 @@
 
 Auto-classifies your task and routes to the appropriate workflow. Accepts:
 
+- **No arguments**: Extracts the task from your current conversation context
 - Task description: `/maister:work "Add user profile page"`
 - Task folder path: `/maister:work .maister/tasks/new-features/2026-02-17-user-profile` (resumes)
 - GitHub issue URL: `/maister:work https://github.com/org/repo/issues/42`
@@ -18,7 +19,7 @@ The plugin classifies the task type with confidence scoring, asks for confirmati
 
 ### `/maister:development-new [description]`
 
-Starts the unified development workflow (14 adaptive phases).
+Starts the unified development workflow (14 adaptive phases). All arguments are optional — when run without a description, the plugin extracts it from your current conversation. Task type (bug/enhancement/feature) is auto-detected from context when `--type` is omitted.
 
 | Flag | Description |
 |------|-------------|
@@ -58,7 +59,7 @@ Resume an interrupted development workflow from where it left off.
 
 ### `/maister:performance-new [description]`
 
-Starts performance optimization with static bottleneck analysis (9 phases). Detects N+1 queries, missing indexes, O(n^2) algorithms, blocking I/O, and memory leak patterns.
+Starts performance optimization with static bottleneck analysis (9 phases). Can be run without arguments — the plugin extracts the optimization target from your conversation. Detects N+1 queries, missing indexes, O(n^2) algorithms, blocking I/O, and memory leak patterns.
 
 | Flag | Description |
 |------|-------------|
@@ -81,7 +82,7 @@ You can optionally provide profiling data (flame graphs, APM screenshots) — th
 
 ### `/maister:migration-new [description]`
 
-Starts migration workflow (8 phases) with mandatory rollback planning and risk assessment.
+Starts migration workflow (8 phases) with mandatory rollback planning and risk assessment. Can be run without arguments — the plugin extracts migration details from your conversation.
 
 | Flag | Description |
 |------|-------------|
@@ -104,7 +105,7 @@ Starts migration workflow (8 phases) with mandatory rollback planning and risk a
 
 ### `/maister:research-new [question]`
 
-Starts research workflow (8 phases) with multi-source gathering, synthesis, and optional solution brainstorming.
+Starts research workflow (8 phases) with multi-source gathering, synthesis, and optional solution brainstorming. Can be run without arguments — the plugin extracts the research question from your conversation.
 
 | Flag | Description |
 |------|-------------|
@@ -197,7 +198,7 @@ Presents findings in confidence tiers (high/medium/low) for review before applyi
 
 ### `/maister:standards-update [description]`
 
-Update or create standards from conversation context or explicit description. Scans recent conversation for patterns like "we should always...", "our convention is...", "prefer X over Y".
+Update or create standards from conversation context or explicit description. When run without arguments, scans your current conversation for standards patterns like "we should always...", "our convention is...", "prefer X over Y" and proposes them as new standards.
 
 ---
 

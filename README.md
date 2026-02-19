@@ -40,9 +40,17 @@ This scans your codebase and creates `.maister/` with auto-detected coding stand
 /maister:work "Add user profile page with avatar upload"
 ```
 
+Or just discuss your task with Claude and then run:
+
+```
+/maister:work
+```
+
+The plugin picks up context from your conversation — no arguments needed.
+
 ## How It Works
 
-1. You describe a task in natural language
+1. You describe a task — either as an argument or just in conversation
 2. The plugin classifies it (feature, bug, enhancement, etc.) and proposes a workflow
 3. You confirm, and it guides you through phases: **requirements → spec → plan → implement → verify**
 4. At each phase, it asks for your input and decisions (or pass `--yolo` for continuous execution)
@@ -50,18 +58,35 @@ This scans your codebase and creates `.maister/` with auto-detected coding stand
 
 All artifacts are saved in `.maister/tasks/` organized by type and date.
 
+### Context-Aware Commands
+
+Every workflow command works without arguments. The plugin reads your current conversation to extract the task description and auto-detect the task type:
+
+```
+You: "The login page throws a 500 error when the session expires"
+You: /maister:development-new
+→ Auto-detects: bug fix, extracts description from conversation
+```
+
+```
+You: /maister:standards-update
+→ Scans conversation for patterns like "we always use..." or "prefer X over Y"
+```
+
+You can always be explicit when you prefer — arguments and flags simply override the auto-detection.
+
 ## Supported Workflows
 
 | Type | Command | Use When |
 |------|---------|----------|
-| **Feature** | `/maister:development-new --type=feature` | Adding new capabilities |
-| **Bug Fix** | `/maister:development-new --type=bug` | Fixing defects with TDD Red→Green |
-| **Enhancement** | `/maister:development-new --type=enhancement` | Improving existing features |
+| **Feature** | `/maister:development-new` | Adding new capabilities |
+| **Bug Fix** | `/maister:development-new` | Fixing defects with TDD Red→Green |
+| **Enhancement** | `/maister:development-new` | Improving existing features |
 | **Performance** | `/maister:performance-new` | Optimizing speed or resource usage |
 | **Migration** | `/maister:migration-new` | Changing technologies or patterns |
 | **Research** | `/maister:research-new` | Investigating questions or gathering requirements |
 
-Or just use `/maister:work "description"` and let the plugin classify automatically.
+Task type (feature/bug/enhancement) is auto-detected from context. Override with `--type=feature|bug|enhancement` if needed. Or use `/maister:work` as a single entry point that routes to the right workflow.
 
 ## Standards-Aware Development
 
