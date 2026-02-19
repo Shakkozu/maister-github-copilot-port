@@ -822,11 +822,6 @@ This hook fires after context compaction and injects a reminder into Claude's co
 
 **Purpose**: Prevents interactive mode from being bypassed when Claude receives "continue without asking" instructions after compaction. The compacted context retains information about which task was being worked on, but may lose the explicit `mode: interactive` setting.
 
-**Logging**: Hook executions are logged to `~/.maister-hooks.log` for debugging:
-```
-[2026-01-19 14:30:45] SessionStart(compact) | project=/Users/marek/myproject
-```
-
 **See**: `hooks/hooks.json` for hook configuration (auto-discovered by Claude Code).
 
 ## Claude Code Documentation

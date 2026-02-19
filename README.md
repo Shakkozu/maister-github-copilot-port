@@ -17,7 +17,7 @@ Maister brings guided workflows to your Claude Code projects. Describe what you 
 **1. Add the marketplace**
 
 ```
-/plugin marketplace add SkillPanel/ai-sdlc
+/plugin marketplace add SkillPanel/Maister
 ```
 
 **2. Install the plugin**

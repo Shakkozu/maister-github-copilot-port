@@ -7,5 +7,5 @@
 # Claude local settings
 .claude/settings.local.json
 
-# AI SDLC task tracking (generated per-project, not part of plugin source)
-.ai-sdlc/
+# Maister task tracking (generated per-project, not part of plugin source)
+.maister/
