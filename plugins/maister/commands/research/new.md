@@ -12,15 +12,17 @@ Start comprehensive research to investigate a topic, analyze findings, and gener
 ## Usage
 
 ```bash
-/maister:research-new [question] [--yolo] [--type=TYPE] [--brainstorm] [--no-brainstorm]
+/maister:research-new [question] [--yolo] [--type=TYPE] [--brainstorm] [--no-brainstorm] [--design] [--no-design]
 ```
 
 ### Options
 
 - `--yolo`: Continuous execution without pauses
 - `--type=TYPE`: Research type (technical, requirements, literature, mixed)
-- `--brainstorm`: Force brainstorming/design phases (skips Phase 1 decision, auto-enables)
-- `--no-brainstorm`: Skip brainstorming/design phases (go directly to output generation)
+- `--brainstorm`: Force brainstorming phase (explore solution alternatives)
+- `--no-brainstorm`: Skip brainstorming phase
+- `--design`: Force high-level design phase
+- `--no-design`: Skip high-level design phase
 
 ## Examples
 

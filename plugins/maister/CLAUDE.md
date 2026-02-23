@@ -692,7 +692,7 @@ Research context flows through ALL phases without skipping any. Research artifac
 | `/maister:performance-resume` | `[path] [--from=phase]` | |
 | `/maister:migration-new` | `[desc] [--yolo] [--type=TYPE]` | `.maister/tasks/migrations/` |
 | `/maister:migration-resume` | `[path] [--from=phase]` | |
-| `/maister:research-new` | `[question] [--yolo] [--type=TYPE] [--brainstorm] [--no-brainstorm]` | `.maister/tasks/research/` |
+| `/maister:research-new` | `[question] [--yolo] [--type=TYPE] [--brainstorm] [--no-brainstorm] [--design] [--no-design]` | `.maister/tasks/research/` |
 | `/maister:research-resume` | `[path] [--from=phase]` | |
 
 ### Review & Audit Commands
