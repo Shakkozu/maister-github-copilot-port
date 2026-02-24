@@ -230,11 +230,27 @@ Pass `task_type="enhancement"` and the performance-focused description. The code
 
 📋 **Standards Discovery**: Implementation reads `.maister/docs/INDEX.md` continuously.
 
+**ANTI-PATTERN — DO NOT DO THIS:**
+- ❌ "Let me implement this directly..." — STOP. Delegate to implementation-plan-executor.
+- ❌ "This is simple enough to code inline..." — STOP. Simplicity is NOT a reason to skip delegation.
+
+**INVOKE NOW** — Skill tool call:
+
 **Execute**: Skill tool - `maister-implementation-plan-executor`
 **Output**: Implemented optimizations, `implementation/work-log.md`
-**State**: Update implementation progress
+**State**: Update implementation progress, extract phase_summaries.implementation
 
-→ **AUTO-CONTINUE** — Do NOT end turn, do NOT prompt user. Proceed immediately to Phase 7.
+**SELF-CHECK**: Did you just invoke the Skill tool with `maister-implementation-plan-executor`? Or did you start writing code yourself? If the latter, STOP immediately and invoke the Skill tool instead.
+
+**⚠️ POST-IMPLEMENTATION CONTINUATION** — After the skill completes and returns control:
+1. Read `orchestrator-state.yml` to confirm you are the orchestrator
+2. Update state: add Phase 6 to `completed_phases`
+3. Proceed to Phase 7
+
+→ Pause
+
+**Interactive**: AskUserQuestion - "Implementation complete. Continue to Phase 7?"
+**YOLO**: "→ Continuing to Phase 7..."
 
 ---
 

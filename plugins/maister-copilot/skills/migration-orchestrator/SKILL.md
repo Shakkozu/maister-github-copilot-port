@@ -180,11 +180,25 @@ Use for:
 ### Phase 5: Migration Execution
 
 **Purpose**: Execute migration steps with incremental verification
+
+**ANTI-PATTERN — DO NOT DO THIS:**
+- ❌ "Let me implement this directly..." — STOP. Delegate to implementer.
+- ❌ "This migration is simple enough to code inline..." — STOP. Simplicity is NOT a reason to skip delegation.
+
+**INVOKE NOW** — Skill tool call:
+
 **Execute**: Skill tool - `maister-implementer`
 **Output**: Implemented migration changes, `implementation/work-log.md`
-**State**: Update implementation progress
+**State**: Update implementation progress, extract phase_summaries.implementation
 
-**Standards Reminder**: Review `.maister/docs/INDEX.md` before implementing.
+📋 **Standards Reminder**: Review `.maister/docs/INDEX.md` before implementing.
+
+**SELF-CHECK**: Did you just invoke the Skill tool with `maister-implementer`? Or did you start writing migration code yourself? If the latter, STOP immediately and invoke the Skill tool instead.
+
+**⚠️ POST-IMPLEMENTATION CONTINUATION** — After the skill completes and returns control:
+1. Read `orchestrator-state.yml` to confirm you are the orchestrator
+2. Update state: add Phase 5 to `completed_phases`
+3. Proceed to Phase 6
 
 → Pause
 
@@ -206,7 +220,15 @@ Use for:
 - Validate data integrity (for data migrations)
 - Check performance benchmarks (before/after)
 
-→ Conditional: if verdict=PASS skip to Phase 8, if fixable issues continue to Phase 7, otherwise stop workflow
+**⚠️ POST-VERIFICATION CONTINUATION** — After the skill completes and returns control:
+1. Read `orchestrator-state.yml` to confirm you are the orchestrator
+2. Update state: add Phase 6 to `completed_phases`
+3. Evaluate verdict: if PASS → Phase 8, if fixable issues → Phase 7, otherwise stop workflow
+
+→ Pause
+
+**Interactive**: AskUserQuestion - "Verification complete. [verdict summary]. Continue to Phase [7 or 8]?"
+**YOLO**: "→ Continuing to Phase [7 or 8]..."
 
 ---
 

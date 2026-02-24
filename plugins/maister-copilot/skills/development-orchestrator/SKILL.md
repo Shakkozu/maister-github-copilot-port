@@ -346,6 +346,11 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 **Output**: `verification/implementation-verification.md`, optional code-review/pragmatic/reality reports, updated `implementation/work-log.md`
 **State**: Update verification results, `verification_context`
 
+**⚠️ POST-VERIFICATION CONTINUATION** — After the skill completes and returns control:
+1. Read `orchestrator-state.yml` to confirm you are the orchestrator
+2. Update state: add Phase 11 to `completed_phases`
+3. Proceed to Phase 12
+
 → Pause
 
 **Interactive**: AskUserQuestion - "Verification complete. Continue to Phase 12?"
