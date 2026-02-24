@@ -6,7 +6,7 @@ argument-hint: "[bug description]"
 
 # Quick Bug Fix
 
-Lightweight TDD-driven bug fix workflow. Analyze, reproduce with a failing test, fix, verify. No orchestrator state, no task directory, no subagents.
+Lightweight TDD-driven bug fix workflow with planning mode. Analyze the bug, present a fix plan for approval, then reproduce with a failing test, fix, and verify. No orchestrator state, no task directory, no subagents.
 
 For complex bugs that grow beyond a quick fix, suggests escalating to the full development workflow (`/maister:development-new`).
 
@@ -46,6 +46,8 @@ For complex bugs that grow beyond a quick fix, suggests escalating to the full d
   ```
 
 ### Step 2: Discover Standards
+
+**CRITICAL: This step MUST complete before entering plan mode.**
 
 **Check if `.maister/docs/INDEX.md` exists:**
 
@@ -108,7 +110,52 @@ Use AskUserQuestion:
 
 **If no escalation needed or user chooses to continue:** proceed to Step 4.
 
-### Step 4: TDD Red Gate
+### Step 4: Enter Planning Mode
+
+**Use the `EnterPlanMode` tool to present the fix plan for user approval.**
+
+Standards context from Step 2 and analysis from Step 3 MUST inform the plan.
+
+**Plan file content:**
+
+```markdown
+## Bug Analysis
+
+**Root Cause**: [hypothesis with evidence — file paths, code references]
+**Affected Files**: [list of files that need changes]
+
+## Proposed Fix
+
+[Description of the fix approach — what changes, why this approach]
+
+## Test Strategy
+
+[What the failing test will assert — setup conditions, expected behavior]
+
+## Applicable Standards
+
+[List each standard file read, with key guidelines extracted from each.
+If no standards exist: "No AI SDLC standards found. Consider running `/maister:init`."]
+
+## Standards Compliance Checklist
+
+- [ ] [Guideline from standard file] (from `standards/[path]`)
+- [ ] [Guideline from standard file] (from `standards/[path]`)
+```
+
+### ExitPlanMode Gate: Mandatory Sections
+
+**BLOCKING: Do NOT call `ExitPlanMode` until the plan file contains:**
+
+1. **"## Bug Analysis"** — root cause hypothesis with evidence
+2. **"## Proposed Fix"** — what changes and why
+3. **"## Test Strategy"** — what the TDD red test will assert
+4. **"## Applicable Standards"** — standards read and key guidelines
+5. **"## Standards Compliance Checklist"** — checkboxes for applicable guidelines
+
+If any section is missing, add it before calling ExitPlanMode.
+
+### Step 5: TDD Red Gate
 
 **Write a failing test that reproduces the bug.**
 
@@ -126,11 +173,11 @@ Use AskUserQuestion:
 - Investigate further — re-read the bug description, check if conditions are correct
 - Use AskUserQuestion: "The reproduction test passes — the expected behavior already works under these conditions. Is the bug description accurate, or are there additional conditions?"
 
-### Step 5: Fix & Verify (TDD Green)
+### Step 6: Fix & Verify (TDD Green)
 
 **Implement the fix:**
 
-1. Apply the fix based on root cause analysis from Step 3
+1. Apply the fix based on the approved plan from Step 4
 2. **Apply discovered standards** from Step 2
 3. Run the failing test — it MUST now pass
 4. Run the full test file and related test files to check for regressions
@@ -145,7 +192,7 @@ Use AskUserQuestion:
 - Stop and present findings to the user
 - Suggest escalating to `/maister:development-new` for a more thorough approach
 
-### Step 6: Summary
+### Step 7: Summary
 
 **Provide completion summary:**
 
@@ -156,6 +203,8 @@ Use AskUserQuestion:
 - **Tests**: Which tests were run and their results (including the TDD red→green transition)
 - **Commit suggestion**: Propose a commit message
 
+**Post-implementation: verify standards compliance using the checklist from the plan file.**
+
 ---
 
 ## What This Does
@@ -164,9 +213,10 @@ Use AskUserQuestion:
 2. **Discovers** applicable standards from `.maister/docs/INDEX.md`
 3. **Analyzes** codebase to find root cause and assess complexity
 4. **Escalates** to full development workflow if bug is too complex
-5. **Reproduces** bug with a failing test (TDD Red)
-6. **Fixes** the bug and verifies test passes (TDD Green)
-7. **Summarizes** root cause, fix, standards applied, and test results
+5. **Plans** the fix and presents for user approval via planning mode
+6. **Reproduces** bug with a failing test (TDD Red)
+7. **Fixes** the bug and verifies test passes (TDD Green)
+8. **Summarizes** root cause, fix, standards applied, and test results
 
 ## Graceful Fallback
 
