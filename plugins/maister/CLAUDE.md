@@ -600,6 +600,7 @@ Skills are automatically invoked by Claude when appropriate. Details live in eac
 | `docs-manager` | Internal engine for doc file operations, INDEX.md generation, CLAUDE.md integration. Not user-invocable — called by maister:init, standards-update, standards-discover | `skills/docs-manager/skill.md` |
 | `maister:init` | Initialize `.maister/docs/` with project analysis, documentation generation, and baseline standards | `skills/init/SKILL.md` |
 | `standards-update` | Update or create standards from conversation context or explicit input | `skills/standards-update/SKILL.md` |
+| `quick-bugfix` | Quick TDD-driven bug fix with complexity escalation to full development workflow | `skills/quick-bugfix/SKILL.md` |
 
 ### Orchestrator Framework
 
@@ -711,6 +712,7 @@ Research context flows through ALL phases without skipping any. Research artifac
 |---------|-------|---------|
 | `/maister:quick-plan` | `[task description]` | Enter planning mode with standards awareness from INDEX.md |
 | `/maister:quick-dev` | `[task description]` | Implement directly with standards awareness (no planning) |
+| `/maister:quick-bugfix` | `[bug description]` | Quick bug fix with TDD red/green gates and complexity escalation |
 
 **See**: Individual `commands/*/` and `skills/*/skill.md` files for detailed documentation.
 
