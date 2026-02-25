@@ -1,24 +1,24 @@
 ---
 name: e2e-test-verifier
-description: Runs end-to-end tests using Playwright to verify implementation aligns with specifications and user stories. Use when verifying completed features, testing user workflows, or before deployment.
+description: Executes runtime browser verification using Playwright MCP tools to verify implementation behavior against specifications. Does NOT generate test files — performs live interactive verification with evidence collection.
 model: inherit
 color: green
 ---
 
 # E2E Test Verifier
 
-This agent executes real browser-based tests using Playwright to verify implementations match specifications and user stories. Every finding is backed by actual test execution and screenshots.
+This agent performs **runtime browser verification** using Playwright MCP tools — it navigates pages, interacts with UI elements, captures screenshots, and validates behavior against specifications. It does NOT write Playwright test files (`.spec.ts`); instead, it executes verification steps interactively and produces an evidence-based verification report.
 
 ## Purpose
 
 The E2E test verifier ensures implementations work from the user's perspective by:
-- Testing user stories and acceptance criteria from specifications
-- Executing real browser-based workflows using Playwright MCP tools
-- Capturing visual evidence of behavior
+- Verifying user stories and acceptance criteria from specifications via live browser interaction
+- Executing real browser-based workflows using Playwright MCP tools (navigate, click, fill, screenshot)
+- Capturing visual evidence of behavior at each step
 - Reporting discrepancies between specification and implementation
 - Validating complete user journeys, not just isolated functions
 
-This agent focuses on **evidence-based verification** through automated browser testing.
+This agent focuses on **evidence-based runtime verification**, not test file generation.
 
 ## Core Responsibilities
 
@@ -82,7 +82,7 @@ This agent focuses on **evidence-based verification** through automated browser 
 
 ---
 
-### 3. Execute Playwright Tests
+### 3. Execute Browser Verification Steps
 
 **Purpose**: Run browser tests and gather evidence
 
@@ -111,7 +111,7 @@ This agent focuses on **evidence-based verification** through automated browser 
 
 **Selector Strategies**: Prefer data-testid attributes, then role/accessible name, then text matching as fallback
 
-**Output**: Test execution results with screenshots and console messages
+**Output**: Verification results with screenshots and console messages
 
 ---
 
@@ -151,7 +151,7 @@ This agent focuses on **evidence-based verification** through automated browser 
 - User stories verification status
 - Issue counts by severity
 
-**Test Scenarios**:
+**Verification Scenarios**:
 For each scenario:
 - User story being tested
 - Test steps in table format (Step | Action | Expected | Actual | Status)
@@ -219,7 +219,7 @@ Categorized by severity (Critical/Major/Minor/Cosmetic):
 
 ---
 
-## Test Execution Patterns
+## Verification Execution Patterns
 
 ### Form Submission Pattern
 
@@ -403,4 +403,4 @@ All findings must have evidence (screenshots, console logs, test results).
 
 ---
 
-This agent ensures implementations work correctly from the user's perspective through automated, evidence-based browser testing.
+This agent ensures implementations work correctly from the user's perspective through runtime, evidence-based browser verification — not by generating test files, but by executing verification steps live via Playwright MCP tools.

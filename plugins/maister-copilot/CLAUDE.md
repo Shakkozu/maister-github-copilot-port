@@ -731,7 +731,7 @@ Subagents are specialized AI agents invoked by skills and orchestrators. All age
 | Agent | Purpose | Invoked By | Details |
 |-------|---------|------------|---------|
 | `ui-mockup-generator` | ASCII mockups showing UI integration with existing layouts | development-orchestrator (feature/enhancement) | `agents/ui-mockup-generator.md` |
-| `e2e-test-verifier` | Playwright browser testing with screenshots | development-orchestrator (optional) | `agents/e2e-test-verifier.md` |
+| `e2e-test-verifier` | Runtime browser verification via Playwright MCP tools (not test file generation) | development-orchestrator (optional) | `agents/e2e-test-verifier.md` |
 | `user-docs-generator` | User documentation with Playwright screenshots | development-orchestrator (optional) | `agents/user-docs-generator.md` |
 
 ### Performance Agents

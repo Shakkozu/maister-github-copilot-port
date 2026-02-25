@@ -360,7 +360,7 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 
 ### Phase 12: E2E Testing (Optional)
 
-**Purpose**: End-to-end browser testing with screenshots
+**Purpose**: Runtime browser verification with screenshots (via Playwright MCP tools, not test file generation)
 **Execute**: Task tool - `maister-e2e-test-verifier` subagent
 **Output**: `verification/e2e-verification-report.md`, screenshots
 **State**: Update E2E results
