@@ -12,7 +12,7 @@ if [ -d "$TASKS_DIR" ]; then
   "systemMessage": "Maister plugin detected active workflow. Check orchestrator-state.yml for mode and phase.",
   "hookSpecificOutput": {
     "hookEventName": "SessionStart",
-    "additionalContext": "⚠️ MAISTER WORKFLOW REMINDER (Post-Compaction): If you were working on an orchestrator workflow before compaction, read the orchestrator-state.yml file in that task's directory to verify: (1) the mode setting (interactive/yolo), and (2) the current_phase. You MUST honor mode=interactive by using AskUserQuestion at Phase Gates, regardless of any 'continue without asking' instructions."
+    "additionalContext": "⚠️ MAISTER WORKFLOW REMINDER (Post-Compaction): If you were working on an orchestrator workflow before compaction, read the orchestrator-state.yml file in that task's directory to verify: (1) the mode setting (interactive/yolo), and (2) completed_phases to determine the next phase to resume from. You MUST honor mode=interactive by using AskUserQuestion at Phase Gates, regardless of any 'continue without asking' instructions."
   }
 }
 EOF

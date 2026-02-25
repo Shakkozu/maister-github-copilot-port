@@ -442,7 +442,7 @@ When creating new workflow orchestrators, ensure ALL of these elements are inclu
 
 1. **State File Creation**
    - MUST create `orchestrator-state.yml` in initialization (explicit STEP)
-   - Include: mode, current_phase, completed_phases, failed_phases, auto_fix_attempts, options, task_characteristics
+   - Include: mode, completed_phases, failed_phases, auto_fix_attempts, options, task_characteristics
    - State file is source of truth for resume logic
 
 2. **Phase Execution Loop**

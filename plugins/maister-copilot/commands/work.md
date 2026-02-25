@@ -98,7 +98,7 @@ Auto-classifies tasks and routes to the appropriate workflow orchestrator. Suppo
 
 3. Extract status from state file:
    - `completed`: null = in-progress, timestamp = finished
-   - `current_phase`: what phase is active
+   - `completed_phases`: derive active phase as first phase not in this list
    - `failed_phases`: array of failed attempts
 
 4. Present status to user with AskUserQuestion:
@@ -106,7 +106,7 @@ Auto-classifies tasks and routes to the appropriate workflow orchestrator. Suppo
 **For In-Progress Tasks:**
 ```
 Options:
-1. Resume from current phase ([current_phase])
+1. Resume from next incomplete phase
 2. Restart from specific phase
 3. Cancel
 ```

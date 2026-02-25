@@ -21,7 +21,6 @@ orchestrator:
 
   # Phase tracking
   started_phase: [phase-name]
-  current_phase: [phase-name]
   completed_phases: []
   failed_phases: []
 
@@ -137,8 +136,8 @@ State is updated at key points in each phase:
 | Operation | When | Fields Updated |
 |-----------|------|----------------|
 | Create | Workflow start | All fields initialized, `mode`, `started_phase`, timestamps |
-| Phase Start | Before execution | `current_phase`, `updated` |
-| Phase Complete | After success | `completed_phases` (add), `current_phase` (next), `updated` |
+| Phase Start | Before execution | `updated` |
+| Phase Complete | After success | `completed_phases` (add), `updated` |
 | Phase Failure | After max attempts | `failed_phases` (add with error), `updated` |
 | Retry | On each retry | `auto_fix_attempts.[phase]` (increment), `updated` |
 | Context Update | After subagent | Domain-specific fields from subagent output |

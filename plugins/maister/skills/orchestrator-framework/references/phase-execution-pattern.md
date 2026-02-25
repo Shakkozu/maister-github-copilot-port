@@ -85,7 +85,7 @@ For each phase:
 1. **Check completion**: Read `orchestrator-state.yml` → if phase in `completed_phases`, skip
 2. **Mark task in progress**: `TaskUpdate` the phase's task to `in_progress` (shows spinner with `activeForm`)
 3. **Execute**: Run the phase content (delegate via Skill/Task tool or execute directly)
-4. **Update state**: Add phase to `completed_phases`, update `current_phase`
+4. **Update state**: Add phase to `completed_phases`
 5. **Mark task completed**: `TaskUpdate` the phase's task to `completed`. Optionally set `metadata` with timing and artifact paths. Set `owner` if phase was delegated to a skill/agent.
 6. **Follow transition**: Execute the `→` instruction at phase end
 
