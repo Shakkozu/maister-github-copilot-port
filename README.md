@@ -116,7 +116,7 @@ This is the key differentiator. Maister doesn't just run workflows - it learns y
 - **`/maister:init`** scans config files, source code, and documentation to auto-detect your coding standards
 - **Continuous checking** - standards are consulted before specification, during planning, and while coding (not just at the start)
 - **`/maister:standards-discover`** refreshes standards from your evolving codebase
-- **`/maister:standards-update`** lets you add or refine standards manually
+- **`/maister:standards-update`** lets you add or refine standards manually, or sync from another project with `--from=PATH`
 
 Standards live in `.maister/docs/standards/` and are indexed in `.maister/docs/INDEX.md`.
 

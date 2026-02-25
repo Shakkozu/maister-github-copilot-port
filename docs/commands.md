@@ -200,9 +200,13 @@ Auto-discovers coding standards from multiple sources in parallel: config files,
 
 Presents findings in confidence tiers (high/medium/low) for review before applying.
 
-### `/maister:standards-update [description]`
+### `/maister:standards-update [description] [--from=PATH]`
 
 Update or create standards from conversation context or explicit description. When run without arguments, scans your current conversation for standards patterns like "we should always...", "our convention is...", "prefer X over Y" and proposes them as new standards.
+
+| Flag | Description |
+|------|-------------|
+| `--from=PATH` | Sync standards from another project. Analyzes differences, shows what's missing or changed, and lets you select which standards to import. |
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: maister:standards-update
 description: Update or create project standards from conversation context or explicit description
-argument-hint: "[description of standard/convention]"
+argument-hint: "[description of standard/convention] [--from=PATH]"
 ---
 
 # Update Project Standards
@@ -13,7 +13,58 @@ Update or create standards in `.maister/docs/standards/` based on conversation c
 ```bash
 /maister:standards-update                                    # Detect from conversation
 /maister:standards-update "always use React.memo for lists"  # From description
+/maister:standards-update --from=/path/to/other-project      # Sync from another project
 ```
+
+---
+
+## Mode: Sync from External Project (`--from=PATH`)
+
+When `--from=PATH` is provided, the skill switches to **sync mode** — importing standards from another project's `.maister/docs/standards/` into the current project. This bypasses Phases 1-3 and uses a dedicated flow.
+
+### SYNC STEP 1: Validate Source
+
+1. Resolve the path (absolute or relative to cwd)
+2. Check `PATH/.maister/docs/standards/` exists. If not, inform the user and stop.
+3. Check `.maister/docs/standards/` exists in the current project. If not, offer to run `/maister:init` first.
+
+### SYNC STEP 2: Analyze Differences
+
+1. Scan source project's `standards/*/` — list all categories and files
+2. Scan current project's `standards/*/` — list all categories and files
+3. For each source file, compare against the local counterpart:
+   - **Missing locally**: Category or file doesn't exist in the current project
+   - **Differs**: Both exist but content differs (read and compare)
+   - **Identical**: No action needed
+4. Present a summary to the user via AskUserQuestion (multi-select):
+   - Group by status: "New standards to add" and "Standards that differ"
+   - Each item shows: `[category]/[file]` with brief description of what it contains
+   - Options: individual files to sync, plus "Select all new" / "Select all different" convenience options
+   - User selects which standards to import
+
+### SYNC STEP 3: Apply Selected Standards
+
+For each selected standard:
+- **Missing locally**: Copy the file from source. Create category directory if needed.
+- **Differs**: Show a brief diff summary and use AskUserQuestion per file:
+  - "Replace with source version" — overwrite local file
+  - "Merge (append new sections)" — read both files, append `###` sections from source that don't exist locally
+  - "Skip" — leave local file unchanged
+
+### SYNC STEP 4: Update INDEX.md
+
+Invoke docs-manager skill via Skill tool:
+> "Regenerate INDEX.md to include all newly added/updated standards. Verify CLAUDE.md integration."
+
+### SYNC STEP 5: Summarize
+
+Display: standards added, standards updated, standards skipped, and total count. Suggest reviewing the imported standards and committing.
+
+---
+
+## Mode: Conversation / Description (default)
+
+When `--from` is NOT provided, the skill uses the standard detect-and-update flow below.
 
 ---
 

@@ -651,7 +651,7 @@ Commands invoke orchestrators and utilities. All orchestrators support `--yolo` 
 | Command | Usage | Purpose |
 |---------|-------|---------|
 | `/maister:init` | `/maister:init [--standards-from=PATH]` | Initialize framework with project analysis and smart defaults for docs/standards. Optionally copy standards from another project's `.maister/docs/standards/` instead of built-in defaults. |
-| `/maister:standards-update` | `/maister:standards-update [path]` | Update/create standards from conversation context |
+| `/maister:standards-update` | `/maister:standards-update [description] [--from=PATH]` | Update/create standards from conversation context, or sync from another project |
 | `/maister:standards-discover` | `/maister:standards-discover [--scope=SCOPE]` | Discover standards from config files and code patterns |
 
 > **Note**: These are all skills (not commands). `/maister:init`, `/maister:standards-update`, and `/maister:standards-discover` invoke their respective skills which delegate file operations to the internal `docs-manager` skill.
