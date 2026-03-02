@@ -1,6 +1,6 @@
 {
   "name": "maister-copilot",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Structured, standards-aware development workflows for Claude Code",
   "author": {
     "name": "Skillpanel",

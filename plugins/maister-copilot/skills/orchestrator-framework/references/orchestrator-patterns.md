@@ -313,3 +313,4 @@ If prerequisites missing, use AskUserQuestion: "Start from Phase 1", "Specify di
 | Verification passes | Proceed to next phase |
 | User chooses "Proceed with known issues" | Proceed with warning logged |
 | Max iterations (3) reached | Ask user how to proceed |
+| Critical issues remain unresolved | **MUST NOT proceed** — require user approval first |

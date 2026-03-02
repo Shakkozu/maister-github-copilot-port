@@ -319,25 +319,44 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 
 ### Phase 10: Verification Options Prompt
 
-**Purpose**: Determine which verification checks to run
-**Execute**: Direct - confirm/override defaults set by Phase 2, use AskUserQuestion for each concern
-**Output**: Updated state with verification options
-**State**: Set `options.code_review_enabled`, `options.e2e_enabled`, `options.user_docs_enabled`
-
-**Always enabled**: Reality check, pragmatic review
+**Purpose**: Determine which verification checks to run using tiered decision matrix
+**Execute**: Direct - display plan, confirm/adjust via AskUserQuestion
+**Output**: Updated state with all verification options
+**State**: Set `options.code_review_enabled`, `options.pragmatic_review_enabled`, `options.reality_check_enabled`, `options.production_check_enabled`, `options.e2e_enabled`, `options.user_docs_enabled`
 **Auto-set**: `skip_test_suite: true` (full test suite already passed during implementation phase; cleared before re-verification if fixes are applied)
 
-**Interactive mode** — ask separate questions for each concern:
+**Step 1**: Display the verification plan:
+```
+Verification Plan:
+  Obligatory (always run):
+    ✓ Completeness check
+    ✓ Test suite (skipped — passed during implementation; re-enabled after fixes)
 
-1. **Code review**: AskUserQuestion — "Enable code review?" Options: "Yes (Recommended)", "No, skip". Always recommended.
-2. **E2E testing**: AskUserQuestion — "Enable E2E browser verification?" Options: "Yes (Recommended)" (if `options.e2e_enabled: true` from Phase 2), "Yes", "No, skip". Recommended when `task_characteristics.ui_heavy: true`.
-3. **User documentation**: AskUserQuestion — "Generate user documentation?" Options: "Yes (Recommended)" (if `options.user_docs_enabled: true` from Phase 2), "Yes", "No, skip". Recommended when `task_characteristics.ui_heavy: true` or `creates_new_entities: true`.
+  Recommended (adjustable):
+    ✓ Code review — quality and security analysis
+    ✓ Pragmatic review — detects over-engineering
+    ✓ Reality check — validates work solves the problem
+    ✓ Production readiness — deployment readiness checks
 
-**YOLO mode** — confirm Phase 2 defaults without user interaction:
-- Code review: always enabled
-- E2E testing: enabled if `options.e2e_enabled: true` (set by Phase 2 based on `ui_heavy`)
-- User documentation: enabled if `options.user_docs_enabled: true` (set by Phase 2 based on `ui_heavy` or `creates_new_entities`)
-- Output: "→ Verification options: code review ✓, e2e [✓/✗], user docs [✓/✗]. Continuing to Phase 11..."
+  Conditional:
+    [✓/—] E2E browser testing — [reason]
+    [✓/—] User documentation — [reason]
+```
+
+**Step 2** (interactive mode — 3 questions):
+
+**Q1** (always): AskUserQuestion (multi-select) — "Which standard verifications to run?"
+Options: "Code review (Recommended)", "Pragmatic review (Recommended)", "Reality check (Recommended)", "Production readiness (Recommended)". All pre-selected.
+
+**Q2** (SKIP if `options.e2e_enabled: false` and no `--e2e` flag): AskUserQuestion — "Enable E2E browser verification?" Options: "Yes (Recommended)", "No, skip".
+
+**Q3** (SKIP if `options.user_docs_enabled: false` and no `--user-docs` flag): AskUserQuestion — "Generate user documentation?" Options: "Yes (Recommended)", "No, skip".
+
+**YOLO mode** — no questions, use auto-decided defaults:
+- Tier 2: all enabled (unless command flags override)
+- E2E: enabled if `options.e2e_enabled: true` (set by Phase 2 based on `ui_heavy`)
+- User docs: enabled if `options.user_docs_enabled: true` (set by Phase 2 based on `ui_heavy` or `creates_new_entities`)
+- Output: "→ Verification: completeness ✓, tests (skip) ✓, code review ✓, pragmatic ✓, reality ✓, production ✓, E2E [✓/✗], user docs [✓/✗]. Continuing to Phase 11..."
 
 → Pause (interactive only; YOLO auto-continues)
 
@@ -346,23 +365,43 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 ### Phase 11: Verification & Issue Resolution
 
 **Purpose**: Comprehensive implementation verification with fix-then-reverify cycles
-**Execute**:
-1. Skill tool - `maister:implementation-verifier`
-2. If issues found: Fix trivial issues directly, AskUserQuestion for non-trivial
-3. Before re-verification: set `skip_test_suite: false` (code changed, tests must re-run)
-4. Re-verify after fixes (max 3 fix-then-reverify cycles)
 **Output**: `verification/implementation-verification.md`, optional code-review/pragmatic/reality reports, updated `implementation/work-log.md`
 **State**: Update verification results, `verification_context`
 
-**⚠️ POST-VERIFICATION CONTINUATION** — After the skill completes and returns control:
+**Execute**:
+
+**Step 1**: Invoke Skill tool - `maister:implementation-verifier`
+
+**Step 2**: Display issue summary — show counts by severity (critical/warning/info) and list all critical + warning issues with their location, description, and fixability.
+
+**Step 3**: Gate on verification status:
+- `status: passed` → skip to Post-Verification Continuation
+- `status: passed_with_issues` or `failed` → enter fix-then-reverify loop (Step 4)
+
+**Step 4**: Fix-then-reverify loop (max 3 iterations):
+1. **Auto-fix** issues with `fixable: true` and severity `critical` or `warning` — apply the fix using the `suggestion` field, log each fix to `verification_context.fixes_applied`
+2. **Ask user** about `fixable: false` critical issues — AskUserQuestion: "Try to fix anyway" / "Accept and proceed" / "Let me investigate"
+3. **Log** warning-level `fixable: false` issues and proceed (no user prompt needed)
+4. If fixes were applied: set `skip_test_suite: false` (code changed, tests must re-run) → re-invoke `maister:implementation-verifier` → return to Step 2
+5. Update `verification_context.reverify_count`
+
+**Exit conditions**:
+- No critical issues remain → proceed
+- User explicitly approves "Accept and proceed" for remaining critical issues → proceed with warning logged
+- Max 3 iterations reached → AskUserQuestion: "Proceed with known issues?" / "Stop workflow"
+- **MUST NOT proceed with unresolved critical issues unless user explicitly approves**
+
+**YOLO mode**: Auto-fix all `fixable: true` issues, log `fixable: false` warnings, but STILL pause on `fixable: false` critical issues (critical issues need user awareness even in YOLO).
+
+**⚠️ POST-VERIFICATION CONTINUATION** — After issue resolution completes:
 1. Read `orchestrator-state.yml` to confirm you are the orchestrator
 2. Update state: add Phase 11 to `completed_phases`
 3. Proceed to Phase 12
 
 → Pause
 
-**Interactive**: AskUserQuestion - "Verification complete. Continue to Phase 12?"
-**YOLO**: "→ Continuing to Phase 12..."
+**Interactive**: AskUserQuestion - "Verification: [N] critical, [N] warnings [resolved/remaining]. Continue to Phase 12?"
+**YOLO**: "→ Verification: [summary]. Continuing to Phase 12..."
 
 ---
 
@@ -431,6 +470,7 @@ orchestrator:
     code_review_enabled: true
     pragmatic_review_enabled: true
     reality_check_enabled: true
+    production_check_enabled: true
   task_context:
     risk_level: null
     clarifications_resolved: null
