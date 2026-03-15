@@ -544,7 +544,7 @@ Research context flows through ALL phases without skipping any. Research artifac
 | `/maister:quick-dev` | `[task description]` | Implement directly with standards awareness (no planning) |
 | `/maister:quick-bugfix` | `[bug description]` | Quick bug fix with TDD red/green gates and complexity escalation |
 
-**See**: Individual `commands/*/` and `skills/*/skill.md` files for detailed documentation.
+**See**: Individual `commands/` and `skills/*/skill.md` files for detailed documentation.
 
 ## Available Subagents
 

@@ -544,7 +544,7 @@ Research context flows through ALL phases without skipping any. Research artifac
 | `/maister-quick-dev` | `[task description]` | Implement directly with standards awareness (no planning) |
 | `/maister-quick-bugfix` | `[bug description]` | Quick bug fix with TDD red/green gates and complexity escalation |
 
-**See**: Individual `commands/*/` and `skills/*/skill.md` files for detailed documentation.
+**See**: Individual `commands/` and `skills/*/skill.md` files for detailed documentation.
 
 ## Available Subagents
 
@@ -701,6 +701,5 @@ When implementing or modifying plugin features:
 
 This is the Copilot CLI variant. Key differences from Claude Code:
 - **No multi-select**: When asking users to select multiple options, ask sequential single-select questions instead
-- **Command names**: Use hyphens instead of colons (e.g., `/maister-development-new`)
+- **Command names**: No plugin prefix in names (e.g., `development-new`); the plugin system adds the plugin-id prefix automatically
 - **Project instructions file**: Use `.github/copilot-instructions.md` instead of `CLAUDE.md`. If the project uses `AGENTS.md`, support that as well.
-- **Commands directory**: All commands are flat (no subdirectories)

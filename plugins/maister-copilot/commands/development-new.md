@@ -1,5 +1,5 @@
 ---
-name: maister-development-new
+name: development-new
 description: Start a new development workflow with unified orchestration through all phases
 ---
 

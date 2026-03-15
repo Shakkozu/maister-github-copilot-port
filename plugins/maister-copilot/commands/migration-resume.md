@@ -1,5 +1,5 @@
 ---
-name: maister-migration-resume
+name: migration-resume
 description: Resume an interrupted or failed migration workflow from where it left off
 ---
 

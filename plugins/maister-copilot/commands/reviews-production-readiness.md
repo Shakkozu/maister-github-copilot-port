@@ -1,5 +1,5 @@
 ---
-name: maister-reviews-production-readiness
+name: reviews-production-readiness
 description: Verify production deployment readiness with comprehensive checks
 ---
 

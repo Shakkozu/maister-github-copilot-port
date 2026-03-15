@@ -1,5 +1,5 @@
 ---
-name: maister-research-resume
+name: research-resume
 description: Resume an interrupted or failed research workflow from where it left off
 ---
 

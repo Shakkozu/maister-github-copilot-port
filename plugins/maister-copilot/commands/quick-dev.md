@@ -1,5 +1,5 @@
 ---
-name: maister-quick-dev
+name: quick-dev
 description: Implement task directly with AI SDLC standards awareness (no planning mode)
 ---
 

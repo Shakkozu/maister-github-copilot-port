@@ -1,5 +1,5 @@
 ---
-name: maister-reviews-spec-audit
+name: reviews-spec-audit
 description: Independent specification audit to verify completeness and clarity before implementation
 ---
 

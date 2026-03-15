@@ -1,5 +1,5 @@
 ---
-name: maister-development-resume
+name: development-resume
 description: Resume an interrupted or failed development workflow from where it left off
 ---
 

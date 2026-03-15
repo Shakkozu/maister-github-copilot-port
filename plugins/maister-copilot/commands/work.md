@@ -1,5 +1,5 @@
 ---
-name: maister-work
+name: work
 description: Unified entry point - auto-classifies tasks and routes to appropriate workflow
 ---
 

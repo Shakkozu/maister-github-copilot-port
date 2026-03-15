@@ -1,5 +1,5 @@
 ---
-name: maister-reviews-pragmatic
+name: reviews-pragmatic
 description: Run pragmatic code review to detect over-engineering and ensure code matches project scale
 ---
 

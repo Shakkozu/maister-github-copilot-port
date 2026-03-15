@@ -1,5 +1,5 @@
 ---
-name: maister-performance-resume
+name: performance-resume
 description: Resume an interrupted or failed performance optimization workflow from where it left off
 ---
 

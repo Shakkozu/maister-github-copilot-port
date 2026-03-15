@@ -1,5 +1,5 @@
 ---
-name: maister-migration-new
+name: migration-new
 description: Start a new migration workflow with guided orchestration through all phases
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: maister-performance-new
+name: performance-new
 description: Start a performance optimization workflow with static code analysis for bottleneck detection
 ---
 
