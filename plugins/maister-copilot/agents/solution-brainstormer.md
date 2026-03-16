@@ -224,7 +224,7 @@ warnings: ["any non-critical observations"]
 
 ## Integration
 
-**Invoked by**: research orchestrator (Phase 3, Part A)
+**Invoked by**: research orchestrator (Phase 3)
 
 **Prerequisites**:
 - Task directory exists with `analysis/` and `outputs/` subdirectories
@@ -235,7 +235,7 @@ warnings: ["any non-critical observations"]
 
 **Output**: `outputs/solution-exploration.md` + structured result
 
-**Next Phase**: Orchestrator presents alternatives to user for convergence (Phase 3 Part B), then feeds chosen approach into solution-designer (Phase 4)
+**Next Phase**: Orchestrator presents alternatives to user for convergence (Phase 4: Solution Convergence), then feeds chosen approach into solution-designer (Phase 5)
 
 ---
 

@@ -65,8 +65,8 @@ The Task prompt MUST include:
 | `solution_exploration_path` | Orchestrator | Path to `outputs/solution-exploration.md` |
 | `synthesis_path` | Orchestrator | Path to `analysis/synthesis.md` |
 | `research_report_path` | Orchestrator | Path to `outputs/research-report.md` |
-| `selected_approach` | Orchestrator (Phase 2 Part D) | Which alternative was chosen |
-| `design_preferences` | Orchestrator (Phase 3 Part A) | User's design preferences/constraints |
+| `selected_approach` | Orchestrator (Phase 4: Solution Convergence) | Which alternative was chosen |
+| `design_preferences` | Orchestrator (Phase 5 Part A) | User's design preferences/constraints |
 
 **Accumulated Context** (Pattern 7):
 - `research_type`: technical, requirements, literature, mixed
@@ -332,7 +332,7 @@ warnings: ["any non-critical observations"]
 
 ## Integration
 
-**Invoked by**: research orchestrator (Phase 3, Part B)
+**Invoked by**: research orchestrator (Phase 5)
 
 **Prerequisites**:
 - Task directory exists with `analysis/` and `outputs/` subdirectories
@@ -344,7 +344,7 @@ warnings: ["any non-critical observations"]
 
 **Output**: `outputs/high-level-design.md` + `outputs/decision-log.md` + structured result
 
-**Next Phase**: Design documents feed into Phase 4 (Output Generation) and are later consumed by the development orchestrator's specification phase when development starts from research
+**Next Phase**: Design documents feed into Phase 6 (Completion) and are later consumed by the development orchestrator's specification phase when development starts from research
 
 **Downstream consumption**:
 - `specification-creator` reads `high-level-design.md` as primary architectural input

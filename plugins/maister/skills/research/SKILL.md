@@ -65,7 +65,7 @@ Use when:
 |------|-------------|---------|
 | `references/research-methodologies.md` | Phase 1 | Research type classification, methodology selection, gathering strategies, analysis frameworks |
 | `references/brainstorming-techniques.md` | Phase 3 | Divergent/convergent thinking, interactive exploration, scope guardrails |
-| `references/design-techniques.md` | Phase 4 | Decision documentation (MADR), ADR guidance, decision linking |
+| `references/design-techniques.md` | Phase 5 | Decision documentation (MADR), ADR guidance, decision linking |
 
 ---
 
@@ -75,12 +75,10 @@ Use when:
 |-------|---------|------------|-------------|
 | 1 | "Research foundation (init, plan, gather, synthesize)" | "Executing research foundation" | Direct + research-planner + information-gatherer (xN) + research-synthesizer |
 | 2 | "Evaluate brainstorming value" | "Evaluating brainstorming value" | Direct |
-| 3 | "Brainstorm solutions" | "Brainstorming solutions" | Direct + solution-brainstormer |
-| 4 | "Design high-level architecture" | "Designing high-level architecture" | Direct + solution-designer |
-| 5 | "Review outputs" | "Reviewing outputs" | Direct |
-| 6 | "Verify findings" | "Verifying findings" | Direct (optional) |
-| 7 | "Integrate into project" | "Integrating into project" | Direct (optional) |
-| 8 | "Spawn development" | "Spawning development" | Direct (optional) |
+| 3 | "Generate solution alternatives" | "Generating solution alternatives" | solution-brainstormer |
+| 4 | "Evaluate brainstorming alternatives" | "Evaluating brainstorming alternatives" | Direct (interactive) |
+| 5 | "Design high-level architecture" | "Designing high-level architecture" | Direct + solution-designer |
+| 6 | "Summarize research and suggest next steps" | "Completing research" | Direct |
 
 ---
 
@@ -204,25 +202,21 @@ AskUserQuestion - "Research foundation complete (initialized, planned, gathered,
 6. Update state: set `brainstorming_enabled` and `design_enabled`
 
 → If brainstorming enabled: continue to Phase 3
-→ If brainstorming disabled AND design enabled: skip to Phase 4
-→ If both disabled: skip to Phase 5
+→ If brainstorming disabled AND design enabled: skip to Phase 5
+→ If both disabled: skip to Phase 6
 
 ---
 
-### Phase 3: Solution Brainstorming
+### Phase 3: Solution Generation
 
-**Purpose**: Explore solution alternatives from research evidence, then let user converge on chosen approaches
-**Execute**: Orchestrator-Direct Hybrid
+**Purpose**: Generate solution alternatives from research evidence using specialized brainstormer subagent
+**Execute**: solution-brainstormer subagent
 **Output**: `outputs/solution-exploration.md`
-**State**: Update `phase_summaries.phase-2`
+**State**: Update `phase_summaries.phase-3`
 
 **Skip if**: `brainstorming_enabled = false` (user chose to skip in Phase 2, or `--no-brainstorm` flag)
 
 **Read `references/brainstorming-techniques.md` NOW using the Read tool** — divergent/convergent thinking techniques, scope guardrails
-
-**Part A — Solution Generation (Subagent)**:
-
-Generate alternatives purely from research evidence, without user preference bias.
 
 > **ANTI-PATTERN**: Do NOT generate solution alternatives inline. The solution-brainstormer agent has specialized multi-perspective analysis capabilities.
 
@@ -230,11 +224,24 @@ Generate alternatives purely from research evidence, without user preference bia
 
 **Context to pass** (Pattern 7):
 - `task_path`, `synthesis_path`, `research_report_path`
+- `output_path`: `outputs/solution-exploration.md` — brainstormer MUST write to this exact path
 - Accumulated context: `research_type`, `research_question`, `confidence_level`, `phase_summaries` (Phase 1)
 
-> **SELF-CHECK**: After Task tool returns, verify `outputs/solution-exploration.md` exists and contains alternatives. If missing, this is a CRITICAL failure.
+> **SELF-CHECK**: After Task tool returns, verify `outputs/solution-exploration.md` exists and contains alternatives. If missing: **STOP. Do NOT proceed to Phase 4 or Phase 5.** Re-invoke the brainstormer with corrected context (ensure `output_path` is `outputs/solution-exploration.md`). If second attempt also fails, use AskUserQuestion to report the failure and ask whether to retry or skip brainstorming.
 
-**Part B — Present & Converge (Direct)**:
+→ **AUTO-CONTINUE**
+
+---
+
+### Phase 4: Solution Convergence
+
+**Purpose**: Present brainstorming alternatives to user for decision-making on each decision area
+**Execute**: Direct (interactive)
+**Output**: Updated `orchestrator-state.yml` with chosen approaches
+**State**: Update `phase_summaries.phase-4` with `decision_areas` and `deferred_ideas`
+
+**Skip if**: `brainstorming_enabled = false`
+**Resume check**: If `phase_summaries.phase-4.decision_areas` has entries with `chosen_approach` set, skip already-resolved areas
 
 > **ANTI-PATTERN**: Do NOT present all decision areas in a single summary table and ask one combined "do you agree?" question. Each area MUST get its own detailed presentation and its own AskUserQuestion call.
 >
@@ -257,26 +264,28 @@ Generate alternatives purely from research evidence, without user preference bia
 3. After all areas resolved, present a brief summary of the chosen combination
 4. Update state with chosen approaches per decision area
 
+> **GATE CHECK**: Verify that AskUserQuestion was called for EACH decision area. If any decision area was skipped for any reason (e.g., output file missing, read failure), STOP and resolve before continuing. Do NOT mark Phase 4 complete without user convergence on all decision areas.
+
 → Pause
 
 AskUserQuestion - "Brainstorming complete. Continue to high-level design?"
 
 ---
 
-### Phase 4: High-Level Design
+### Phase 5: High-Level Design
 
 **Purpose**: Create architecture design from selected solution approach
 **Execute**: Orchestrator-Direct Hybrid
 **Output**: `outputs/high-level-design.md`, `outputs/decision-log.md`
-**State**: Update `phase_summaries.phase-3`
+**State**: Update `phase_summaries.phase-5`
 
 **Skip if**: `design_enabled = false`
 
 **Read `references/design-techniques.md` NOW using the Read tool** — MADR format, ADR guidance, decision documentation patterns
 
 **Part A — Design Direction (Direct)**:
-1. If Phase 3 ran: confirm selected approaches from brainstorming convergence
-2. If Phase 3 was skipped: use research report recommendations as design input
+1. If Phase 4 ran: confirm selected approaches from convergence
+2. If Phase 4 was skipped: use research report recommendations as design input
 3. AskUserQuestion for any design preferences or constraints (e.g., "Any architectural constraints or preferences?")
 
 **Part B — Design Generation (Subagent)**:
@@ -287,12 +296,12 @@ AskUserQuestion - "Brainstorming complete. Continue to high-level design?"
 
 **Context to pass** (Pattern 7):
 - `task_path`, `synthesis_path`, `research_report_path`
-- `solution_exploration_path` (only if Phase 3 ran)
-- `selected_approach` (from Phase 3 convergence if ran, or from research report recommendations)
+- `solution_exploration_path` (only if Phase 3-4 ran)
+- `selected_approach` (from Phase 4 convergence if ran, or from research report recommendations)
 - `design_preferences` (from Part A)
 - Accumulated context: `research_type`, `research_question`, `confidence_level`, `phase_summaries`
 
-> **SELF-CHECK**: After Task tool returns, verify both `outputs/high-level-design.md` and `outputs/decision-log.md` exist. If missing, this is a CRITICAL failure.
+> **SELF-CHECK**: After Task tool returns, verify both `outputs/high-level-design.md` and `outputs/decision-log.md` exist. If missing: **STOP. Do NOT proceed to Part C.** Re-invoke the designer with corrected context. If second attempt also fails, use AskUserQuestion to report the failure and ask whether to retry or skip design.
 
 **Part C — Summary (Direct)**:
 3. Read `outputs/high-level-design.md` and `outputs/decision-log.md`
@@ -308,76 +317,23 @@ AskUserQuestion - "Design complete. Continue to output generation?"
 
 ---
 
-### Phase 5: Review Outputs
+### Phase 6: Completion
 
-**Purpose**: Present research outputs summary to user and confirm completeness
+**Purpose**: Summarize research results and suggest next steps
 **Execute**: Direct
-**Output**: No new files — reviews existing outputs
-**State**: Track output inventory
+**Output**: No new files — summarizes existing outputs
 
 **Process**:
 1. Inventory all generated outputs: `outputs/research-report.md` (always), plus conditional: `solution-exploration.md`, `high-level-design.md`, `decision-log.md`
-2. Present summary of what was produced and key findings
-3. Ask user if anything is missing or needs expansion
-
-→ Pause
-
-AskUserQuestion - "Research outputs ready. Continue to verification?"
-
----
-
-### Phase 6: Verification (Optional)
-
-**Purpose**: Verify research quality and completeness
-**Execute**: Direct - present report, request user review
-**Output**: `verification/verification-report.md`
-**State**: Update verification status
-
-**Skip if**: Technical research with high confidence, simple exploratory
-**Enable if**: Mixed research, medium/low confidence, critical gaps identified
-
-→ Conditional: if integration_enabled continue to Phase 7, else skip to Phase 8 check
-
----
-
-### Phase 7: Integration (Optional)
-
-**Purpose**: Integrate outputs into project documentation
-**Execute**: Direct - save to appropriate locations
-**Output**: `integration-manifest.md`
-**State**: Track integration status
-
-**Skip if**: Exploratory research not for documentation
-**Enable if**: Design artifacts generated, research-report useful as reference
-
-**Process**:
-- For design artifacts: Save paths for parent orchestrator
-- For research report: Ask user where to reference in `.maister/docs/`
-
-→ Conditional: if design artifacts exist continue to Phase 8, else complete workflow
-
----
-
-### Phase 8: Spawn Development (Optional)
-
-**Purpose**: Offer to start development workflow with research context
-**Execute**: Direct - AskUserQuestion for user decision
-**Output**: Development workflow started (if chosen)
-**State**: Track spawn decision
-
-**Skip if**: No design artifacts generated
-
-```
-AskUserQuestion:
-  Question: "Research produced design artifacts. Start development workflow?"
-  Options:
-  - "Start development with this research"
-  - "Skip - I'll start manually later"
-  - "Review outputs first"
-```
-
-If user chooses "Start development":
-- Invoke Skill: `maister:development [current-research-task-path]`
+2. Present executive summary to user:
+   - Key findings and confidence level
+   - Which optional phases ran (brainstorming, design)
+   - Key decision highlights (if brainstorming/design ran)
+3. If design artifacts exist, suggest starting development in a fresh session:
+   ```
+   To start development based on this research, clear context first or start a new session, then run:
+   /maister:development [task-path]
+   ```
 
 → End of workflow
 
@@ -408,9 +364,11 @@ research_context:
       steps_completed: []  # track which steps completed for resume
     phase-3:
       summary: "..."
+    phase-4:
+      summary: "..."
       decision_areas: []        # list of {area, alternatives_count, chosen_approach}
       deferred_ideas: []
-    phase-4:
+    phase-5:
       summary: "..."
       architecture_style: null
       decisions_count: 0
@@ -418,8 +376,6 @@ research_context:
 options:
   brainstorming_enabled: null  # null=not yet decided, set by Phase 2 or --brainstorm/--no-brainstorm flag
   design_enabled: null          # independent, set by Phase 2 or --design/--no-design flag
-  verification_enabled: null    # null=auto-detect
-  integration_enabled: null
 ```
 
 ---
@@ -444,10 +400,8 @@ options:
 ├── outputs/
 │   ├── research-report.md          # Phase 1, Step 4 (main deliverable)
 │   ├── solution-exploration.md     # Phase 3 (conditional)
-│   ├── high-level-design.md        # Phase 4 (conditional)
-│   └── decision-log.md             # Phase 4 (conditional)
-└── verification/
-    └── verification-report.md      # Phase 6 (optional)
+│   ├── high-level-design.md        # Phase 5 (conditional)
+│   └── decision-log.md             # Phase 5 (conditional)
 ```
 
 ---
@@ -462,11 +416,9 @@ options:
 | 1 (Step 4) | 2 | Request targeted re-gathering for gaps |
 | 2 | 1 | Re-evaluate recommendation if synthesis unclear |
 | 3 | 2 | Re-invoke solution-brainstormer with adjusted context |
-| 4 | 2 | Re-invoke solution-designer with adjusted context |
-| 5 | 1 | Review only, no generation |
-| 6 | 0 | Read-only, report only |
-| 7 | 0 | Read-only, provide manual guidance |
-| 8 | 0 | User decision only |
+| 4 | 1 | Re-read exploration file, re-present decision areas |
+| 5 | 2 | Re-invoke solution-designer with adjusted context |
+| 6 | 0 | Summary only |
 
 ---
 
@@ -483,7 +435,7 @@ options:
 
 **Integration**:
 1. Parent orchestrator invokes research skill
-2. Research executes phases 1-5 (skip optional phases 6-8)
+2. Research executes phases 1-5 (skip Phase 6 completion — parent orchestrator handles next steps)
 3. Design outputs fed into parent's specification phase
 4. Research report saved in parent task's `analysis/research/` directory
 
