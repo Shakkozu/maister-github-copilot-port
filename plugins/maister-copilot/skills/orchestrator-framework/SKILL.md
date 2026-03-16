@@ -49,10 +49,10 @@ All orchestrators follow these principles:
 
 ## Orchestrators Using This Framework
 
-- `development-orchestrator` (bug fixes, enhancements, features)
-- `performance-orchestrator`
-- `migration-orchestrator`
-- `research-orchestrator`
+- `development` (bug fixes, enhancements, features)
+- `performance`
+- `migration`
+- `research`
 
 ## NOT an Executable Skill
 

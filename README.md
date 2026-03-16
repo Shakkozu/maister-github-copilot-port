@@ -50,13 +50,13 @@ If you have another project already using Maister, you can reuse its standards a
 ### First Workflow
 
 ```bash
-/maister:development-new Add user profile page with avatar upload
+/maister:development Add user profile page with avatar upload
 ```
 
 Or just discuss your task with Claude and then run:
 
 ```bash
-/maister:development-new
+/maister:development
 ```
 
 The plugin picks up context from your conversation - no arguments needed.
@@ -77,7 +77,7 @@ Every workflow command works without arguments. The plugin reads your current co
 
 ```
 You: "The login page throws a 500 error when the session expires"
-You: /maister:development-new
+You: /maister:development
 → Auto-detects: bug fix, extracts description from conversation
 ```
 
@@ -92,10 +92,10 @@ You can always be explicit when you prefer - arguments and flags simply override
 
 | Command | Use When |
 |---------|----------|
-| `/maister:development-new` | Features, bug fixes, enhancements - auto-detects type from context |
-| `/maister:research-new` | Evidence-based research with solution brainstorming and high-level design documents |
-| `/maister:performance-new` | Optimizing speed or resource usage |
-| `/maister:migration-new` | Changing technologies or patterns |
+| `/maister:development` | Features, bug fixes, enhancements - auto-detects type from context |
+| `/maister:research` | Evidence-based research with solution brainstorming and high-level design documents |
+| `/maister:performance` | Optimizing speed or resource usage |
+| `/maister:migration` | Changing technologies or patterns |
 
 Task type (feature/bug/enhancement) is auto-detected from context. Override with `--type=feature|bug|enhancement` if needed. Or use `/maister:work` as a single entry point that routes to the right workflow.
 

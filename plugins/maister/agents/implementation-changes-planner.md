@@ -62,7 +62,7 @@ Transform implementation steps into actionable change plans with continuous stan
 ## Standards Applied
 
 ### From Implementation Plan (Mandatory)
-- [x] skills/development-orchestrator/SKILL.md - Structure patterns
+- [x] skills/development/SKILL.md - Structure patterns
 - [x] .maister/docs/standards/global/naming.md - Naming conventions
 
 ### Discovered During Planning

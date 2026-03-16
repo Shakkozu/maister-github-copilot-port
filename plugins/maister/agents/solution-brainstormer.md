@@ -224,7 +224,7 @@ warnings: ["any non-critical observations"]
 
 ## Integration
 
-**Invoked by**: research-orchestrator (Phase 3, Part A)
+**Invoked by**: research orchestrator (Phase 3, Part A)
 
 **Prerequisites**:
 - Task directory exists with `analysis/` and `outputs/` subdirectories

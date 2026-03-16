@@ -7,9 +7,9 @@ Maister provides six workflow types, each with phases tailored to its needs. All
 The unified development workflow handles features, enhancements, and bug fixes through a 14-phase adaptive pipeline. Phases activate or skip based on task type.
 
 ```
-/maister:development-new
-/maister:development-new "Add two-factor authentication"
-/maister:development-new "Fix login timeout" --type=bug
+/maister:development
+/maister:development "Add two-factor authentication"
+/maister:development "Fix login timeout" --type=bug
 ```
 
 When run without arguments, the plugin extracts the task description from your conversation and auto-detects the type (feature, bug, or enhancement). Use `--type=` only when you want to override the auto-detection.
@@ -40,7 +40,7 @@ When run without arguments, the plugin extracts the task description from your c
 Start development informed by a completed research workflow. Research context flows through all phases:
 
 ```
-/maister:development-new "Implement OAuth" --research=.maister/tasks/research/2026-01-12-oauth-research
+/maister:development "Implement OAuth" --research=.maister/tasks/research/2026-01-12-oauth-research
 ```
 
 Research artifacts are copied to `analysis/research-context/` and summaries pass to every subagent.
@@ -48,7 +48,7 @@ Research artifacts are copied to `analysis/research-context/` and summaries pass
 ### Resume
 
 ```
-/maister:development-resume [task-path] [--from=PHASE] [--reset-attempts]
+/maister:development [task-path] [--from=PHASE] [--reset-attempts]
 ```
 
 Resume phases: `analysis`, `gap`, `spec`, `plan`, `implement`, `verify`
@@ -60,8 +60,8 @@ Resume phases: `analysis`, `gap`, `spec`, `plan`, `implement`, `verify`
 Static code analysis to detect bottlenecks, followed by standard spec/plan/implement/verify pipeline.
 
 ```
-/maister:performance-new
-/maister:performance-new "Optimize dashboard loading time" --yolo
+/maister:performance
+/maister:performance "Optimize dashboard loading time" --yolo
 ```
 
 ### Phases
@@ -83,7 +83,7 @@ Static code analysis to detect bottlenecks, followed by standard spec/plan/imple
 ### Resume
 
 ```
-/maister:performance-resume [task-path] [--from=PHASE] [--reset-attempts]
+/maister:performance [task-path] [--from=PHASE] [--reset-attempts]
 ```
 
 Resume phases: `analysis`, `specification`, `planning`, `implementation`, `verification`
@@ -95,8 +95,8 @@ Resume phases: `analysis`, `specification`, `planning`, `implementation`, `verif
 Technology, data, and architecture migrations with rollback planning and risk assessment.
 
 ```
-/maister:migration-new
-/maister:migration-new "Migrate from REST to GraphQL" --type=code
+/maister:migration
+/maister:migration "Migrate from REST to GraphQL" --type=code
 ```
 
 **Migration types**: `code`, `data`, `architecture`, `general`
@@ -123,7 +123,7 @@ Technology, data, and architecture migrations with rollback planning and risk as
 ### Resume
 
 ```
-/maister:migration-resume [task-path] [--from=PHASE] [--reset-attempts]
+/maister:migration [task-path] [--from=PHASE] [--reset-attempts]
 ```
 
 Resume phases: `analysis`, `target`, `spec`, `plan`, `execute`, `verify`, `docs`
@@ -135,8 +135,8 @@ Resume phases: `analysis`, `target`, `spec`, `plan`, `execute`, `verify`, `docs`
 Multi-source research with synthesis, optional solution brainstorming, and high-level design.
 
 ```
-/maister:research-new
-/maister:research-new "What authentication approach fits our architecture?" --type=technical
+/maister:research
+/maister:research "What authentication approach fits our architecture?" --type=technical
 ```
 
 **Research types**: `technical`, `requirements`, `literature`, `mixed`
@@ -161,7 +161,7 @@ Information gathering runs parallel subagents across multiple source categories 
 ### Resume
 
 ```
-/maister:research-resume [task-path] [--from=PHASE] [--reset-attempts]
+/maister:research [task-path] [--from=PHASE] [--reset-attempts]
 ```
 
 Resume phases: `foundation`, `brainstorming-decision`, `brainstorming`, `design`, `outputs`, `verification`, `integration`

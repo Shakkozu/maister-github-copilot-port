@@ -120,7 +120,7 @@ If description contains error messages or stack traces:
 - Feature signals: add, new, create, build, implement, develop, new feature, new capability, from scratch
 - Refactoring signals: refactor, clean up, restructure, reorganize, decouple, separate concerns, remove duplication, extract method
 - Security signals: vulnerability, CVE, exploit, SQL injection, XSS, CSRF, auth bypass, privilege escalation
-- **All route to development-orchestrator** — the gap-analyzer detects specific characteristics
+- **All route to development orchestrator** — the gap-analyzer detects specific characteristics
 
 **Performance**:
 - Primary: slow, performance, optimize, speed up, faster, bottleneck
@@ -355,10 +355,10 @@ Use ask_user with relevant options
 4. `/work` routes to appropriate orchestrator
 
 **Classification Routes**:
-- **development** → development-orchestrator
-- **performance** → performance-orchestrator
-- **migration** → migration-orchestrator
-- **research** → research-orchestrator
+- **development** → development orchestrator
+- **performance** → performance orchestrator
+- **migration** → migration orchestrator
+- **research** → research orchestrator
 
 **External Systems** (tries MCP → CLI → WebFetch → prompt user):
 - **GitHub**: MCP tools or `gh issue view`

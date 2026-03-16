@@ -1,7 +1,7 @@
 ---
-name: development-orchestrator
+name: development
 description: Unified orchestrator for all development tasks. Phases adapt based on detected task characteristics rather than predetermined types. Supports interactive mode (pause between phases) and YOLO mode (continuous execution). Use for any development work that modifies code.
-user-invocable: false
+user-invocable: true
 ---
 
 # Development Orchestrator
@@ -84,9 +84,9 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 
 **Purpose**: Comprehensive codebase exploration followed by scope/requirements clarification
 **Execute**:
-1. Skill tool - `maister-codebase-analyzer`
+1. Skill tool - `maister:codebase-analyzer`
 2. Update state with analysis results
-3. Direct - use ask_user for max 5 critical clarifying questions
+3. Direct - use AskUserQuestion for max 5 critical clarifying questions
 4. Save clarifications to `analysis/clarifications.md`
 **Output**: `analysis/codebase-analysis.md`, `analysis/clarifications.md`
 **State**: Update `task_context.risk_level`, `phase_summaries.codebase_analysis`, `task_context.clarifications_resolved`
@@ -101,7 +101,7 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 
 **Purpose**: Compare current vs desired state, detect task characteristics, then resolve scope/approach decisions
 **Execute**:
-1. Task tool - `maister-gap-analyzer` subagent
+1. Task tool - `maister:gap-analyzer` subagent
 2. **Extract and store structured data from gap-analyzer result**:
    a. Read `task_characteristics` from gap-analyzer output — 5 fields: `has_reproducible_defect`, `modifies_existing_code`, `creates_new_entities`, `involves_data_operations`, `ui_heavy`
    b. Write all 5 fields to `orchestrator-state.yml` at `task_context.task_characteristics`
@@ -112,11 +112,11 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 **⛔ DECISION GATE** (mandatory — do NOT skip):
 - Parse `decisions_needed` from gap-analyzer output
 - If `decisions_needed.critical` OR `decisions_needed.important` is non-empty:
-  - **Interactive**: MUST use `ask_user` — one question per critical decision, batch important decisions into a single sequential single-select questions (one per option)
+  - **Interactive**: MUST use `AskUserQuestion` — one question per critical decision, batch important decisions into a single multi-select question
   - **YOLO**: Accept recommended defaults, but LOG each decision (id, issue, chosen option, rationale) to `analysis/scope-clarifications.md`
 - If both are empty: Note "No scope decisions needed" in state
 
-**SELF-CHECK** before continuing: "Did the gap-analyzer return `decisions_needed` items? If yes, did I invoke `ask_user` (interactive) or log decisions (YOLO)? If I skipped this, STOP and go back."
+**SELF-CHECK** before continuing: "Did the gap-analyzer return `decisions_needed` items? If yes, did I invoke `AskUserQuestion` (interactive) or log decisions (YOLO)? If I skipped this, STOP and go back."
 
 3. Save scope clarifications to `analysis/scope-clarifications.md`
 4. **Set optional phase defaults** based on detected characteristics:
@@ -131,8 +131,8 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 
 → Pause (when decisions exist), otherwise Conditional
 
-**Interactive** (decisions exist): ask_user - "Scope decisions resolved. Continue?"
-**Interactive** (no decisions): ask_user - "Gap analysis complete, no decisions needed. Continue?"
+**Interactive** (decisions exist): AskUserQuestion - "Scope decisions resolved. Continue?"
+**Interactive** (no decisions): AskUserQuestion - "Gap analysis complete, no decisions needed. Continue?"
 **YOLO**: "→ Continuing..."
 
 → Conditional: check `task_characteristics.has_reproducible_defect` → Phase 3, else check `task_characteristics.ui_heavy` → Phase 4, else skip to Phase 5
@@ -152,7 +152,7 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 
 → Pause
 
-**Interactive**: ask_user - "TDD red gate complete. Continue to Phase 4?"
+**Interactive**: AskUserQuestion - "TDD red gate complete. Continue to Phase 4?"
 **YOLO**: "→ Continuing to Phase 4..."
 
 ---
@@ -160,7 +160,7 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 ### Phase 4: UI Mockup Generation (Conditional)
 
 **Purpose**: Generate ASCII mockups showing UI integration
-**Execute**: Task tool - `maister-ui-mockup-generator` subagent
+**Execute**: Task tool - `maister:ui-mockup-generator` subagent
 **Output**: `analysis/ui-mockups.md`
 **State**: Update `phase_summaries.ui_mockups`
 
@@ -170,7 +170,7 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 
 → Pause
 
-**Interactive**: ask_user - "UI mockups complete. Continue to Phase 5?"
+**Interactive**: AskUserQuestion - "UI mockups complete. Continue to Phase 5?"
 **YOLO**: "→ Continuing to Phase 5..."
 
 ---
@@ -181,14 +181,14 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 **Execute**:
 
 **Part A — Technical & Architecture Clarification (inline, conditional)**:
-1. If complex task with multiple approaches: Direct - use ask_user for 3-5 technical questions
-2. If multiple valid architectural approaches exist: Present 2-3 approaches via ask_user. The chosen approach is passed to specification-creator so the spec is written with the decided architecture.
+1. If complex task with multiple approaches: Direct - use AskUserQuestion for 3-5 technical questions
+2. If multiple valid architectural approaches exist: Present 2-3 approaches via AskUserQuestion. The chosen approach is passed to specification-creator so the spec is written with the decided architecture.
 3. Save to `analysis/technical-clarifications.md` (conditional)
 
 **Skip technical clarification if**: Simple task, risk_level = low, no multiple approaches detected
 
 **Part B — Requirements Gathering (inline)**:
-3. Direct - use ask_user for specification requirements:
+3. Direct - use AskUserQuestion for specification requirements:
    - Adaptive question count based on description length:
      - Brief (<30 words): 6-8 questions
      - Standard (30-100 words): 4-6 questions
@@ -212,11 +212,11 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 
 **INVOKE NOW** — Task tool call:
 
-6. Task tool - `maister-specification-creator` subagent
+6. Task tool - `maister:specification-creator` subagent
 
 **Context to pass to subagent**: task_path, task_description, task_characteristics, requirements_path (analysis/requirements.md), project_context_paths (INDEX.md, vision.md, roadmap.md, tech-stack.md), risk_level, phase_summaries (codebase_analysis, gap_analysis, clarifications, scope_clarifications, ui_mockups), research_context (if any)
 
-**SELF-CHECK**: Did you just invoke the Task tool with `maister-specification-creator`? Or did you start writing spec.md yourself? If the latter, STOP immediately and invoke the Task tool instead.
+**SELF-CHECK**: Did you just invoke the Task tool with `maister:specification-creator`? Or did you start writing spec.md yourself? If the latter, STOP immediately and invoke the Task tool instead.
 
 **Output**: `analysis/technical-clarifications.md` (conditional), `analysis/requirements.md`, `implementation/spec.md`
 **State**: Update `task_context.tech_clarified`, `task_context.architecture_decision`, `phase_summaries.specification`
@@ -225,7 +225,7 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 
 → Pause
 
-**Interactive**: ask_user - "Specification created. Continue to Phase 6?"
+**Interactive**: AskUserQuestion - "Specification created. Continue to Phase 6?"
 **YOLO**: "→ Continuing to Phase 6..."
 
 ---
@@ -233,18 +233,18 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 ### Phase 6: Specification Audit (Recommended)
 
 **Purpose**: Independent review of specification before implementation
-**Execute**: Task tool - `maister-spec-auditor` subagent
+**Execute**: Task tool - `maister:spec-auditor` subagent
 **Output**: `verification/spec-audit.md`
 **State**: Update `options.spec_audit_enabled`
 
 **Recommended**: Always. Present spec audit as the recommended default. User can skip if they choose.
 
-**Interactive**: ask_user - "Run specification audit? (Recommended)" with "Yes, run audit (Recommended)" as first option
+**Interactive**: AskUserQuestion - "Run specification audit? (Recommended)" with "Yes, run audit (Recommended)" as first option
 **YOLO**: Always run
 
 → Pause
 
-**Interactive**: ask_user - "Audit complete. Continue to Phase 7?"
+**Interactive**: AskUserQuestion - "Audit complete. Continue to Phase 7?"
 **YOLO**: "→ Continuing to Phase 7..."
 
 ---
@@ -260,17 +260,17 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 
 **INVOKE NOW** — Task tool call:
 
-**Execute**: Task tool - `maister-implementation-planner` subagent
+**Execute**: Task tool - `maister:implementation-planner` subagent
 **Output**: `implementation/implementation-plan.md`
 **State**: Update task groups and dependencies
 
 **Context to pass to subagent**: task_path, task_description, task_characteristics, phase_summaries (specification, gap_analysis, codebase_analysis), research_context (if any)
 
-**SELF-CHECK**: Did you just invoke the Task tool with `maister-implementation-planner`? Or did you start writing implementation-plan.md yourself? If the latter, STOP immediately and invoke the Task tool instead.
+**SELF-CHECK**: Did you just invoke the Task tool with `maister:implementation-planner`? Or did you start writing implementation-plan.md yourself? If the latter, STOP immediately and invoke the Task tool instead.
 
 → Pause
 
-**Interactive**: ask_user - "Plan created. Continue to Phase 8?"
+**Interactive**: AskUserQuestion - "Plan created. Continue to Phase 8?"
 **YOLO**: "→ Continuing to Phase 8..."
 
 ---
@@ -285,11 +285,11 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 
 **INVOKE NOW** — Skill tool call:
 
-**Execute**: Skill tool - `maister-implementation-plan-executor`
+**Execute**: Skill tool - `maister:implementation-plan-executor`
 **Output**: Implemented code, `implementation/work-log.md`
 **State**: Update implementation progress, extract phase_summaries.implementation
 
-**SELF-CHECK**: Did you just invoke the Skill tool with `maister-implementation-plan-executor`? Or did you start writing code yourself? If the latter, STOP immediately and invoke the Skill tool instead.
+**SELF-CHECK**: Did you just invoke the Skill tool with `maister:implementation-plan-executor`? Or did you start writing code yourself? If the latter, STOP immediately and invoke the Skill tool instead.
 
 **⚠️ POST-IMPLEMENTATION CONTINUATION** — After the skill completes and returns control:
 1. Read `orchestrator-state.yml` to confirm you are the orchestrator
@@ -298,7 +298,7 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 
 → Pause
 
-**Interactive**: ask_user - "Implementation complete. Continue to Phase [9 or 10]?"
+**Interactive**: AskUserQuestion - "Implementation complete. Continue to Phase [9 or 10]?"
 **YOLO**: "→ Continuing to Phase [9 or 10]..."
 
 ---
@@ -316,7 +316,7 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 
 → Pause
 
-**Interactive**: ask_user - "TDD gate passed. Continue to Phase 10?"
+**Interactive**: AskUserQuestion - "TDD gate passed. Continue to Phase 10?"
 **YOLO**: "→ Continuing to Phase 10..."
 
 ---
@@ -324,7 +324,7 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 ### Phase 10: Verification Options Prompt
 
 **Purpose**: Determine which verification checks to run using tiered decision matrix
-**Execute**: Direct - display plan, confirm/adjust via ask_user
+**Execute**: Direct - display plan, confirm/adjust via AskUserQuestion
 **Output**: Updated state with all verification options
 **State**: Set `options.code_review_enabled`, `options.pragmatic_review_enabled`, `options.reality_check_enabled`, `options.production_check_enabled`, `options.e2e_enabled`, `options.user_docs_enabled`
 **Auto-set**: `skip_test_suite: true` (full test suite already passed during implementation phase; cleared before re-verification if fixes are applied)
@@ -349,12 +349,12 @@ Verification Plan:
 
 **Step 2** (interactive mode — 3 questions):
 
-**Q1** (always): ask_user (sequential single-select) — "Which standard verifications to run?"
+**Q1** (always): AskUserQuestion (multi-select) — "Which standard verifications to run?"
 Options: "Code review (Recommended)", "Pragmatic review (Recommended)", "Reality check (Recommended)", "Production readiness (Recommended)". All pre-selected.
 
-**Q2** (SKIP if `options.e2e_enabled: false` and no `--e2e` flag): ask_user — "Enable E2E browser verification?" Options: "Yes (Recommended)", "No, skip".
+**Q2** (SKIP if `options.e2e_enabled: false` and no `--e2e` flag): AskUserQuestion — "Enable E2E browser verification?" Options: "Yes (Recommended)", "No, skip".
 
-**Q3** (SKIP if `options.user_docs_enabled: false` and no `--user-docs` flag): ask_user — "Generate user documentation?" Options: "Yes (Recommended)", "No, skip".
+**Q3** (SKIP if `options.user_docs_enabled: false` and no `--user-docs` flag): AskUserQuestion — "Generate user documentation?" Options: "Yes (Recommended)", "No, skip".
 
 **YOLO mode** — no questions, use auto-decided defaults:
 - Tier 2: all enabled (unless command flags override)
@@ -374,7 +374,7 @@ Options: "Code review (Recommended)", "Pragmatic review (Recommended)", "Reality
 
 **Execute**:
 
-**Step 1**: Invoke Skill tool - `maister-implementation-verifier`
+**Step 1**: Invoke Skill tool - `maister:implementation-verifier`
 
 **Step 2**: Display issue summary — show counts by severity (critical/warning/info) and list all critical + warning issues with their location, description, and fixability.
 
@@ -384,15 +384,15 @@ Options: "Code review (Recommended)", "Pragmatic review (Recommended)", "Reality
 
 **Step 4**: Fix-then-reverify loop (max 3 iterations):
 1. **Auto-fix** issues with `fixable: true` and severity `critical` or `warning` — apply the fix using the `suggestion` field, log each fix to `verification_context.fixes_applied`
-2. **Ask user** about `fixable: false` critical issues — ask_user: "Try to fix anyway" / "Accept and proceed" / "Let me investigate"
+2. **Ask user** about `fixable: false` critical issues — AskUserQuestion: "Try to fix anyway" / "Accept and proceed" / "Let me investigate"
 3. **Log** warning-level `fixable: false` issues and proceed (no user prompt needed)
-4. If fixes were applied: set `skip_test_suite: false` (code changed, tests must re-run) → re-invoke `maister-implementation-verifier` → return to Step 2
+4. If fixes were applied: set `skip_test_suite: false` (code changed, tests must re-run) → re-invoke `maister:implementation-verifier` → return to Step 2
 5. Update `verification_context.reverify_count`
 
 **Exit conditions**:
 - No critical issues remain → proceed
 - User explicitly approves "Accept and proceed" for remaining critical issues → proceed with warning logged
-- Max 3 iterations reached → ask_user: "Proceed with known issues?" / "Stop workflow"
+- Max 3 iterations reached → AskUserQuestion: "Proceed with known issues?" / "Stop workflow"
 - **MUST NOT proceed with unresolved critical issues unless user explicitly approves**
 
 **YOLO mode**: Auto-fix all `fixable: true` issues, log `fixable: false` warnings, but STILL pause on `fixable: false` critical issues (critical issues need user awareness even in YOLO).
@@ -404,7 +404,7 @@ Options: "Code review (Recommended)", "Pragmatic review (Recommended)", "Reality
 
 → Pause
 
-**Interactive**: ask_user - "Verification: [N] critical, [N] warnings [resolved/remaining]. Continue to Phase 12?"
+**Interactive**: AskUserQuestion - "Verification: [N] critical, [N] warnings [resolved/remaining]. Continue to Phase 12?"
 **YOLO**: "→ Verification: [summary]. Continuing to Phase 12..."
 
 ---
@@ -412,7 +412,7 @@ Options: "Code review (Recommended)", "Pragmatic review (Recommended)", "Reality
 ### Phase 12: E2E Testing (Optional)
 
 **Purpose**: Runtime browser verification with screenshots (via Playwright MCP tools, not test file generation)
-**Execute**: Task tool - `maister-e2e-test-verifier` subagent
+**Execute**: Task tool - `maister:e2e-test-verifier` subagent
 **Prompt must include**: task_path (absolute), spec_path, base_url. Report saves to `{task_path}/verification/e2e-verification-report.md`.
 **Output**: `verification/e2e-verification-report.md`, screenshots
 **State**: Update E2E results
@@ -421,7 +421,7 @@ Options: "Code review (Recommended)", "Pragmatic review (Recommended)", "Reality
 
 → Pause
 
-**Interactive**: ask_user - "E2E complete. Continue to Phase 13?"
+**Interactive**: AskUserQuestion - "E2E complete. Continue to Phase 13?"
 **YOLO**: "→ Continuing to Phase 13..."
 
 ---
@@ -429,7 +429,7 @@ Options: "Code review (Recommended)", "Pragmatic review (Recommended)", "Reality
 ### Phase 13: User Documentation (Optional)
 
 **Purpose**: Generate user-facing documentation with screenshots
-**Execute**: Task tool - `maister-user-docs-generator` subagent
+**Execute**: Task tool - `maister:user-docs-generator` subagent
 **Prompt must include**: task_path (absolute), spec_path, base_url. Guide saves to `{task_path}/documentation/user-guide.md`.
 **Output**: `documentation/user-guide.md`, screenshots
 **State**: Update docs generation status
@@ -438,7 +438,7 @@ Options: "Code review (Recommended)", "Pragmatic review (Recommended)", "Reality
 
 → Pause
 
-**Interactive**: ask_user - "Documentation complete. Continue to Phase 14?"
+**Interactive**: AskUserQuestion - "Documentation complete. Continue to Phase 14?"
 **YOLO**: "→ Continuing to Phase 14..."
 
 ---
@@ -570,7 +570,7 @@ When starting development from a completed research task, the orchestrator loads
 
 **Method 1: Research folder as sole argument** (recommended)
 ```
-/maister-development-new .maister/tasks/research/2026-01-12-oauth-research
+/maister:development .maister/tasks/research/2026-01-12-oauth-research
 ```
 The orchestrator auto-detects this is a research folder and:
 - Extracts task description from `research_context.research_question`
@@ -579,7 +579,7 @@ The orchestrator auto-detects this is a research folder and:
 
 **Method 2: Explicit --research flag**
 ```
-/maister-development-new "Implement OAuth" --research=.maister/tasks/research/2026-01-12-oauth-research
+/maister:development "Implement OAuth" --research=.maister/tasks/research/2026-01-12-oauth-research
 ```
 
 ### Research Artifacts (Standard List)
@@ -610,8 +610,8 @@ When research context is detected, read these files from the research folder:
 ## Command Integration
 
 Invoked via:
-- `/maister-development-new [description] [--yolo]`
-- `/maister-development-resume [task-path] [--from=PHASE]`
+- `/maister:development [description] [--yolo] [--e2e] [--user-docs] [--research=PATH]` (new)
+- `/maister:development [task-path] [--from=PHASE] [--reset-attempts]` (resume)
 
 ---
 

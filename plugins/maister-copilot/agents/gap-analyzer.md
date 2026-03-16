@@ -483,7 +483,7 @@ Your gap analysis is successful when:
 
 ## Integration
 
-**Invoked by**: development-orchestrator (Phase 2)
+**Invoked by**: development orchestrator (Phase 2)
 
 **Prerequisites**: `analysis/codebase-analysis.md` exists (Phase 1 output)
 

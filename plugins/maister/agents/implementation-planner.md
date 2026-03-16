@@ -267,7 +267,7 @@ groups:
 
 ## Integration
 
-**Invoked by**: development-orchestrator (Phase 7), migration-orchestrator (Phase 3)
+**Invoked by**: development orchestrator (Phase 7), migration orchestrator (Phase 3)
 
 **Prerequisites**:
 - Task directory exists with `implementation/` subdirectory

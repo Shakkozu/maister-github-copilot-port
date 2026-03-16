@@ -224,7 +224,7 @@ Adapt specification depth and focus based on `task_characteristics` from the gap
 - Include: all sections with full detail
 - Testing emphasis: feature works end-to-end
 
-### When invoked by migration-orchestrator
+### When invoked by migration orchestrator
 - Focus on: migration strategy, rollback procedures, compatibility
 - Additional sections: Rollback Plan, Dual-Run Configuration (if applicable)
 - Testing emphasis: compatibility verification, data integrity
@@ -280,7 +280,7 @@ warnings: ["any non-critical observations"]
 
 ## Integration
 
-**Invoked by**: development-orchestrator (Phase 5), migration-orchestrator (Phase 2)
+**Invoked by**: development orchestrator (Phase 5), migration orchestrator (Phase 2)
 
 **Prerequisites**:
 - Task directory exists with `analysis/` and `implementation/` subdirectories

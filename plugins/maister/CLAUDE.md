@@ -46,10 +46,10 @@ This plugin supports 4 workflow types that route to specialized orchestrators:
 
 | Workflow Type | Purpose | Orchestrator | Classification Keywords |
 |---------------|---------|-------------|------------------------|
-| **Development** | Bug fixes, enhancements, new features | development-orchestrator | "fix", "bug", "add", "new", "improve", "enhance", "create" |
-| **Performance** | Optimize speed/efficiency | performance-orchestrator | "slow", "optimize", "speed up", "faster" |
-| **Migration** | Move tech/patterns | migration-orchestrator | "migrate", "move from X to Y", "upgrade" |
-| **Research** | Investigate and document findings | research-orchestrator | "research", "investigate", "explore options" |
+| **Development** | Bug fixes, enhancements, new features | development | "fix", "bug", "add", "new", "improve", "enhance", "create" |
+| **Performance** | Optimize speed/efficiency | performance | "slow", "optimize", "speed up", "faster" |
+| **Migration** | Move tech/patterns | migration | "migrate", "move from X to Y", "upgrade" |
+| **Research** | Investigate and document findings | research | "research", "investigate", "explore options" |
 
 ### Design Principles
 
@@ -147,7 +147,7 @@ For UI-heavy features/enhancements, the plugin can generate ASCII mockups:
 **When Used**:
 - Optional phase in development workflow
 - Auto-triggered when `task_characteristics.ui_heavy` is true
-- Invoked automatically by development-orchestrator
+- Invoked automatically by development orchestrator
 
 **Output**: `analysis/ui-mockups.md` with ASCII diagrams
 
@@ -475,10 +475,10 @@ Orchestrators manage complete workflows with state management, auto-recovery, an
 
 | Skill | Purpose | Details |
 |-------|---------|---------|
-| `development-orchestrator` | **Unified workflow** (14 phases: 1-14) for all development tasks. Phases activate based on detected task characteristics (not predetermined types). TDD gates activate when defects detected, UI mockups when UI-heavy. | `skills/development-orchestrator/SKILL.md` |
-| `performance-orchestrator` | Static code analysis for bottleneck detection, reuses standard spec/plan/implement/verify pipeline | `skills/performance-orchestrator/SKILL.md` |
-| `migration-orchestrator` | Code/data/architecture migrations with rollback plans | `skills/migration-orchestrator/skill.md` |
-| `research-orchestrator` | Multi-source research with synthesis, solution brainstorming, high-level design, and citations | `skills/research-orchestrator/skill.md` |
+| `development` | **Unified workflow** (14 phases: 1-14) for all development tasks. Phases activate based on detected task characteristics (not predetermined types). TDD gates activate when defects detected, UI mockups when UI-heavy. | `skills/development/SKILL.md` |
+| `performance` | Static code analysis for bottleneck detection, reuses standard spec/plan/implement/verify pipeline | `skills/performance/SKILL.md` |
+| `migration` | Code/data/architecture migrations with rollback plans | `skills/migration/SKILL.md` |
+| `research` | Multi-source research with synthesis, solution brainstorming, high-level design, and citations | `skills/research/SKILL.md` |
 
 ## Available Commands
 
@@ -496,35 +496,24 @@ Commands invoke orchestrators and utilities. All orchestrators support `--yolo` 
 
 ### Workflow Commands
 
-#### Development Command
+Each workflow skill handles both new tasks and resuming existing ones. Pass a task description to start new, or a task path to resume.
 
-| Command | Usage | Description |
-|---------|-------|-------------|
-| `/maister:development-new` | `[desc] [--yolo] [--e2e] [--user-docs] [--research=PATH]` | Start any development task (bug fix, enhancement, or new feature) |
-| `/maister:development-resume` | `[path] [--from=PHASE] [--reset-attempts]` | Resume interrupted development workflow |
-
-**Task directory**: `.maister/tasks/development/`
+| Command | Usage | Task Directory |
+|---------|-------|----------------|
+| `/maister:development` | `[desc] [--yolo] [--e2e] [--user-docs] [--research=PATH]` (new) / `[task-path] [--from=PHASE] [--reset-attempts]` (resume) | `.maister/tasks/development/` |
+| `/maister:performance` | `[desc] [--yolo]` (new) / `[task-path] [--from=PHASE]` (resume) | `.maister/tasks/performance/` |
+| `/maister:migration` | `[desc] [--yolo] [--type=TYPE]` (new) / `[task-path] [--from=PHASE]` (resume) | `.maister/tasks/migrations/` |
+| `/maister:research` | `[question] [--yolo] [--type=TYPE] [--brainstorm] [--no-brainstorm] [--design] [--no-design]` (new) / `[task-path] [--from=PHASE]` (resume) | `.maister/tasks/research/` |
 
 **Research-Based Development**: Start development informed by a completed research workflow:
 ```bash
 # Auto-detect research folder (recommended)
-/maister:development-new .maister/tasks/research/2026-01-12-oauth-research
+/maister:development .maister/tasks/research/2026-01-12-oauth-research
 
 # Explicit --research flag
-/maister:development-new "Implement OAuth" --research=.maister/tasks/research/2026-01-12-oauth-research
+/maister:development "Implement OAuth" --research=.maister/tasks/research/2026-01-12-oauth-research
 ```
 Research context flows through ALL phases without skipping any. Research artifacts are copied to `analysis/research-context/` and summaries pass to every subagent via Pattern 7.
-
-#### Other Workflow Commands
-
-| Command | Usage | Task Directory |
-|---------|-------|----------------|
-| `/maister:performance-new` | `[desc] [--yolo]` | `.maister/tasks/performance/`  |
-| `/maister:performance-resume` | `[path] [--from=phase]` | |
-| `/maister:migration-new` | `[desc] [--yolo] [--type=TYPE]` | `.maister/tasks/migrations/` |
-| `/maister:migration-resume` | `[path] [--from=phase]` | |
-| `/maister:research-new` | `[question] [--yolo] [--type=TYPE] [--brainstorm] [--no-brainstorm] [--design] [--no-design]` | `.maister/tasks/research/` |
-| `/maister:research-resume` | `[path] [--from=phase]` | |
 
 ### Review & Audit Commands
 
@@ -557,9 +546,9 @@ Subagents are specialized AI agents invoked by skills and orchestrators. All age
 | `project-analyzer` | Deep codebase analysis for tech stack, architecture, conventions | `/maister:init` | `agents/project-analyzer.md` |
 | `docs-operator` | Internal service agent: executes docs-manager operations mid-workflow via Task tool. Has docs-manager skill preloaded. **Special case**: companion agent pattern only works here because docs-manager does NOT spawn subagents (only file operations). Do not use this pattern for skills that spawn subagents. | init, standards-update, standards-discover | `agents/docs-operator.md` |
 | `task-classifier` | Classifies task descriptions into workflow types with confidence scoring | `/work` command | `agents/task-classifier.md` |
-| `gap-analyzer` | Compares current vs desired state with characteristic-detection-based analysis modules | development-orchestrator | `agents/gap-analyzer.md` |
-| `specification-creator` | Creates specs from gathered requirements with reusability search and self-verification | development-orchestrator, migration-orchestrator | `agents/specification-creator.md` |
-| `implementation-planner` | Breaks specs into task groups with test-driven steps and dependency chains | development-orchestrator, migration-orchestrator | `agents/implementation-planner.md` |
+| `gap-analyzer` | Compares current vs desired state with characteristic-detection-based analysis modules | development orchestrator | `agents/gap-analyzer.md` |
+| `specification-creator` | Creates specs from gathered requirements with reusability search and self-verification | development, migration orchestrators | `agents/specification-creator.md` |
+| `implementation-planner` | Breaks specs into task groups with test-driven steps and dependency chains | development, migration orchestrators | `agents/implementation-planner.md` |
 | `codebase-analysis-reporter` | Merges raw Explore agent findings into structured analysis report with deduplication, cross-referencing, and risk assessment | codebase-analyzer skill | `agents/codebase-analysis-reporter.md` |
 
 **Deprecated Agent**:
@@ -569,25 +558,25 @@ Subagents are specialized AI agents invoked by skills and orchestrators. All age
 
 | Agent | Purpose | Invoked By | Details |
 |-------|---------|------------|---------|
-| `ui-mockup-generator` | ASCII mockups showing UI integration with existing layouts | development-orchestrator (feature/enhancement) | `agents/ui-mockup-generator.md` |
-| `e2e-test-verifier` | Runtime browser verification via Playwright MCP tools (not test file generation) | development-orchestrator (optional) | `agents/e2e-test-verifier.md` |
-| `user-docs-generator` | User documentation with Playwright screenshots | development-orchestrator (optional) | `agents/user-docs-generator.md` |
+| `ui-mockup-generator` | ASCII mockups showing UI integration with existing layouts | development orchestrator (feature/enhancement) | `agents/ui-mockup-generator.md` |
+| `e2e-test-verifier` | Runtime browser verification via Playwright MCP tools (not test file generation) | development orchestrator (optional) | `agents/e2e-test-verifier.md` |
+| `user-docs-generator` | User documentation with Playwright screenshots | development orchestrator (optional) | `agents/user-docs-generator.md` |
 
 ### Performance Agents
 
 | Agent | Purpose | Invoked By | Details |
 |-------|---------|------------|---------|
-| `bottleneck-analyzer` | Static code analysis detecting N+1 queries, missing indexes, O(n^2) algorithms, blocking I/O, memory leak patterns. Optionally incorporates user-provided profiling data. | performance-orchestrator | `agents/bottleneck-analyzer.md` |
+| `bottleneck-analyzer` | Static code analysis detecting N+1 queries, missing indexes, O(n^2) algorithms, blocking I/O, memory leak patterns. Optionally incorporates user-provided profiling data. | performance orchestrator | `agents/bottleneck-analyzer.md` |
 
 ### Research Agents
 
 | Agent | Purpose | Invoked By | Details |
 |-------|---------|------------|---------|
-| `research-planner` | Creates methodology and identifies sources | research-orchestrator | `agents/research-planner.md` |
-| `information-gatherer` | Multi-source data collection with citations | research-orchestrator | `agents/information-gatherer.md` |
-| `research-synthesizer` | Pattern identification, insights generation | research-orchestrator | `agents/research-synthesizer.md` |
-| `solution-brainstormer` | Solution alternatives with multi-perspective trade-off analysis | research-orchestrator | `agents/solution-brainstormer.md` |
-| `solution-designer` | High-level C4 architecture design and ADR documentation | research-orchestrator | `agents/solution-designer.md` |
+| `research-planner` | Creates methodology and identifies sources | research orchestrator | `agents/research-planner.md` |
+| `information-gatherer` | Multi-source data collection with citations | research orchestrator | `agents/information-gatherer.md` |
+| `research-synthesizer` | Pattern identification, insights generation | research orchestrator | `agents/research-synthesizer.md` |
+| `solution-brainstormer` | Solution alternatives with multi-perspective trade-off analysis | research orchestrator | `agents/solution-brainstormer.md` |
+| `solution-designer` | High-level C4 architecture design and ADR documentation | research orchestrator | `agents/solution-designer.md` |
 
 ### Verification Agents
 
@@ -596,7 +585,7 @@ Subagents are specialized AI agents invoked by skills and orchestrators. All age
 | `implementation-completeness-checker` | Plan completion + standards compliance + documentation completeness | implementation-verifier | `agents/implementation-completeness-checker.md` |
 | `test-suite-runner` | Runs full test suite, analyzes results, flags regressions | implementation-verifier | `agents/test-suite-runner.md` |
 | `code-reviewer` | Automated code quality, security, performance analysis | implementation-verifier, standalone command | `agents/code-reviewer.md` |
-| `production-readiness-checker` | Pre-deployment verification with GO/NO-GO recommendation | implementation-verifier, performance-orchestrator, standalone command | `agents/production-readiness-checker.md` |
+| `production-readiness-checker` | Pre-deployment verification with GO/NO-GO recommendation | implementation-verifier, performance orchestrator, standalone command | `agents/production-readiness-checker.md` |
 
 ### Review & Audit Agents
 

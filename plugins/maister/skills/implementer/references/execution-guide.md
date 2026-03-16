@@ -74,7 +74,7 @@ When subagent creates a change plan, expect this structure:
 ### Phase 1: Read Standards Compliance Section (BLOCKING)
 
 1. Parse `implementation-plan.md` for "## Standards Compliance" section
-2. Extract all file paths (e.g., `skills/development-orchestrator/SKILL.md`, `.maister/docs/standards/global/`)
+2. Extract all file paths (e.g., `skills/development/SKILL.md`, `.maister/docs/standards/global/`)
 3. **READ each file** using Read tool - do NOT skip
 4. Initialize Standards Reading Log in work-log.md
 
@@ -110,7 +110,7 @@ When subagent creates a change plan, expect this structure:
 ## Standards Reading Log
 
 ### From Implementation Plan (Phase 1)
-- [x] skills/development-orchestrator/SKILL.md - Read at 2025-01-15 10:30
+- [x] skills/development/SKILL.md - Read at 2025-01-15 10:30
 - [x] .maister/docs/standards/global/naming.md - Read at 2025-01-15 10:31
 
 ### Discovered During Implementation

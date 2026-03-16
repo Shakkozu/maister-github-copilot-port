@@ -4,7 +4,7 @@
 
 **Purpose:** Pattern guide for the three migration types: Code, Data, and Architecture
 
-This reference provides characteristics, detection patterns, and workflow adaptations for each migration type supported by the migration-orchestrator.
+This reference provides characteristics, detection patterns, and workflow adaptations for each migration type supported by the migration orchestrator.
 
 ---
 

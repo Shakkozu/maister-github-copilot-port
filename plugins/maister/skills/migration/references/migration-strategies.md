@@ -4,7 +4,7 @@
 
 **Purpose:** Pattern guide for migration execution strategies (incremental, rollback, dual-run)
 
-This reference provides decision criteria and implementation patterns for the three core migration strategies supported by the migration-orchestrator.
+This reference provides decision criteria and implementation patterns for the three core migration strategies supported by the migration orchestrator.
 
 ---
 
@@ -21,7 +21,7 @@ This reference provides decision criteria and implementation patterns for the th
 
 ## Overview
 
-Migration strategies define **how** to execute the transition from current to target state. The migration-orchestrator supports three core strategies, which can be combined:
+Migration strategies define **how** to execute the transition from current to target state. The migration orchestrator supports three core strategies, which can be combined:
 
 | Strategy | Purpose | Risk Level | Use When |
 |----------|---------|------------|----------|

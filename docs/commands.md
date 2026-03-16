@@ -17,9 +17,9 @@ The plugin classifies the task type with confidence scoring, asks for confirmati
 
 ## Development
 
-### `/maister:development-new [description]`
+### `/maister:development [description | task-path]`
 
-Starts the unified development workflow (14 adaptive phases). All arguments are optional — when run without a description, the plugin extracts it from your current conversation. Task type (bug/enhancement/feature) is auto-detected from context when `--type` is omitted.
+Starts the unified development workflow (14 adaptive phases) or resumes an existing one. All arguments are optional — when run without a description, the plugin extracts it from your current conversation. Pass an existing task path to resume. Task type (bug/enhancement/feature) is auto-detected from context when `--type` is omitted.
 
 | Flag | Description |
 |------|-------------|
@@ -29,83 +29,56 @@ Starts the unified development workflow (14 adaptive phases). All arguments are 
 | `--user-docs` | Generate user documentation phase |
 | `--code-review` | Include code review phase |
 | `--research=PATH` | Start development informed by a completed research task |
-| `--from=PHASE` | Start from a specific phase |
+| `--from=PHASE` | Start from or resume at a specific phase |
+| `--reset-attempts` | Reset failed attempt counters (resume) |
 
 **Task directory**: `.maister/tasks/development/`
-
-### `/maister:development-resume [task-path]`
-
-Resume an interrupted development workflow from where it left off.
-
-| Flag | Description |
-|------|-------------|
-| `--from=PHASE` | Override resume point (`analysis`, `gap`, `spec`, `plan`, `implement`, `verify`) |
-| `--reset-attempts` | Reset failed attempt counters |
-
-### Shorthand Aliases
-
-| Alias | Equivalent |
-|-------|-----------|
-| `/maister:feature-new [desc]` | `/maister:development-new --type=feature [desc]` |
-| `/maister:feature-resume` | `/maister:development-resume` |
-| `/maister:enhancement-new [desc]` | `/maister:development-new --type=enhancement [desc]` |
-| `/maister:enhancement-resume` | `/maister:development-resume` |
-| `/maister:bug-fix-new [desc]` | `/maister:development-new --type=bug [desc]` |
-| `/maister:bug-fix-resume` | `/maister:development-resume` |
+**Resume phases**: `analysis`, `gap`, `spec`, `plan`, `implement`, `verify`
 
 ---
 
 ## Performance
 
-### `/maister:performance-new [description]`
+### `/maister:performance [description | task-path]`
 
-Starts performance optimization with static bottleneck analysis (9 phases). Can be run without arguments — the plugin extracts the optimization target from your conversation. Detects N+1 queries, missing indexes, O(n^2) algorithms, blocking I/O, and memory leak patterns.
+Starts performance optimization with static bottleneck analysis (9 phases) or resumes an existing one. Can be run without arguments — the plugin extracts the optimization target from your conversation. Detects N+1 queries, missing indexes, O(n^2) algorithms, blocking I/O, and memory leak patterns.
 
 | Flag | Description |
 |------|-------------|
 | `--yolo` | Continuous execution |
+| `--from=PHASE` | Start from or resume at a specific phase |
+| `--reset-attempts` | Reset failed attempt counters (resume) |
 
 You can optionally provide profiling data (flame graphs, APM screenshots) — the workflow creates a directory for these.
 
 **Task directory**: `.maister/tasks/performance/`
-
-### `/maister:performance-resume [task-path]`
-
-| Flag | Description |
-|------|-------------|
-| `--from=PHASE` | Override resume point (`analysis`, `specification`, `planning`, `implementation`, `verification`) |
-| `--reset-attempts` | Reset failed attempt counters |
+**Resume phases**: `analysis`, `specification`, `planning`, `implementation`, `verification`
 
 ---
 
 ## Migration
 
-### `/maister:migration-new [description]`
+### `/maister:migration [description | task-path]`
 
-Starts migration workflow (8 phases) with mandatory rollback planning and risk assessment. Can be run without arguments — the plugin extracts migration details from your conversation.
+Starts migration workflow (8 phases) with mandatory rollback planning and risk assessment, or resumes an existing one. Can be run without arguments — the plugin extracts migration details from your conversation.
 
 | Flag | Description |
 |------|-------------|
 | `--yolo` | Continuous execution |
 | `--type=code\|data\|architecture\|general` | Migration type (affects risk focus) |
-| `--from=PHASE` | Start from a specific phase |
+| `--from=PHASE` | Start from or resume at a specific phase |
+| `--reset-attempts` | Reset failed attempt counters (resume) |
 
 **Task directory**: `.maister/tasks/migrations/`
-
-### `/maister:migration-resume [task-path]`
-
-| Flag | Description |
-|------|-------------|
-| `--from=PHASE` | Override resume point (`analysis`, `target`, `spec`, `plan`, `execute`, `verify`, `docs`) |
-| `--reset-attempts` | Reset failed attempt counters |
+**Resume phases**: `analysis`, `target`, `spec`, `plan`, `execute`, `verify`, `docs`
 
 ---
 
 ## Research
 
-### `/maister:research-new [question]`
+### `/maister:research [question | task-path]`
 
-Starts research workflow (8 phases) with multi-source gathering, synthesis, and optional solution brainstorming. Can be run without arguments — the plugin extracts the research question from your conversation.
+Starts research workflow (8 phases) with multi-source gathering, synthesis, and optional solution brainstorming, or resumes an existing one. Can be run without arguments — the plugin extracts the research question from your conversation.
 
 | Flag | Description |
 |------|-------------|
@@ -113,18 +86,13 @@ Starts research workflow (8 phases) with multi-source gathering, synthesis, and 
 | `--type=technical\|requirements\|literature\|mixed` | Research methodology type |
 | `--brainstorm` | Force brainstorming + design phases |
 | `--no-brainstorm` | Skip brainstorming phases |
-| `--from=PHASE` | Start from a specific phase |
+| `--from=PHASE` | Start from or resume at a specific phase |
+| `--reset-attempts` | Reset failed attempt counters (resume) |
 
-Research output can feed into development: `/maister:development-new --research=.maister/tasks/research/...`
+Research output can feed into development: `/maister:development --research=.maister/tasks/research/...`
 
 **Task directory**: `.maister/tasks/research/`
-
-### `/maister:research-resume [task-path]`
-
-| Flag | Description |
-|------|-------------|
-| `--from=PHASE` | Override resume point (`foundation`, `brainstorming-decision`, `brainstorming`, `design`, `outputs`, `verification`, `integration`) |
-| `--reset-attempts` | Reset failed attempt counters |
+**Resume phases**: `foundation`, `brainstorming-decision`, `brainstorming`, `design`, `outputs`, `verification`, `integration`
 
 ---
 
@@ -230,6 +198,6 @@ Standards compliance checklist is required in the plan file before exiting plan 
 
 Lightweight TDD-driven bug fix without a full orchestrator workflow. Analyzes the bug, writes a failing test, implements the fix, and verifies the test passes.
 
-**When to use**: Simple, isolated bugs where you can quickly identify the root cause. If the bug is too complex (multiple files, unclear root cause, architectural impact), the skill suggests escalating to `/maister:development-new`.
+**When to use**: Simple, isolated bugs where you can quickly identify the root cause. If the bug is too complex (multiple files, unclear root cause, architectural impact), the skill suggests escalating to `/maister:development`.
 
 No task directory created — works directly in your codebase.

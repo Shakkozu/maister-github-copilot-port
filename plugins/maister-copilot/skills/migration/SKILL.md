@@ -1,7 +1,7 @@
 ---
-name: migration-orchestrator
+name: migration
 description: Orchestrates the complete migration workflow from current state analysis through implementation to compatibility verification. Handles technology migrations, platform changes, and architecture pattern transitions with adaptive risk assessment, incremental execution, and rollback planning. Supports interactive mode (pause between phases) and YOLO mode (continuous execution). Use when migrating technologies, platforms, or architecture patterns.
-user-invocable: false
+user-invocable: true
 ---
 
 # Migration Orchestrator
@@ -90,9 +90,9 @@ Use for:
 
 **Purpose**: Comprehensive analysis of current system before migration, followed by scope/requirements clarification
 **Execute**:
-1. Skill tool - `maister:codebase-analyzer`
+1. Skill tool - `maister-codebase-analyzer`
 2. Update state with analysis results
-3. Direct - use AskUserQuestion for max 5 critical clarifying questions about migration scope, target system, and constraints
+3. Direct - use ask_user for max 5 critical clarifying questions about migration scope, target system, and constraints
 4. Save clarifications to `analysis/clarifications.md`
 **Output**: `analysis/current-state-analysis.md`, `analysis/clarifications.md`
 **State**: Update task_context with current system info, `task_context.clarifications_resolved`
@@ -106,7 +106,7 @@ Use for:
 ### Phase 2: Target State Planning & Gap Analysis
 
 **Purpose**: Define target system and identify migration gaps
-**Execute**: Task tool - `maister:gap-analyzer` subagent
+**Execute**: Task tool - `maister-gap-analyzer` subagent
 **Output**: `analysis/target-state-plan.md`
 **State**: Update `migration_context.migration_type`, `target_system`, `risk_level`, `breaking_changes`
 
@@ -119,7 +119,7 @@ Use for:
 
 → Pause
 
-**Interactive**: AskUserQuestion - "Gap analysis complete. Continue to migration strategy?"
+**Interactive**: ask_user - "Gap analysis complete. Continue to migration strategy?"
 **YOLO**: "→ Continuing to Phase 3..."
 
 ---
@@ -130,7 +130,7 @@ Use for:
 **Execute**:
 
 **Part A — Migration Requirements Gathering (inline)**:
-1. Direct - use AskUserQuestion for migration-specific requirements (3-5 questions):
+1. Direct - use ask_user for migration-specific requirements (3-5 questions):
    - Migration scope and boundaries (what's in/out of migration)
    - Rollback expectations and downtime tolerance
    - Data migration specifics (if data migration type)
@@ -140,7 +140,7 @@ Use for:
 2. Save gathered requirements to `analysis/requirements.md`
 
 **Part B — Specification Creation (subagent)**:
-3. Task tool - `maister:specification-creator` subagent
+3. Task tool - `maister-specification-creator` subagent
 
 **Context to pass to subagent**: task_path, task_type (migration), task_description, requirements_path (analysis/requirements.md), project_context_paths, migration_type, current_system, target_system, risk_level, breaking_changes, phase_summaries (current_state_analysis, gap_analysis)
 
@@ -151,7 +151,7 @@ Use for:
 
 → Pause
 
-**Interactive**: AskUserQuestion - "Migration specification complete. Continue to implementation planning?"
+**Interactive**: ask_user - "Migration specification complete. Continue to implementation planning?"
 **YOLO**: "→ Continuing to Phase 4..."
 
 ---
@@ -159,7 +159,7 @@ Use for:
 ### Phase 4: Implementation Planning
 
 **Purpose**: Break migration into task groups with rollback steps
-**Execute**: Task tool - `maister:implementation-planner` subagent
+**Execute**: Task tool - `maister-implementation-planner` subagent
 **Output**: `implementation/implementation-plan.md` with rollback procedures
 **State**: Update task groups and dependencies
 
@@ -167,7 +167,7 @@ Use for:
 
 → Pause
 
-**Interactive**: AskUserQuestion - "Implementation plan ready. Continue to execute migration?"
+**Interactive**: ask_user - "Implementation plan ready. Continue to execute migration?"
 **YOLO**: "→ Continuing to Phase 5..."
 
 ---
@@ -182,13 +182,13 @@ Use for:
 
 **INVOKE NOW** — Skill tool call:
 
-**Execute**: Skill tool - `maister:implementer`
+**Execute**: Skill tool - `maister-implementer`
 **Output**: Implemented migration changes, `implementation/work-log.md`
 **State**: Update implementation progress, extract phase_summaries.implementation
 
 📋 **Standards Reminder**: Review `.maister/docs/INDEX.md` before implementing.
 
-**SELF-CHECK**: Did you just invoke the Skill tool with `maister:implementer`? Or did you start writing migration code yourself? If the latter, STOP immediately and invoke the Skill tool instead.
+**SELF-CHECK**: Did you just invoke the Skill tool with `maister-implementer`? Or did you start writing migration code yourself? If the latter, STOP immediately and invoke the Skill tool instead.
 
 **⚠️ POST-IMPLEMENTATION CONTINUATION** — After the skill completes and returns control:
 1. Read `orchestrator-state.yml` to confirm you are the orchestrator
@@ -197,7 +197,7 @@ Use for:
 
 → Pause
 
-**Interactive**: AskUserQuestion - "Migration execution complete. Continue to verification?"
+**Interactive**: ask_user - "Migration execution complete. Continue to verification?"
 **YOLO**: "→ Continuing to Phase 6..."
 
 ---
@@ -205,7 +205,7 @@ Use for:
 ### Phase 6: Verification + Compatibility Testing
 
 **Purpose**: Verify migration success with compatibility and rollback testing
-**Execute**: Skill tool - `maister:implementation-verifier`
+**Execute**: Skill tool - `maister-implementation-verifier`
 **Output**: `verification/implementation-verification.md`, `verification/compatibility-test-results.md`
 **State**: Update verification results
 
@@ -222,7 +222,7 @@ Use for:
 
 → Pause
 
-**Interactive**: AskUserQuestion - "Verification complete. [verdict summary]. Continue to Phase [7 or 8]?"
+**Interactive**: ask_user - "Verification complete. [verdict summary]. Continue to Phase [7 or 8]?"
 **YOLO**: "→ Continuing to Phase [7 or 8]..."
 
 ---
@@ -239,7 +239,7 @@ Use for:
 **Process**:
 1. Parse issues (categorize: auto-fixable, needs decision, not fixable)
 2. Apply auto-fixes (test fixes, config adjustments, deprecation warnings)
-3. For user decisions: AskUserQuestion with rollback option
+3. For user decisions: ask_user with rollback option
 4. Re-verify after fixes (max 3 iterations)
 
 **Data Safety Critical**: HALT on any data integrity issue - never auto-fix data problems.
@@ -251,7 +251,7 @@ Use for:
 
 → Pause
 
-**Interactive**: AskUserQuestion - "Issues resolved. Continue to documentation?"
+**Interactive**: ask_user - "Issues resolved. Continue to documentation?"
 **YOLO**: "→ Continuing to Phase 8..."
 
 ---
@@ -259,7 +259,7 @@ Use for:
 ### Phase 8: Documentation (Optional)
 
 **Purpose**: Create migration guide for end users
-**Execute**: Task tool - `maister:user-docs-generator` subagent
+**Execute**: Task tool - `maister-user-docs-generator` subagent
 **Output**: `documentation/migration-guide.md`
 **State**: Set documentation complete
 
@@ -357,7 +357,7 @@ options:
 ## Command Integration
 
 Invoked via:
-- `/maister:migration-new [description] [--yolo] [--type=TYPE]`
-- `/maister:migration-resume [task-path] [--from=PHASE]`
+- `/maister-migration [description] [--yolo] [--type=TYPE]` (new)
+- `/maister-migration [task-path] [--from=PHASE]` (resume)
 
 Task directory: `.maister/tasks/migrations/YYYY-MM-DD-task-name/`

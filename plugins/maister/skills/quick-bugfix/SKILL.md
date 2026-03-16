@@ -8,7 +8,7 @@ argument-hint: "[bug description]"
 
 Lightweight TDD-driven bug fix workflow with planning mode. Analyze the bug, present a fix plan for approval, then reproduce with a failing test, fix, and verify. No orchestrator state, no task directory, no subagents.
 
-For complex bugs that grow beyond a quick fix, suggests escalating to the full development workflow (`/maister:development-new`).
+For complex bugs that grow beyond a quick fix, suggests escalating to the full development workflow (`/maister:development`).
 
 ## Usage
 
@@ -25,7 +25,7 @@ For complex bugs that grow beyond a quick fix, suggests escalating to the full d
 - You have a clear description of expected vs actual behavior
 - Fix likely touches a small number of files
 
-**Use `/maister:development-new` instead when:**
+**Use `/maister:development` instead when:**
 - Bug requires architectural changes
 - Multiple subsystems are involved
 - You need formal specification and planning
@@ -106,7 +106,7 @@ Use AskUserQuestion:
 - Question: "This bug appears more complex than a quick fix — [describe why]. How would you like to proceed?"
 - Options:
   1. "Continue with quick fix" — proceed, accepting the complexity
-  2. "Switch to full development workflow" — stop here and suggest running `/maister:development-new` with the bug description and analysis context
+  2. "Switch to full development workflow" — stop here and suggest running `/maister:development` with the bug description and analysis context
 
 **If no escalation needed or user chooses to continue:** proceed to Step 4.
 
@@ -190,7 +190,7 @@ If any section is missing, add it before calling ExitPlanMode.
 
 **If still failing after 3 attempts:**
 - Stop and present findings to the user
-- Suggest escalating to `/maister:development-new` for a more thorough approach
+- Suggest escalating to `/maister:development` for a more thorough approach
 
 ### Step 7: Summary
 

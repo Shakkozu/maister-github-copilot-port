@@ -1,7 +1,7 @@
 ---
-name: performance-orchestrator
+name: performance
 description: Orchestrates performance optimization workflows using static code analysis to identify bottlenecks (N+1 queries, missing indexes, O(n^2) algorithms, blocking I/O, memory leaks). Accepts optional user-provided profiling data. Reuses standard specification, planning, implementation, and verification phases.
-user-invocable: false
+user-invocable: true
 ---
 
 # Performance Orchestrator
@@ -84,9 +84,9 @@ Use for:
 
 **Purpose**: Comprehensive codebase exploration for performance context, followed by scope/requirements clarification
 **Execute**:
-1. Skill tool - `maister:codebase-analyzer`
+1. Skill tool - `maister-codebase-analyzer`
 2. Update state with analysis results
-3. Direct - use AskUserQuestion for max 5 critical clarifying questions about performance concerns, hotspots, and optimization goals
+3. Direct - use ask_user for max 5 critical clarifying questions about performance concerns, hotspots, and optimization goals
 4. Save clarifications to `analysis/clarifications.md`
 **Output**: `analysis/codebase-analysis.md`, `analysis/clarifications.md`
 **State**: Update `performance_context.phase_summaries.codebase_analysis`, `task_context.clarifications_resolved`
@@ -102,13 +102,13 @@ Pass `task_type="enhancement"` and the performance-focused description. The code
 ### Phase 2: Static Performance Analysis
 
 **Purpose**: Identify bottlenecks through static code analysis + optional user profiling data
-**Execute**: Task tool - `maister:bottleneck-analyzer` subagent
+**Execute**: Task tool - `maister-bottleneck-analyzer` subagent
 **Output**: `analysis/performance-analysis.md`
 **State**: Update `performance_context.bottlenecks_identified`, `performance_context.user_data_available`, `performance_context.bottleneck_priorities`
 
 **Process**:
 1. Check if `analysis/user-profiling-data/` contains any files
-2. If empty, use AskUserQuestion:
+2. If empty, use ask_user:
    - Question: "Do you have profiling data to provide (flame graphs, APM screenshots, slow query logs)?"
    - Options: "Yes, let me add files to analysis/user-profiling-data/" | "No, proceed with static analysis only"
 3. If user chooses to add files, wait for them, then proceed
@@ -119,15 +119,15 @@ Pass `task_type="enhancement"` and the performance-focused description. The code
 
 **INVOKE NOW** — Task tool call:
 
-4. Task tool - `maister:bottleneck-analyzer` subagent
+4. Task tool - `maister-bottleneck-analyzer` subagent
 
 **Context to pass**: task_path, description, codebase analysis summary from Phase 1, user data paths (if any)
 
-**SELF-CHECK**: Did you just invoke the Task tool with `maister:bottleneck-analyzer`? Or did you start analyzing code yourself? If the latter, STOP and invoke the Task tool.
+**SELF-CHECK**: Did you just invoke the Task tool with `maister-bottleneck-analyzer`? Or did you start analyzing code yourself? If the latter, STOP and invoke the Task tool.
 
 → Pause
 
-**Interactive**: AskUserQuestion - "Performance analysis complete. [N] bottlenecks identified ([P0 count] P0, [P1 count] P1). Continue to specification?"
+**Interactive**: ask_user - "Performance analysis complete. [N] bottlenecks identified ([P0 count] P0, [P1 count] P1). Continue to specification?"
 **YOLO**: "→ Continuing to Phase 3..."
 
 ---
@@ -141,7 +141,7 @@ Pass `task_type="enhancement"` and the performance-focused description. The code
 **Part A — Requirements Gathering (inline)**:
 
 1. Present bottleneck summary from Phase 2 to user
-2. Use AskUserQuestion for optimization priorities:
+2. Use ask_user for optimization priorities:
    - Which bottleneck priorities to address? (All P0+P1, P0 only, specific ones)
    - Any constraints? (backward compatibility, memory limits, no new dependencies)
    - Performance targets? (specific response time goals, if known)
@@ -159,15 +159,15 @@ Pass `task_type="enhancement"` and the performance-focused description. The code
 
 **INVOKE NOW** — Task tool call:
 
-4. Task tool - `maister:specification-creator` subagent
+4. Task tool - `maister-specification-creator` subagent
 
 **Context to pass**: task_path, task_type="performance", task_description, requirements_path (analysis/requirements.md), project_context_paths (INDEX.md, vision.md, roadmap.md, tech-stack.md), phase_summaries (codebase_analysis, bottleneck_analysis)
 
-**SELF-CHECK**: Did you just invoke the Task tool with `maister:specification-creator`? Or did you start writing spec.md yourself? If the latter, STOP and invoke the Task tool.
+**SELF-CHECK**: Did you just invoke the Task tool with `maister-specification-creator`? Or did you start writing spec.md yourself? If the latter, STOP and invoke the Task tool.
 
 → Pause
 
-**Interactive**: AskUserQuestion - "Specification created. Continue to Phase 4?"
+**Interactive**: ask_user - "Specification created. Continue to Phase 4?"
 **YOLO**: "→ Continuing to Phase 4..."
 
 ---
@@ -175,19 +175,19 @@ Pass `task_type="enhancement"` and the performance-focused description. The code
 ### Phase 4: Specification Audit (Conditional)
 
 **Purpose**: Independent review of optimization specification
-**Execute**: Task tool - `maister:spec-auditor` subagent
+**Execute**: Task tool - `maister-spec-auditor` subagent
 **Output**: `verification/spec-audit.md`
 **State**: Update `options.spec_audit_enabled`
 
 **Run if**: >5 optimizations planned, spec >50 lines, or user requests
 **Skip if**: Simple optimization (1-3 changes)
 
-**Interactive**: AskUserQuestion to decide - "Run specification audit?"
+**Interactive**: ask_user to decide - "Run specification audit?"
 **YOLO**: Auto-decide based on optimization count
 
 → Pause
 
-**Interactive**: AskUserQuestion - "Audit complete. Continue to Phase 5?"
+**Interactive**: ask_user - "Audit complete. Continue to Phase 5?"
 **YOLO**: "→ Continuing to Phase 5..."
 
 ---
@@ -204,17 +204,17 @@ Pass `task_type="enhancement"` and the performance-focused description. The code
 
 **INVOKE NOW** — Task tool call:
 
-**Execute**: Task tool - `maister:implementation-planner` subagent
+**Execute**: Task tool - `maister-implementation-planner` subagent
 **Output**: `implementation/implementation-plan.md`
 **State**: Update task groups and dependencies
 
 **Context to pass**: task_path, task_type="performance", task_description, phase_summaries (specification, bottleneck_analysis, codebase_analysis)
 
-**SELF-CHECK**: Did you just invoke the Task tool with `maister:implementation-planner`? Or did you start writing the plan yourself? If the latter, STOP and invoke the Task tool.
+**SELF-CHECK**: Did you just invoke the Task tool with `maister-implementation-planner`? Or did you start writing the plan yourself? If the latter, STOP and invoke the Task tool.
 
 → Pause
 
-**Interactive**: AskUserQuestion - "Implementation plan created. Continue to Phase 6?"
+**Interactive**: ask_user - "Implementation plan created. Continue to Phase 6?"
 **YOLO**: "→ Continuing to Phase 6..."
 
 ---
@@ -231,11 +231,11 @@ Pass `task_type="enhancement"` and the performance-focused description. The code
 
 **INVOKE NOW** — Skill tool call:
 
-**Execute**: Skill tool - `maister:implementation-plan-executor`
+**Execute**: Skill tool - `maister-implementation-plan-executor`
 **Output**: Implemented optimizations, `implementation/work-log.md`
 **State**: Update implementation progress, extract phase_summaries.implementation
 
-**SELF-CHECK**: Did you just invoke the Skill tool with `maister:implementation-plan-executor`? Or did you start writing code yourself? If the latter, STOP immediately and invoke the Skill tool instead.
+**SELF-CHECK**: Did you just invoke the Skill tool with `maister-implementation-plan-executor`? Or did you start writing code yourself? If the latter, STOP immediately and invoke the Skill tool instead.
 
 **⚠️ POST-IMPLEMENTATION CONTINUATION** — After the skill completes and returns control:
 1. Read `orchestrator-state.yml` to confirm you are the orchestrator
@@ -244,7 +244,7 @@ Pass `task_type="enhancement"` and the performance-focused description. The code
 
 → Pause
 
-**Interactive**: AskUserQuestion - "Implementation complete. Continue to Phase 7?"
+**Interactive**: ask_user - "Implementation complete. Continue to Phase 7?"
 **YOLO**: "→ Continuing to Phase 7..."
 
 ---
@@ -252,21 +252,21 @@ Pass `task_type="enhancement"` and the performance-focused description. The code
 ### Phase 7: Verification Options
 
 **Purpose**: Determine which verification checks to run
-**Execute**: Direct - use AskUserQuestion for options
+**Execute**: Direct - use ask_user for options
 **Output**: Updated state with verification options
 **State**: Set `options.code_review_enabled`, `options.pragmatic_review_enabled`, `options.production_check_enabled`, `options.reality_check_enabled`
 
 **Always enabled**: Reality check, pragmatic review
 **Auto-set**: `skip_test_suite: true` (full test suite already passed during implementation phase; cleared before re-verification if fixes are applied)
 
-**Interactive**: AskUserQuestion with multiselect - "Which additional verification checks?"
+**Interactive**: ask_user with sequential single-select - "Which additional verification checks?"
   - "Code review" (recommended)
   - "Production readiness check"
 **YOLO**: Auto-enable code review, skip production readiness
 
 → Pause
 
-**Interactive**: AskUserQuestion - "Options selected. Continue to Phase 8?"
+**Interactive**: ask_user - "Options selected. Continue to Phase 8?"
 **YOLO**: "→ Continuing to Phase 8..."
 
 ---
@@ -275,8 +275,8 @@ Pass `task_type="enhancement"` and the performance-focused description. The code
 
 **Purpose**: Comprehensive implementation verification with fix-then-reverify cycles
 **Execute**:
-1. Skill tool - `maister:implementation-verifier`
-2. If issues found: Fix trivial issues directly, AskUserQuestion for non-trivial
+1. Skill tool - `maister-implementation-verifier`
+2. If issues found: Fix trivial issues directly, ask_user for non-trivial
 3. Before re-verification: set `skip_test_suite: false` (code changed, tests must re-run)
 4. Re-verify after fixes (max 3 fix-then-reverify cycles)
 **Output**: `verification/implementation-verification.md`, optional review reports
@@ -284,7 +284,7 @@ Pass `task_type="enhancement"` and the performance-focused description. The code
 
 → Pause
 
-**Interactive**: AskUserQuestion - "Verification complete. Continue to finalization?"
+**Interactive**: ask_user - "Verification complete. Continue to finalization?"
 **YOLO**: "→ Continuing to Phase 9..."
 
 ---
@@ -383,7 +383,7 @@ options:
 ## Command Integration
 
 Invoked via:
-- `/maister:performance-new [description] [--yolo]`
-- `/maister:performance-resume [task-path]`
+- `/maister-performance [description] [--yolo]` (new)
+- `/maister-performance [task-path] [--from=PHASE]` (resume)
 
 Task directory: `.maister/tasks/performance/YYYY-MM-DD-task-name/`
