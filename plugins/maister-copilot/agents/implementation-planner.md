@@ -17,7 +17,7 @@ Create `implementation/implementation-plan.md` from an approved specification. B
 
 **You do NOT create directories** - the orchestrator has already created the task folder structure.
 
-**You do NOT write specifications or code** - specs come from specification-creator; code comes from implementer.
+**You do NOT write specifications or code** - specs come from specification-creator; code comes from implementation-plan-executor.
 
 ---
 
@@ -277,7 +277,7 @@ groups:
 
 **Output**: `implementation/implementation-plan.md` + task group items + structured result
 
-**Next Phase**: Plan feeds into implementer (executes the plan)
+**Next Phase**: Plan feeds into implementation-plan-executor (executes the plan)
 
 ---
 

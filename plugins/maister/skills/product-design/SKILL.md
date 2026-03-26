@@ -278,6 +278,8 @@ AskUserQuestion — "I detected these design characteristics. Please confirm or 
 
 Read `analysis/design-context.md` for full context (not just state summary) — use it to inform context-aware questions.
 
+**Compute and persist Phase 2 routing**: Read `design_characteristics` from `orchestrator-state.yml`. If `is_greenfield OR is_complex` → write `next_phase: "Phase 3: User & Persona Exploration"` to state. Else → write `next_phase: "Phase 4: Idea Generation"` to state.
+
 **Mode: Exploration** (announce to user)
 
 > "Let's explore the problem space. I want to understand the core challenge before we start designing solutions..."
@@ -312,9 +314,7 @@ AskUserQuestion — with options:
 **Output**: `analysis/problem-statement.md`
 **State**: Update `phase_summaries.problem_exploration` with `problem_statement`, `constraints`, `success_criteria`
 
--> Conditional: check `is_greenfield OR is_complex` -> Phase 3, else -> Phase 4
-
-AskUserQuestion — "Problem space explored. [If Phase 3 skipped: 'Skipping persona exploration (enhancement scope). ']Continue to [Phase 3: Persona Exploration / Phase 4: Idea Generation]?"
+AskUserQuestion — "Problem space explored." Read `next_phase` from `orchestrator-state.yml`. If next phase is Phase 4, prepend "Skipping persona exploration (enhancement scope). " Ask "Continue to [next_phase value]?"
 
 ---
 
@@ -461,6 +461,8 @@ AskUserQuestion — "Design direction approved. Continue to Feature Specificatio
 
 Read `analysis/design-decisions.md` for selected approach details to inform specification drafts.
 
+**Compute and persist Phase 6 routing**: Read `design_characteristics.is_ui_focused` from `orchestrator-state.yml`. If `is_ui_focused` → write `next_phase: "Phase 7: Visual Prototyping"` to state. Else → write `next_phase: "Phase 8: Review & Handoff"` to state.
+
 **Mode: Convergence** (section-by-section propose-and-refine)
 
 > "Now let's define the specification in detail. I'll draft each section for you to review and refine..."
@@ -516,9 +518,7 @@ If no gaps: proceed to Phase 7/8.
 **Output**: `analysis/feature-spec.md`
 **State**: Update `phase_summaries.feature_specification` with `spec_sections` (individually approved), `sections_count`
 
--> Conditional: check `is_ui_focused` -> Phase 7, else -> Phase 8
-
-AskUserQuestion — "Specification complete. [If Phase 7 skipped: 'No UI prototyping needed (backend-focused design). ']Continue to [Phase 7: Visual Prototyping / Phase 8: Review & Handoff]?"
+AskUserQuestion — "Specification complete." Read `next_phase` from `orchestrator-state.yml`. If next phase is Phase 8, prepend "No UI prototyping needed (backend-focused design). " Ask "Continue to [next_phase value]?"
 
 ---
 

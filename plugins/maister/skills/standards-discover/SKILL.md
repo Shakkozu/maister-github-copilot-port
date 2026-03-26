@@ -209,7 +209,7 @@ Display final results:
 | Integrates With | How |
 |-----------------|-----|
 | `docs-manager` skill | Creates/updates standard files, regenerates INDEX.md |
-| `implementer` skill | Discovered standards immediately available via INDEX.md |
+| `implementation-plan-executor` skill | Discovered standards immediately available via INDEX.md |
 | `standards-update` command | Complementary: discover = automated bulk, update = manual single |
 
 ---

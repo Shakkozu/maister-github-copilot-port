@@ -76,7 +76,7 @@ Use for:
 | 2 | "Plan target state and gaps" | "Planning target state and gaps" | gap-analyzer |
 | 3 | "Gather requirements & create migration strategy" | "Gathering requirements & creating migration strategy" | Direct + specification-creator (subagent) |
 | 4 | "Plan implementation" | "Planning implementation" | implementation-planner (subagent) |
-| 5 | "Execute migration" | "Executing migration" | implementer |
+| 5 | "Execute migration" | "Executing migration" | implementation-plan-executor |
 | 6 | "Verify and test compatibility" | "Verifying and testing compatibility" | implementation-verifier |
 | 7 | "Resolve verification issues" | "Resolving verification issues" | Direct (conditional) |
 | 8 | "Generate documentation" | "Generating documentation" | user-docs-generator (optional) |
@@ -175,18 +175,18 @@ ask_user - Display executive summary before asking. Read `implementation/impleme
 **Purpose**: Execute migration steps with incremental verification
 
 **ANTI-PATTERN — DO NOT DO THIS:**
-- ❌ "Let me implement this directly..." — STOP. Delegate to implementer.
+- ❌ "Let me implement this directly..." — STOP. Delegate to implementation-plan-executor.
 - ❌ "This migration is simple enough to code inline..." — STOP. Simplicity is NOT a reason to skip delegation.
 
 **INVOKE NOW** — Skill tool call:
 
-**Execute**: Skill tool - `maister-implementer`
+**Execute**: Skill tool - `maister-implementation-plan-executor`
 **Output**: Implemented migration changes, `implementation/work-log.md`
 **State**: Update implementation progress, extract phase_summaries.implementation
 
 📋 **Standards Reminder**: Review `.maister/docs/INDEX.md` before implementing.
 
-**SELF-CHECK**: Did you just invoke the Skill tool with `maister-implementer`? Or did you start writing migration code yourself? If the latter, STOP immediately and invoke the Skill tool instead.
+**SELF-CHECK**: Did you just invoke the Skill tool with `maister-implementation-plan-executor`? Or did you start writing migration code yourself? If the latter, STOP immediately and invoke the Skill tool instead.
 
 **⚠️ POST-IMPLEMENTATION CONTINUATION** — After the skill completes and returns control:
 1. Read `orchestrator-state.yml` to confirm you are the orchestrator

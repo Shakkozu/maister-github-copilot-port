@@ -127,9 +127,14 @@ Use for **all development tasks**: bug fixes, enhancements, new features, and an
 
 → Pause (when decisions exist), otherwise Conditional
 
-AskUserQuestion - Display executive summary before asking. Read `analysis/gap-analysis.md` and extract: task type detected, risk level, key characteristics enabled (TDD gates, UI mockups, E2E, user docs), scope decisions made (if any). Format as brief overview then "Continue to specification?"
+**ANTI-PATTERN — DO NOT DO THIS:**
+- ❌ "The UI change is small/simple, skipping Phase 4..." — STOP. If `ui_heavy` is true, Phase 4 runs. The gap-analyzer made this assessment, not you.
+- ❌ "No new screens needed, just a component..." — STOP. `ui_heavy` is a signal from the gap-analyzer. Do NOT override it with your own complexity judgment.
 
-→ Conditional: check `task_characteristics.has_reproducible_defect` → Phase 3, else check `task_characteristics.ui_heavy` → Phase 4, else skip to Phase 5
+AskUserQuestion - Display executive summary before asking. Read `analysis/gap-analysis.md` and extract: task type detected, risk level, key characteristics enabled (TDD gates, UI mockups, E2E, user docs), scope decisions made (if any). Then read `task_context.task_characteristics` from `orchestrator-state.yml` and determine the next phase:
+- If `has_reproducible_defect` is true → ask "Continue to Phase 3: TDD Red Gate?"
+- If `ui_heavy` is true → ask "Continue to Phase 4: UI Mockup Generation?"
+- Otherwise → ask "Continue to Phase 5: Technical Approach, Requirements & Specification?"
 
 ---
 
@@ -174,6 +179,8 @@ AskUserQuestion - "UI mockups complete. Continue to Phase 5?"
 ### Phase 5: Technical Approach, Requirements & Specification
 
 > **Phase gate**: Requires `AskUserQuestion` confirmation from the preceding phase before executing.
+
+**⛔ ROUTING GUARD**: Read `task_context.task_characteristics` from `orchestrator-state.yml`. If `has_reproducible_defect` is true and Phase 3 is NOT in `completed_phases` → STOP, execute Phase 3 first. If `ui_heavy` is true and Phase 4 is NOT in `completed_phases` → STOP, execute Phase 4 first.
 
 **Purpose**: Resolve technical decisions, gather specification requirements, then create comprehensive specification
 **Execute**:

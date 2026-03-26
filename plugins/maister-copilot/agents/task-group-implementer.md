@@ -228,7 +228,7 @@ If you encounter errors during implementation:
 
 ## Integration
 
-**Invoked by**: `implementation-plan-executor` skill (Mode B: Delegated)
+**Invoked by**: `implementation-plan-executor` skill
 
 **Input** (via Task tool prompt):
 - Task group content (from implementation-plan.md)

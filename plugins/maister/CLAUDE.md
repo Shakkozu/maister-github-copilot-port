@@ -345,9 +345,9 @@ Ask these questions before documenting:
 
 **✅ Principle-Based** (Guidance approach):
 ```markdown
-Orchestrates implementation from plan to verified code. Adapts execution complexity based on task size, maintains continuous standards discovery, follows test-driven approach.
+Orchestrates implementation from plan to verified code. Delegates each task group to subagent, maintains continuous standards discovery, follows test-driven approach.
 
-**See**: `skills/implementer/skill.md` for execution modes and technical details.
+**See**: `skills/implementation-plan-executor/SKILL.md` for execution model and technical details.
 ```
 
 ## Reference Documentation Guidelines
@@ -454,7 +454,6 @@ Skills are automatically invoked by Claude when appropriate. Details live in eac
 | Skill | Purpose | Details |
 |-------|---------|---------|
 | `codebase-analyzer` | Thin dispatcher: selects agent roles adaptively, launches parallel Explore subagents, delegates report synthesis to `codebase-analysis-reporter` subagent | `skills/codebase-analyzer/SKILL.md` |
-| `implementer` | Executes plans with **mandatory** standards reading (INDEX.md + implementation-plan.md Standards Compliance section + keyword-triggered) and **test step enforcement** (requires user approval to skip N.1 tests) | `skills/implementer/SKILL.md` |
 | `implementation-verifier` | Read-only QA orchestrator: delegates completeness checks, test execution, code review, and production readiness to specialized subagents; compiles results into verification report | `skills/implementation-verifier/SKILL.md` |
 | `standards-discover` | Parallel multi-source standards discovery (config, code, docs, PRs/CI) with confidence scoring | `skills/standards-discover/SKILL.md` |
 | `docs-manager` | Internal engine for doc file operations, INDEX.md generation, CLAUDE.md integration. Not user-invocable — accessed via `docs-operator` agent (Task tool) by init, standards-update, standards-discover | `skills/docs-manager/skill.md` |
@@ -600,7 +599,6 @@ Subagents are specialized AI agents invoked by skills and orchestrators. All age
 | `code-quality-pragmatist` | Detects over-engineering, ensures scale-appropriate code | implementation-verifier | `agents/code-quality-pragmatist.md` |
 | `spec-auditor` | Independent spec audit with senior auditor perspective | orchestrators | `agents/spec-auditor.md` |
 | `reality-assessor` | Validates work actually solves the problem | implementation-verifier | `agents/reality-assessor.md` |
-| `implementation-changes-planner` | Creates detailed change plans (no file modifications) | implementer | `agents/implementation-changes-planner.md` |
 
 **See**: Individual `agents/*.md` files for detailed workflows and philosophies.
 
